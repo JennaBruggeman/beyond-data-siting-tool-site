@@ -1,0 +1,606 @@
+ 
+(function(){
+'use strict';
+const BD=window.BD; const {$,esc,fmt}=BD;
+const draft=t=>`<span class="draft">${t}</span>`;
+
+ 
+ 
+const ZD=BD.data.zones, ZV=ZD.ZV, ZE=ZD.ZE, LD=ZD.loading;
+const ROOFNOTE={van:['Roof equipment','the Director of Planning may let mechanical equipment and its screening exceed the height limit','Zoning and Development By-law s. 10.1.1'],
+                edm:['Roof equipment','ventilating equipment, plumbing stacks and mechanical penthouses are not counted in height','Bylaw 20001 s. 5.70 cl. 1.9.5']};
+
+function edmMods(z){ const m={}; String(z||'').split(/\s+/).slice(1).forEach(t=>{ const a=t.match(/^h(\d+(\.\d+)?)$/), b=t.match(/^f(\d+(\.\d+)?)$/); if(a) m.h=+a[1]; if(b) m.f=+b[1]; if(t==='cf') m.cf=true; }); return m; }
+ 
+const LOWD={van:/^(R1-1|RT-\d+[A-Z]?)$/, edm:/^(RS|RSF|RR)$/};
+function lowDensity(city,z){ const k=String(z||'').trim().split(/\s+/)[0].toUpperCase(); return LOWD[city].test(k); }
+BD.lowDensity=lowDensity;
+
+function zoneLimits(city,zraw){
+  const A=BD.S.answers, z=String(zraw||'').trim(), key=city==='edm'?z.split(/\s+/)[0].toUpperCase():z;
+   
+  const vkey=key==='I-2'&&A.subB?'I-2B':key==='FC-2'&&A.fcSub&&ZV['FC-2 '+A.fcSub]?'FC-2 '+A.fcSub:key;
+  let base=city==='van'?ZV[vkey]:ZE[key], assumed=false, mods=city==='edm'?edmMods(z):{};
+  const out={zone:z,key,city,cl:[],warn:''};
+  if(!base){ assumed=true; base=city==='van'?ZV['I-2']:ZE.IM;
+    out.warn=`Zone ${esc(z||'(none recorded)')} has no data-centre limits in the tool. The numbers use ${city==='van'?'I-2':'IM'} limits as if the lot were rezoned — an assumption for comparison, not a prediction. Set your own limits below if you know them.`;
+    if(mods.h||mods.f) out.warn+=` The zoning map gives this lot ${mods.h?`a ${mods.h} m height`:''}${mods.h&&mods.f?' and ':''}${mods.f?`a floor area ratio of ${mods.f}`:''} (Bylaw 20001 modifiers, s. 8.20); these are shown, not used, because they belong to a zone where a data centre is not an allowed use.`; }
+   
+  if(base.q&&base.q.length){ const F={fsr:'floor area ratio',h:'height'}, b2=Object.assign({},base); base.q.forEach(f=>{ b2[f]=ZE.IM[f]; }); base=b2;
+    out.q=base.q; out.warn=`Zone ${esc(key)}: the by-law gives no ${base.q.map(f=>F[f]||f).join(' or ')} (?). To draw something, the tool borrows IM's ${base.q.map(f=>f==='fsr'?'floor area ratio '+ZE.IM.fsr[1]:f==='h'?'height '+ZE.IM.h+' m':f).join(' and ')}: not this zone's limits.`; }
+  out.assumed=assumed; out.base=base; out.mods=mods;
+  out.cl=base.cl.slice(); out.cl.push(ROOFNOTE[city]);
+  
+  const fsr=A.userFSR?[+A.userFSR,+A.userFSR]:base.fsr.slice(), hOut=A.userH?+A.userH:base.h;
+  const hx=base.hx;
+  out.fsr=fsr; out.hOutright=hOut; out.hx=hx; out.ground=base.ground; out.yards=base.yards; out.yardsKnown=!!base.known;
+  out.userSet=!!(A.userFSR||A.userH);
+   
+  out.srcId=city==='edm'?(({EETB:1,EETC:1,EETL:1,EETM:1,EETIM:1})[key]&&!assumed?'arch_zns_edmEETP':({EIB:1,EIM:1})[key]&&!assumed?'arch_zns_edmEllerslie':'edm_bl20001'):({'I-2':'van_zdb_i2','I-2B':'van_zdb_i2','I-3':'van_zdb_i3','FC-2':'van_zdb_fc2','I-1C':'van_zdb_i1c'}[key==='I-2'&&A.subB?'I-2B':(assumed?'I-2':key)]||'van_zdb_i2'); out.vkey=vkey;
+   
+   
+  { const sel=BD.S&&BD.S.sel, sb=base.subB; if(city==='van'&&key==='I-3'&&!assumed&&sb&&sel&&sb.includes(String(sel.id))){ out.notAllowed='subB';
+    out.warn=`This lot is in I-3 sub-area B (I-3 Map 1; our reading of the map). A data centre ("Bulk Data Storage") is a conditional use in sub-area A only, so it is not allowed here; rezoning needed (register van_zdb_i3). The numbers below are drawn for comparison only.`; } }
+   
+  if(city==='edm'&&!assumed&&base.path==='rezoning'){ out.notAllowed='majorInd'; out.warn=(out.warn?out.warn+' ':'')+`Zone ${esc(key)} does not permit Major Industrial for a new building, and the City treats large-scale data centres as Major Industrial (no size threshold given, so the tool applies it to every data centre): rezoning needed (register edm_dc_major). The numbers below use ${esc(key)}'s own limits, for comparison only.`; }
+  out.screen=null;
+  if(city==='edm'&&key==='BE') out.screen={src:'arch_ezbLoad',why:'Edmonton BE s. 5.2: mechanical and electrical equipment, transformers and cooling towers "must be screened from view from Abutting Streets and Sites in non-industrial Zones" (register arch_ezbLoad). The plant is screened by default; "leave it seen" is not offered here.'};
+  else if(city==='edm'&&assumed) out.screen={src:'edmZB5120',why:'This lot\'s zone today is not an industrial zone. Edmonton s. 5.120 subs. 1.1.2: for non-industrial development "All mechanical equipment, except for Solar Collectors, must be concealed by screening" (register edmZB5120). The tool applies it until a rezoning settles which rules hold (our reading ?). "Leave it seen" is not offered here.'};
+  return out; }
+BD.zoneLimits=zoneLimits;
+
+ 
+function hull(r){ const p=[]; for(let i=0;i<r.length;i+=2) p.push([r[i],r[i+1]]); p.sort((a,b)=>a[0]-b[0]||a[1]-b[1]);
+  const cr=(o,a,b)=>(a[0]-o[0])*(b[1]-o[1])-(a[1]-o[1])*(b[0]-o[0]); const lo=[],up=[];
+  for(const q of p){ while(lo.length>=2&&cr(lo[lo.length-2],lo[lo.length-1],q)<=0) lo.pop(); lo.push(q); }
+  for(let i=p.length-1;i>=0;i--){ const q=p[i]; while(up.length>=2&&cr(up[up.length-2],up[up.length-1],q)<=0) up.pop(); up.push(q); }
+  return lo.slice(0,-1).concat(up.slice(0,-1)); }
+function frameOf(r){ const h=hull(r); let best=null;
+  for(let i=0;i<h.length;i++){ const a=h[i],b=h[(i+1)%h.length]; const L=Math.hypot(b[0]-a[0],b[1]-a[1]); if(L<1e-6) continue; const ux=(b[0]-a[0])/L, uy=(b[1]-a[1])/L;
+    let u0=1e9,u1=-1e9,v0=1e9,v1=-1e9; for(const q of h){ const u=q[0]*ux+q[1]*uy, v=-q[0]*uy+q[1]*ux; u0=Math.min(u0,u); u1=Math.max(u1,u); v0=Math.min(v0,v); v1=Math.max(v1,v); }
+    const ar=(u1-u0)*(v1-v0); if(!best||ar<best.ar) best={ar,ux,uy,u0,u1,v0,v1}; }
+  let {ux,uy,u0,u1,v0,v1}=best; if(v1-v0>u1-u0){ [ux,uy]=[-uy,ux]; const nu=[v0,v1], nv=[-u1,-u0]; [u0,u1]=nu; [v0,v1]=nv; }
+  const cu=(u0+u1)/2, cv=(v0+v1)/2; const cx=cu*ux-cv*uy, cy=cu*uy+cv*ux;
+  return {cx,cy,ux,uy,L:u1-u0,W:v1-v0, toW:(a,b)=>[cx+a*ux-b*uy, cy+a*uy+b*ux], toL:(x,y)=>[(x-cx)*ux+(y-cy)*uy, -(x-cx)*uy+(y-cy)*ux]}; }
+function rectW(F,a0,a1,b0,b1){ const p=[F.toW(a0,b0),F.toW(a1,b0),F.toW(a1,b1),F.toW(a0,b1)]; return new Float64Array(p.flat()); }
+ 
+function inscribe(F,ring,a0,a1,b0,b1,grid,ye){ const ua=Math.min(a0,a1), ub=Math.max(a0,a1), va=Math.min(b0,b1), vb=Math.max(b0,b1), W=ub-ua, H=vb-va; if(W<=0||H<=0) return null;
+  const L=[]; for(let i=0;i<ring.length;i+=2) L.push(F.toL(ring[i],ring[i+1]));
+  const inLot=(u,v)=>{ const [x,y]=F.toW(u,v); return BD.pip(x,y,ring); };
+   
+  const YE=(ye||[]).filter(e=>e.d>0), clear=(u0,u1,v0,v1)=>{ if(!YE.length) return true; const P=rectW(F,u0,u1,v0,v1); for(const e of YE) if(rectSegDist(P,e)<e.d-1e-3) return false; return true; };
+  const ok=(u0,u1,v0,v1)=>{ for(let k=0;k<=4;k++){ const t=k/4; if(!inLot(u0+(u1-u0)*t,v0)||!inLot(u0+(u1-u0)*t,v1)||!inLot(u0,v0+(v1-v0)*t)||!inLot(u1,v0+(v1-v0)*t)) return false; }
+    for(const [u,v] of L) if(u>u0+0.01&&u<u1-0.01&&v>v0+0.01&&v<v1-0.01) return false; return clear(u0,u1,v0,v1); };
+  if(ok(ua,ub,va,vb)) return [ua,ub,va,vb];
+   
+  const sc0=scaled(); if(!grid) return sc0; const ptClear=(u,v)=>{ if(!inLot(u,v)) return false; if(!YE.length) return true; const [x,y]=F.toW(u,v); for(const e of YE) if(segPt(x,y,e)<e.d-1e-3) return false; return true; };
+  const g=inscribeGrid(ua,ub,va,vb,ptClear,ok), ar=r=>r?(r[1]-r[0])*(r[3]-r[2]):0; if(ar(g)>ar(sc0)) return g; return sc0||inscribeGrid(ua,ub,va,vb,inLot,ok);
+  function scaled(){
+  for(let sc=0.95;sc>=0.2;sc-=0.05){ const w=W*sc, h=H*sc; let best=null;
+    for(let i=0;i<=8;i++) for(let j=0;j<=8;j++){ const u0=ua+(W-w)*i/8, v0=va+(H-h)*j/8; if(ok(u0,u0+w,v0,v0+h)){ best=[u0,u0+w,v0,v0+h]; break; } }
+    if(best) return best;
+    
+    for(const [w2,h2] of [[W,h],[w,H]]) for(let i=0;i<=8;i++) for(let j=0;j<=8;j++){ const u0=ua+(W-w2)*i/8, v0=va+(H-h2)*j/8; if(ok(u0,u0+w2,v0,v0+h2)) return [u0,u0+w2,v0,v0+h2]; } }
+  return null; } }
+function segPt(x,y,e){ const dx=e.bx-e.ax, dy=e.by-e.ay, L2=dx*dx+dy*dy; let t=L2?((x-e.ax)*dx+(y-e.ay)*dy)/L2:0; t=Math.max(0,Math.min(1,t)); return Math.hypot(x-e.ax-t*dx,y-e.ay-t*dy); }
+ 
+function inscribeGrid(ua,ub,va,vb,inLot,ok){ const W=ub-ua, H=vb-va, c=Math.max(1,Math.sqrt(W*H/40000)), nu=Math.floor(W/c), nv=Math.floor(H/c), MIN=6; if(nu<1||nv<1) return null;  
+  const P=[]; for(let j=0;j<=nv;j++){ const row=new Uint8Array(nu+1); for(let i=0;i<=nu;i++) row[i]=inLot(ua+i*c,va+j*c)?1:0; P.push(row); }
+  const h=new Int32Array(nu+1); let best=null;
+  for(let j=0;j<nv;j++){ for(let i=0;i<nu;i++) h[i]=P[j][i]&&P[j][i+1]&&P[j+1][i]&&P[j+1][i+1]?h[i]+1:0;
+    const st=[]; for(let i=0;i<=nu;i++){ while(st.length&&h[st[st.length-1]]>=h[i]){ const t=st.pop(), ht=h[t], left=st.length?st[st.length-1]+1:0, wd=i-left, a=ht*wd;
+        if(ht&&Math.min(ht,wd)*c>=MIN&&(!best||a>best.a)) best={a,i0:left,i1:i,j0:j+1-ht,j1:j+1}; } st.push(i); } }
+  if(!best) return null; let r=[ua+best.i0*c,ua+best.i1*c,va+best.j0*c,va+best.j1*c];
+  for(let k=0;k<8;k++){ if(ok(r[0],r[1],r[2],r[3])) return r; const d=c/2; r=[r[0]+d,r[1]-d,r[2]+d,r[3]-d]; if(Math.min(r[1]-r[0],r[3]-r[2])<MIN) return null; }
+  return null; }
+function signedArea(r){ let s=0; for(let i=0,j=r.length-2;i<r.length;j=i,i+=2) s+=(r[j]*r[i+1]-r[i]*r[j+1]); return s/2; }
+function clip(subj,clipR){ 
+  let c=clipR; if(signedArea(c)<0){ const t=[]; for(let i=c.length-2;i>=0;i-=2) t.push(c[i],c[i+1]); c=new Float64Array(t); }
+  let out=[]; for(let i=0;i<subj.length;i+=2) out.push([subj[i],subj[i+1]]);
+  for(let i=0;i<c.length;i+=2){ const ax=c[i],ay=c[i+1],bx=c[(i+2)%c.length],by=c[(i+3)%c.length]; const inside=p=>(bx-ax)*(p[1]-ay)-(by-ay)*(p[0]-ax)>=0;
+    const inp=out; out=[]; if(!inp.length) break;
+    for(let k=0;k<inp.length;k++){ const P=inp[k], Q=inp[(k+1)%inp.length]; const pi=inside(P), qi=inside(Q);
+      const X=()=>{ const dx=Q[0]-P[0], dy=Q[1]-P[1]; const den=(bx-ax)*dy-(by-ay)*dx; const t=den===0?0:((ax-P[0])*(by-ay)-(ay-P[1])*(bx-ax))/(-den); return [P[0]+t*dx,P[1]+t*dy]; };
+      if(pi&&qi) out.push(Q); else if(pi&&!qi) out.push(X()); else if(!pi&&qi){ out.push(X()); out.push(Q); } } }
+  return new Float64Array(out.flat()); }
+BD.geo={frameOf,rectW,clip,hull};
+ 
+function segSegDist(a,b,c,d){ const cr=(p,q,r)=>(q[0]-p[0])*(r[1]-p[1])-(q[1]-p[1])*(r[0]-p[0]), o1=cr(a,b,c), o2=cr(a,b,d), o3=cr(c,d,a), o4=cr(c,d,b);
+  if(((o1>0)!==(o2>0))&&((o3>0)!==(o4>0))&&o1&&o2&&o3&&o4) return 0;
+  const pd=(p,q,r)=>{ const dx=r[0]-q[0], dy=r[1]-q[1], l2=dx*dx+dy*dy; let t=l2?((p[0]-q[0])*dx+(p[1]-q[1])*dy)/l2:0; t=Math.max(0,Math.min(1,t)); return Math.hypot(p[0]-q[0]-t*dx,p[1]-q[1]-t*dy); };
+  return Math.min(pd(a,c,d),pd(b,c,d),pd(c,a,b),pd(d,a,b)); }
+function rectSegDist(P,e){ const A=[e.ax,e.ay], B=[e.bx,e.by]; if(BD.pip(e.ax,e.ay,P)||BD.pip(e.bx,e.by,P)) return 0; let m=Infinity;
+  for(let i=0;i<8;i+=2){ const j=(i+2)%8; m=Math.min(m,segSegDist([P[i],P[i+1]],[P[j],P[j+1]],A,B)); } return m; }
+ 
+function offsetRing(r0,D0){ const V=[], D=[], m0=r0.length/2; for(let i=0;i<m0;i++){ const x=r0[2*i], y=r0[2*i+1], j=V.length/2; if(j&&Math.hypot(x-V[2*j-2],y-V[2*j-1])<1e-6){ D[j-1]=Math.max(D[j-1],D0[i]||0); continue; } V.push(x,y); D.push(D0[i]||0); }
+  if(V.length>4&&Math.hypot(V[0]-V[V.length-2],V[1]-V[V.length-1])<1e-6){ V.length-=2; D.pop(); }  
+  const r=new Float64Array(V), n=r.length/2; if(n<3) return null; const ccw=signedArea(r)>0, P=[];
+  for(let i=0;i<n;i++){ const h=(i+n-1)%n, j=(i+1)%n, L=(a,b)=>{ const ax=r[2*a], ay=r[2*a+1], bx=r[2*b], by=r[2*b+1], l=Math.hypot(bx-ax,by-ay)||1, dx=(bx-ax)/l, dy=(by-ay)/l, nx=ccw?-dy:dy, ny=ccw?dx:-dx, d=D[a]||0; return {px:ax+nx*d,py:ay+ny*d,dx,dy,nx,ny,d}; };
+    const a=L(h,i), b=L(i,j), den=a.dx*b.dy-a.dy*b.dx;
+    if(Math.abs(den)<1e-9){ const d=Math.max(a.d,b.d); P.push(r[2*i]+b.nx*d,r[2*i+1]+b.ny*d); continue; }
+    const t=((b.px-a.px)*b.dy-(b.py-a.py)*b.dx)/den, X=a.px+a.dx*t, Y=a.py+a.dy*t;
+    if(Math.hypot(X-r[2*i],Y-r[2*i+1])>3*Math.max(a.d,b.d)+1){ P.push(r[2*i]+a.nx*a.d,r[2*i+1]+a.ny*a.d,r[2*i]+b.nx*b.d,r[2*i+1]+b.ny*b.d); continue; }  
+    P.push(X,Y); }
+  const Q=new Float64Array(P), nq=Q.length/2; if((signedArea(Q)>0)!==ccw||Math.abs(signedArea(Q))>Math.abs(signedArea(r))+1e-6) return null;
+  for(let i=0;i<nq;i++) for(let k=i+2;k<nq;k++){ if(i===0&&k===nq-1) continue; const a=[Q[2*i],Q[2*i+1]], b=[Q[2*((i+1)%nq)],Q[2*((i+1)%nq)+1]], c=[Q[2*k],Q[2*k+1]], d=[Q[2*((k+1)%nq)],Q[2*((k+1)%nq)+1]]; if(segSegDist(a,b,c,d)===0) return null; }
+  for(let i=0;i<nq;i++) if(!BD.pip(Q[2*i],Q[2*i+1],r)&&D.every(x=>x>0)) return null;  
+  return Q; }
+
+ 
+ 
+const PNAME=id=>{ const p=BD.archTest&&BD.archTest.CAT&&BD.archTest.CAT.byId[id]; return p?p.name.split(' (')[0].toLowerCase():id.replace(/_/g,' '); };
+function loadingNeed(city,gfa,prog){
+   
+  const rh=x=>Math.floor(x+0.5);
+  if(city==='van'){ const L=LD.van, n0=gfa<100?0:1+(gfa>L.bayFirst?1:0)+Math.max(0,rh((gfa-L.bayEach)/L.bayEach)); const nC=gfa<L.classC[0]?0:gfa<=L.classC[1]?1:2; 
+    const As=L.assembly, U=prog&&prog.uses?prog.uses.filter(u=>u[1]>0):[], inA=U.filter(u=>As&&As.ids.includes(u[0])), unl=U.filter(u=>!(As&&As.ids.includes(u[0]))), aM2=inA.reduce((t,u)=>t+u[1],0);
+    const nA=As&&aM2>=As.min?Math.max(1,rh(aM2/As.per)):0; 
+    const Of=L.office, inO=Of?unl.filter(u=>Of.ids.includes(u[0])):[], oM2=inO.reduce((t,u)=>t+u[1],0), nO=Of&&oM2>0?(Of.bands.find(b=>oM2<b[0])||Of.bands[Of.bands.length-1])[1]:0;  
+    const unl2=unl.filter(u=>!(Of&&Of.ids.includes(u[0]))), n=n0+nA+nO;
+    const pTxt=prog&&prog.m2>0?(prog.uses?(nA?` Plus ${nA} for the ${inA.map(u=>PNAME(u[0])).join(', ')} (${fmt(aM2)} m², row 5.2.3: one for each 2,800 m²; which programs fall in this row is our reading ?).`:'')+(nO?` Plus ${nO} for the ${inO.map(u=>PNAME(u[0])).join(', ')} (${fmt(oM2)} m², row 5.2.9 Office Uses, Class B: a Health Care Office is listed under Office Uses, s. 2).`:'')+(unl2.length?` Not counted, set by the Director of Planning because s. 5.2 does not list them (?): ${unl2.map(u=>PNAME(u[0])).join(', ')}.`:'')
+      :` The programs' floor (${fmt(prog.m2)} m²) needs its own loading by class of use (s. 5.1, Multi-Use Developments), not counted until programs are picked (?).`):'';
+    return {n,nDC:n0,nProg:nA+nO,len:L.len,wid:L.wid,ht:L.ht,aisle:L.aisle,cls:'truck loading bay',nC,
+      basis:`${n} truck loading bay${n===1?'':'s'}: ${n0} for the data centre's ${fmt(gfa)} m² of floor${prog&&prog.dcSup?` (hall, UPS and battery rooms ${fmt(prog.dcSup[0])} m² plus support rooms at ${Math.round(prog.dcSup[1]*100)} %, the safer reading)`:''}.${pTxt}${prog&&prog.skip&&prog.skip.length?` Picked but not drawn, so not counted: ${prog.skip.map(PNAME).join(', ')}.`:''} Each class of use is counted separately and the counts added (Parking By-law s. 5.1, Multi-Use Developments). The by-law calls this size Class B, its mid-size bay: 10.2 × 3.4 m with 3.8 m clearance (Class C is the 23.1 m bay for the largest trucks). The data centre uses row 5.2.5: the by-law does not name data centres, but the City classes them as a Transportation and Storage use (RTS 19744), which row 5.2.5 lists. Each bay is reached by a 6.1 m aisle (s. 5.4.1).${nC?` If the City reads a data centre as a storage warehouse, ${nC} Class C space${nC>1?'s':''} (23.1 × 3.6 m, 14.0 m aisle) would also be needed.`:''}`,src:'vanParking5'}; }
+  const SK=prog&&prog.skip&&prog.skip.length?` Picked but not drawn, so not counted: ${prog.skip.map(PNAME).join(', ')}.`:'';
+  const pm=prog&&prog.m2>0?prog.m2:0, tot=gfa+pm, L=LD.edm, n=tot<L.spaces[0]?0:tot<=L.spaces[1]?1:2; 
+  return {n,len:L.len,wid:L.wid,ht:L.ht,aisle:L.aisle,cls:'loading space',
+    basis:`${n} loading space${n===1?'':'s'} for ${fmt(tot)} m² of non-residential floor area${pm?` in the whole building (data centre ${fmt(gfa)} m²${prog&&prog.dcSup?` with its support rooms at ${Math.round(prog.dcSup[1]*100)} %`:''} plus programs ${fmt(pm)} m²${prog.uses?'':', the programs\' share before any are picked'}; Table 7.2 sets one threshold for the building's non-residential floor, our reading of 'a building')`:''} (Table 7.2).${SK} Each 9.0 × 3.0–3.3 m, 4.0 m clear, wholly on site; backing and turning must not interfere with traffic on abutting streets or alleys (s. 5.80 subs. 7.1). Aisle: Vancouver's 6.1 m used as an assumption.`,src:'edmZB580'}; }
+ 
+function progFloor(s){ const A=BD.S.answers; if(!(BD.tier&&BD.tier()==='arch')) return null;
+  const P0=(BD.arch&&BD.arch.picks||[]).filter(q=>q.m2>0&&BD.archTest&&BD.archTest.CAT.byId[q.id]&&BD.archTest.CAT.byId[q.id].kind==='mass');
+   
+  const D=BD.arch&&BD.arch.drawn, sid=s.city+':'+s.id, dr=D&&D.site===sid?D.ids:null, P=dr?P0.filter(q=>dr.includes(q.id)):P0, skip=dr?P0.filter(q=>!dr.includes(q.id)).map(q=>q.id):[];
+  if(P.length||skip.length) return {m2:P.reduce((t,q)=>t+q.m2,0),uses:P.map(q=>[q.id,q.m2]),skip};
+  return A.progFloor&&A.dcSite===s.id?{m2:A.progFloor,uses:null}:null; }
+
+ 
+let cache={key:null,m:null}, roomTry=false, roomOff=false;  
+function model(){
+  const S=BD.S, s=S.sel, A=S.answers; if(!s) return null; if(!A.built) A.built='new'; if(!A.extent) A.extent='whole';  
+   
+  if(A.vis==null&&BD.tier&&BD.tier()==='arch'){ A.vis='indoors'; A.visDefault='arch'; }
+   
+  if(A.loadIn==null&&BD.tier&&BD.tier()==='arch'){ A.loadIn='1'; A.loadDefault='arch'; }
+  { const a0=s.a||[], Z0=zoneLimits(s.city,s.city==='van'?(a0[1]||''):(a0[2]||a0[1]||'')); if(Z0.screen&&(!A.vis||A.vis==='reveal')) A.vis='screen'; }  
+  const PF=progFloor(s);  
+  const key=JSON.stringify([PF,s.city,s.id,A.built,A.extent,A.floor,A.foot,A.cover,A.loadIn,A.flip,A.hmode,A.storeys,A.userFSR,A.userH,A.plantAt,A.outside,A.inside,A.spares,A.gens,A.genAt,A.genSpares,A.mw,A.vis,A.subB,A.fcSub,A.dcFloor,A.dcSite,A.hallOpt,A.front]);
+  if(cache.key===key) return cache.m;
+  const a=s.a||[], city=s.city, zraw=city==='van'?(a[1]||''):(a[2]||a[1]||'');
+  const Z=zoneLimits(city,zraw);
+  const lotArea=+(BD.S.sel.lotArea||(city==='van'?a[8]:a[4]))||0;
+  let ring=s.ring; if(!ring&&s.pt){ const r=Math.sqrt(Math.max(lotArea,900))/2; ring=new Float64Array([s.pt[0]-r,s.pt[1]-r,s.pt[0]+r,s.pt[1]-r,s.pt[0]+r,s.pt[1]+r,s.pt[0]-r,s.pt[1]+r]); }
+  const m={Z,city,lotArea,ring,notes:[],warn:[]};
+  if(!ring){ cache={key,m}; return m; }
+  let F=frameOf(ring);
+   
+  const LSD=BD.data.lotside; let side=null;
+   
+  if(s.edges&&s.edges.length&&BD.lotSide&&!A.noSide){ const RK=BD.lotSide.RANK, has=(S0,k)=>!!S0[k].street; let S0=BD.lotSide.assign(s.edges,F), rot=false;
+    const cls=BD.lotSide.classify?BD.lotSide.classify(s.edges,city,LSD&&LSD.lines):null, f=cls&&cls.f, turn=()=>{ const o=F, ux=-o.uy, uy=o.ux; F={cx:o.cx,cy:o.cy,ux,uy,L:o.W,W:o.L,toW:(a,b)=>[o.cx+a*ux-b*uy,o.cy+a*uy+b*ux],toL:(x,y)=>[(x-o.cx)*ux+(y-o.cy)*uy,-(x-o.cx)*uy+(y-o.cy)*ux]}; S0=BD.lotSide.assign(s.edges,F); rot=true; };
+    if(f){ if(Math.abs(-f.nx*F.uy+f.ny*F.ux)>Math.abs(f.nx*F.ux+f.ny*F.uy)) turn(); }
+    else if(!has(S0,'u0')&&!has(S0,'u1')&&(has(S0,'v0')||has(S0,'v1'))) turn();
+    const r=k=>S0[k].street?1+RK[S0[k].street.cls]:0, any=['u0','u1','v0','v1'].some(k=>S0[k].street);
+    side={S:S0,rot,any,autoU1:f?(f.nx*F.ux+f.ny*F.uy)>0:r('u1')>r('u0'),cls,src:s.city==='edm'?['edmRoads2026','edmZoningGeo']:['vanStreets2026','vanTax']}; }
+  m.F=F; m.lineCls=side&&side.cls||null; if(side){ const c=f=>({street:f.street?f.street.cls:null,road:f.street?f.street.name:null,d:f.street?Math.round(f.street.d):null,alley:f.alley,nbr:f.nbr.slice()}); m.side={rot:side.rot,autoU1:side.autoU1,any:side.any,u0:c(side.S.u0),u1:c(side.S.u1),v0:c(side.S.v0),v1:c(side.S.v1),src:side.src}; }
+  const blds=(s.blds||[]).filter(b=>b.f!==3);
+  
+  const ftf=BD.eng?BD.eng.R.ftf:{ground:6,up:[5.5,6]};
+  const nF=h=>[1+Math.max(0,Math.floor((h-ftf.ground)/ftf.up[1])),1+Math.max(0,Math.floor((h-ftf.ground)/ftf.up[0]))];
+  if(A.built==='existing'){
+     
+    if(A.extent==='part'&&A.floor==='ground'&&Z.ground&&!Z.assumed){ const c=(Z.cl||[]).find(x=>x[0]==='Ground floor'); m.warn.push(`Ground floor: zone ${Z.zone} does not permit bulk data storage at the ground floor, except for entrances (${c?c[2]:'zone schedule'}; register ${Z.srcId}). Lease an upper floor instead.`); }
+    const hmax=blds.some(b=>b.h>0)?Math.max(...blds.filter(b=>b.h>0).map(b=>b.h)):4; m.hUnknown=blds.some(b=>!(b.h>0)||b.f===6);   m.existing=true; m.H=hmax; m.nF=[Math.max(1,Math.floor(hmax/4)),Math.max(1,Math.floor(hmax/4))];
+    { const big=blds.length?blds.reduce((x,b)=>b.a>x.a?b:x):null; m.foot=big?big.r:null; m.roofH=big?big.h:0; } 
+    m.feet=blds.map(b=>({r:b.r,h:b.h})); m.footArea=blds.reduce((t,b)=>t+b.a,0); 
+     
+    if(Z.yards){ const fl=!!(side&&side.autoU1)!==!!A.flip?-1:1, y=yardsOf(m,Z,side,fl); m.yards=y; m.inset=rectW(F,-F.L/2+(fl>0?y.front:y.rear),F.L/2-(fl>0?y.rear:y.front),-F.W/2+y.s0,F.W/2-y.s1); m.yardRect=m.inset; yardLines(m); }
+  } else {
+    let H=Z.hOutright, hn='outright';
+    if(A.hmode==='cond'&&Z.hx&&!A.userH){ H=Z.hx[0]; hn='conditional'; }
+     
+    const maxSt=Math.max(1,1+Math.floor((Z.hOutright-ftf.ground)/ftf.up[1]+1e-9)); m.maxStoreys=maxSt; let stU=null;
+    if(A.hmode==='storeys'&&A.storeys){ stU=Math.min(A.storeys,maxSt); const want=ftf.ground+(A.storeys-1)*ftf.up[1]; H=ftf.ground+(stU-1)*ftf.up[1]; hn='storeys';
+      if(A.storeys>maxSt) m.hClamp={asked:A.storeys,st:maxSt,want,lim:Z.hOutright,src:Z.srcId,text:`${A.storeys} storeys need about ${want.toFixed(1)} m, above the ${Z.hOutright} m ${A.userH?'you set':'this zone allows outright'} (${A.userH?'your limits':`zone ${Z.zone}${Z.assumed?', as if rezoned':''}; register ${Z.srcId}`}). The tool uses ${maxSt} storeys (${H.toFixed(1)} m), the most that height holds.${Z.hx&&!A.userH?` Taller needs the City's approval: choose "With approval" (up to ${Z.hx[1]} m).`:A.userH?'':' Taller needs a rezoning: set your own limits.'}`}; }
+    m.H=H; m.hmode=hn; m.nF=stU?[stU,stU]:nF(H);
+    
+    const fl=!!(side&&side.autoU1)!==!!A.flip?-1:1, y=yardsOf(m,Z,side,fl); m.yards=y;  
+    let u0=-F.L/2+(fl>0?y.front:y.rear), u1=F.L/2-(fl>0?y.rear:y.front), v0=-F.W/2+y.s0, v1=F.W/2-y.s1;
+    m.yardRect=Z.yards?rectW(F,u0,u1,v0,v1):null;  
+     
+     
+    const yardMode=A.front==='yard'; if(yardMode) m.frontMode='yard';
+    if(y.max){ if(u1-u0>y.max){ if(yardMode) m.depthMax=y.max; else { m.capRear=u1-u0-y.max; if(fl>0) u1=u0+y.max; else u0=u1-y.max; } } if(v1-v0>y.max){ const c=(v0+v1)/2; v0=c-y.max/2; v1=c+y.max/2; } }
+    m.inset=rectW(F,u0,u1,v0,v1); m.yardNote=Z.yardsKnown?'':'Yards and setbacks for this zone are not yet read, so the building may cover the whole lot.'; yardLines(m); const YE=m.edgeYards;
+     
+    m.sideDrive=null; if(A.loadIn&&A.foot!=='existing'&&BD.tier&&BD.tier()==='arch'&&!(YE||[]).some(e=>(e.abuts==='street'||e.abuts==='alley')&&e.kind!=='front')){
+      const w=(LD[city]&&LD[city].aisle)||6.1, sy=Math.max(0,y.s0||0), uf0=fl>0?-F.L/2:F.L/2, ur=fl>0?u1:u0, ua=Math.min(uf0,ur), ub=Math.max(uf0,ur);
+      if(city==='van'){ const inY=Math.min(w,sy), d0=v0-sy; m.sideDrive={w,city,inYard:inY,narrow:w-inY,ring:rectW(F,ua,ub,d0,d0+w)}; v0=Math.max(v0,d0+w); }
+      else { m.sideDrive={w,city,inYard:0,narrow:w,ring:rectW(F,ua,ub,v0,v0+w)}; v0=v0+w; } }
+    
+    
+    const R0=BD.eng&&BD.eng.R, perMW0=R0?(R0.m2PerMW[0]+R0.m2PerMW[1])/2/((R0.hallShare[0]+R0.hallShare[1])/2):0;
+     
+    const dcF=A.dcFloor&&A.dcSite===s.id?A.dcFloor:null;
+    const gfaGuess=dcF?Math.min(lotArea*Z.fsr[1],dcF):A.mw&&perMW0?Math.min(lotArea*Z.fsr[1],A.mw*perMW0):lotArea*Z.fsr[1];
+    const sup=dcF&&LD.dcSupport?LD.dcSupport:0, PF2=dcF?Object.assign({},PF||{m2:0,uses:null},{dcSup:sup?[gfaGuess,sup]:null}):null;  
+    const LN=loadingNeed(city,dcF&&sup?gfaGuess/(1-sup):gfaGuess,PF2); m.loadingNeed=LN;
+    const dir=fl>0?-1:1; let rearEnd=fl>0?u1:u0;
+     
+    if(yardMode){ const RY=m.yardOff&&!m.yardOffBad?m.yardOff:ring, full=u=>[0.02,0.25,0.5,0.75,0.98].every(t=>{ const [x,yy]=F.toW(u,v0+(v1-v0)*t); return BD.pip(x,yy,RY); });
+      let u=rearEnd, k=0; for(;k<300&&!(full(u)&&full(u+dir*1));k++) u+=dir*0.5; if(k<300){ m.rearTrim=Math.abs(u-rearEnd); rearEnd=u; } }    
+    let cur=rearEnd;
+    if(LN.n&&!A.loadIn&&A.foot!=='existing'){ const dep=LN.len+LN.aisle; const a0=cur, a1=cur+dir*dep; { const q=inscribe(F,ring,a0,a1,v0,v1,false,YE); m.loading=q?rectW(F,q[0],q[1],q[2],q[3]):clipYards(m,rectW(F,Math.min(a0,a1),Math.max(a0,a1),v0,v1)); m.loadV=q?[q[2],q[3]]:[v0,v1]; } m.loadDepth=dep; cur=a1;
+      m.loadSpaces=[]; const lv0=m.loadV[0], spanV=m.loadV[1]-m.loadV[0], k=Math.min(LN.n,Math.max(1,Math.floor(spanV/(LN.wid+0.6))));
+      for(let i=0;i<k;i++){ const b0=lv0+0.6+i*(LN.wid+0.6); const s0=rearEnd+dir*0, s1=rearEnd+dir*LN.len; m.loadSpaces.push(rectW(F,Math.min(s0,s1),Math.max(s0,s1),b0,b0+LN.wid)); }
+      if(k<LN.n) m.warn.push(`Only ${k} of ${LN.n} loading spaces fit across the lot.`); }
+     
+    else if(LN.n&&A.loadIn&&A.foot!=='existing') m.loadInside={n:LN.n,m2:LN.len*(LN.n*(LN.wid+0.6)+0.6),len:LN.len,wid:LN.wid};
+    m.plantYardStart=cur; m.dir=dir; m.v=[v0,v1]; m.uFront=fl>0?u0:u1;
+    
+    if(A.foot==='existing'&&blds.length){ m.foot=blds.reduce((x,b)=>b.a>x.a?b:x).r; m.footMode='existing'; }
+    else { m.footMode=A.foot==='cover'?'cover':'max'; m.uBuild=[cur,m.uFront]; }
+    
+  }
+  if(BD.plant) BD.plant.place(m); 
+  if(!m.existing&&!m.foot&&m.uBuild){ let [a0,a1]=m.uBuild; if(m.plantYardDepth) a0=a0+m.dir*m.plantYardDepth;
+     
+    if(m.frontMode==='yard'&&m.depthMax&&Math.abs(a1-a0)>m.depthMax){ m.capFront=Math.abs(a1-a0)-m.depthMax; a1=a0+Math.sign(a1-a0)*m.depthMax; }
+    if(m.footMode==='cover'&&A.cover){ const want=lotArea*A.cover/100, wv=m.v[1]-m.v[0]; const len=Math.min(Math.abs(a1-a0),want/Math.max(wv,1)); if(m.frontMode==='yard') a1=a0+Math.sign(a1-a0||1)*len; else a0=a1+Math.sign(a0-a1||1)*len; }    
+    if(m.frontMode==='yard') m.uFace=a1;
+    const q=inscribe(F,ring,a0,a1,m.v[0],m.v[1],true,m.edgeYards);   if(q&&A.dcFloor&&A.dcSite===BD.S.sel.id) m.hallRoom=(q[1]-q[0])*(q[3]-q[2]);   if(q){
+      
+      
+      if(A.mw&&m.footMode==='max'&&BD.eng){ const R=BD.eng.R, perMW=(R.m2PerMW[0]+R.m2PerMW[1])/2/((R.hallShare[0]+R.hallShare[1])/2), floors=Math.max(1,m.Z&&m.Z.ground?m.nF[0]-1:m.nF[0]),   dcF=A.dcFloor&&A.dcSite===BD.S.sel.id?A.dcFloor:null, need=(dcF||A.mw*perMW)/floors, W=q[1]-q[0], H=q[3]-q[2];
+        if(dcF&&need<=W*H+0.01){  
+          const du=need/H, frontLo=Math.abs(q[0]-m.uFront)<=Math.abs(q[1]-m.uFront), ua=frontLo?q[1]-du:q[0], ub=frontLo?q[1]:q[0]+du; m.serverFoot=rectW(F,ua,ub,q[2],q[3]); m.sizedTo={mw:A.mw,floor:dcF,perMW:dcF/A.mw,ratio:true};
+          m.hallFull=m.serverFoot; m.hallOpts=hallOptions(q,dcF,floors,m,ftf,frontLo); }
+        else if(need<W*H*0.98){ const k=Math.sqrt(need/(W*H)), cv=(q[2]+q[3])/2; let w=W*k, h=H*k; if(h<12){ h=Math.min(H,12); w=need/h; } const fLo=Math.abs(q[0]-m.uFront)<=Math.abs(q[1]-m.uFront), cu=m.frontMode==='yard'?(fLo?q[1]-w/2:q[0]+w/2):(q[0]+q[1])/2;     m.serverFoot=rectW(F,cu-w/2,cu+w/2,cv-h/2,cv+h/2); m.sizedTo=dcF?{mw:A.mw,floor:dcF,perMW:dcF/A.mw,ratio:true}:{mw:A.mw,floor:A.mw*perMW,perMW}; } }
+      
+      const rr=rectW(F,Math.min(a0,a1),Math.max(a0,a1),m.v[0],m.v[1]); m.foot=clipYards(m,rr); m.footRect=rr; m.simpleMass=true;
+      if(!m.serverFoot) m.serverFoot=rectW(F,q[0],q[1],q[2],q[3]); } else { const r=rectW(F,Math.min(a0,a1),Math.max(a0,a1),m.v[0],m.v[1]); m.foot=clipYards(m,r); m.footRect=r; } }
+  if(m.foot&&!m.footArea) m.footArea=BD.area(m.foot);
+  if(m.frontMode==='yard'&&m.foot&&!m.existing&&m.uBuild) frontYard(m);
+  if(m.foot&&!m.existing&&m.footArea<20) m.warn.push('After setbacks, loading and plant there is almost no room left for a building on this lot.');
+  if(BD.plant&&BD.plant.roof){
+     
+    const HO=m.hallOpts&&m.hallOpts.length&&A.hallOpt!=='full'?m.hallOpts:null;
+    if(HO){ const P=m.plant, keep=P?{coolRoof:P.coolRoof,short:P.short}:null;
+      const tryO=o=>{ if(P) Object.assign(P,keep); setHall(m,o); BD.plant.roof(m); return !(m.plant&&m.plant.miss&&m.plant.miss.length); };
+      const pick=HO.find(o=>o.key===A.hallOpt); let ok=false;
+      if(pick) tryO(pick); else { for(const o of HO){ if(tryO(o)){ ok=true; break; } } if(!ok){ setHall(m,null); if(P) Object.assign(P,keep); BD.plant.roof(m); } } }
+    else BD.plant.roof(m); }
+   
+  if(BD.eng&&m.plant&&m.plant.s&&m.plant.s.g&&(A.genAt||'yard')==='roof'&&A.gens!=='none'){ const R=BD.eng.R, Lf=m.mwSized*R.pue[1]*1000*R.fuelHours*R.fuelLkWh, RT=BD.data.equipment.roofTank, per=Lf/m.plant.s.gNeed;
+    m.fuel={L:Lf,per,lim:RT.line,at:'roof'}; if(per>RT.line+0.5){ const mwMax=Math.floor(RT.line/(R.pue[1]*1000*R.fuelHours*R.fuelLkWh)*10)/10; m.warn.push(`Generators on the roof: ${R.fuelHours} h of fuel for ${m.mwSized} MW is about ${fmt(Math.round(per/100)*100)} L in each set's tank; on a roof a tank supplying an engine may hold at most 1,250 L, and 2,500 L on one supply line (CSA B139.1.1 6.5.3; register arch_csa_b139). Put the generators in the yard${mwMax>=0.1?`, or test ${mwMax.toFixed(1)} MW or less`:''}.`); } }
+   
+  m.notes=[]; if(m.plant&&m.plant.bigYard) m.notes.push(`Generators: ${m.plant.placed?m.plant.placed.gy:m.plant.genYard} sets in a ${m.plant.bigYard} m deep plant yard: beyond the tested range (no test lot's is deeper than 21.7 m), so this size is not offered as a fit.`);  
+   
+  m.genNoise=null; { const GN=BD.data.noise&&BD.data.noise.gen, G=m.plant&&(m.plant.boxes||[]).filter(b=>b.kind==='yard'&&/generator/.test(b.name)), E=(m.edgeYards||[]).filter(e=>isFinite(e.ax));
+    if(GN&&G&&G.length&&E.length){ const Lp=d=>GN.lp7-20*Math.log10(Math.max(d,0.5)/7), dmin=f=>{ const EE=E.filter(f); if(!EE.length) return Infinity; return Math.min(...G.map(b=>Math.min(...EE.map(e=>rectSegDist(b.ring,e))))); }, r1=x=>Math.round(x*10)/10;
+      if(city==='van'){ const d=dmin(()=>true), at=Math.max(GN.van.testAt,d), L=Lp(at); m.genNoise={city,d,at,L,ok:L<=GN.van.test+1e-9,near:d<GN.van.testAt};
+        m.notes.push(`Generator test (Noise By-law 6555 s. 4.1(c)): one set at a time is about ${r1(L)} dB(A) at ${r1(at)} m (${d<GN.van.testAt?'the nearest lot line is '+r1(d)+' m away, closer than 6.1 m, so measured at 6.1 m':'the nearest lot line'}), ${L<=GN.van.test+1e-9?'within':'over'} the ${GN.van.test} dB(A) test limit (Kohler enclosure sheet G6-154 for KD2000, Sound Level 2, 78 dB(A) at 7 m, maker claim; free field, our arithmetic). Sets tested together would be louder. Running in a power cut as emergency works (s. 4.3(c)): our reading (?).`); }
+      else { const res=e=>/^residential/.test(e.abuts||''), dr=dmin(res), dn=dmin(e=>!res(e)), Lr=Lp(dr), Ln=Lp(dn), E2=GN.edm;
+        const test=(dr===Infinity||Lr<=E2.resTest1h+1e-9)&&(dn===Infinity||Ln<=E2.nonTest1h+1e-9), night=(dr<Infinity&&Lr>E2.resNight)||(dn<Infinity&&Ln>E2.nonNight);
+        m.genNoise={city,dr,dn,Lr,Ln,test,night};
+        m.notes.push(`Generator test (Community Standards Bylaw C14600 s. 19(3), 21(3), daytime, up to 1 h): one set is about ${dr<Infinity?r1(Lr)+' dB(A) at the nearest residential line ('+r1(dr)+' m, limit '+E2.resTest1h+')':'(no residential line on this lot)'}${dn<Infinity?' and '+r1(Ln)+' dB(A) at the nearest non-residential line ('+r1(dn)+' m, limit '+E2.nonTest1h+')':''}: ${test?'within':'over'} the limits (Kohler enclosure sheet G6-154 for KD2000, Sound Level 2, 78 dB(A) at 7 m, maker claim; free field, our arithmetic).${night?` Overnight power cut: one set is over the ${dr<Infinity&&Lr>E2.resNight?E2.resNight+' dB(A) residential':E2.nonNight+' dB(A) non-residential'} night limit (ss. 20, 22); the bylaw has no generator exemption (s. 24): flagged, not blocked.`:''}`); } } }
+  if(m.yards&&m.yards.unAbut) m.notes.push(`Lot lines: what ${m.yards.unAbut>1?m.yards.unAbut+' of this lot\'s edges abut is':'one of this lot\'s edges abuts is'} not known (no lot or street found, or a parcel with no zone on record), so which setback ${m.yards.unAbut>1?'they have':'it has'} is not known (?); the deepest is applied (see Lot lines).`);
+  if(m.yards&&m.yards.unclear) m.notes.push(`Lot lines: which yard ${m.yards.unclear>1?m.yards.unclear+' of this lot\'s edges have':'one of this lot\'s edges has'} is not known (?); the deepest it could have is applied (see Lot lines).`);  
+  if(BD.eng&&BD.eng.noiseCheck){ let nc=null; try{ nc=BD.eng.noiseCheck(m); }catch(e){ console.warn(e); } m.noise=nc; if(nc&&nc.block) m.warn.push(nc.block); else { if(nc&&nc.req) m.notes.push(nc.req); if(nc&&nc.flag) m.notes.push(nc.flag); } }
+   
+  if(!roomOff&&!roomTry&&m.noise&&m.noise.block&&A.vis!=='indoors'&&m.plant&&m.plant.coolRoof>0){ const keepV=A.vis; let m2=null; roomTry=true;
+    try{ A.vis='indoors'; cache.key=null; m2=model(); }catch(e){ console.warn(e); m2=null; } finally{ A.vis=keepV; roomTry=false; }
+    if(m2&&m2.noise&&!m2.noise.block){ const w=m.noise.worst;
+      m2.noiseRoom={worst:w,block:m.noise.block,src:'arch_nz_nswDcNoise'};
+      m2.notes.unshift(`Noise: needs the roof cooling plant in an enclosed plant room. On the roof, even with ${m.noise.mit&&m.noise.mit.tried&&m.noise.mit.tried.includes('ln+scr')?'low-noise chillers and a solid screen':'the modelled measures'}, it would give about ${w?Math.round(w.lo)+' dBA at '+(w.addr||'a neighbouring lot')+' ('+w.zt+'), '+Math.round(w.d)+' m away, over the '+w.Ls+' dBA night limit ('+w.sec+')':'more than the night limit'}. The plant room is the next measure, and the least that passes; its floor comes out of the building (register arch_nz_nswDcNoise).`);
+      cache={key,m:m2}; return m2; } }
+  m.grade=gradeInfo(s,A);  
+  cache={key,m}; return m; }
+ 
+function gradeInfo(s,A){ const G=BD.data.grade||{}, R=(BD.data.raw.grade||{}), C=G[s.city]||{}, q=s.grade;
+  const out={src:(R[s.city]||{}).src||'?',label:C.label||'?',datum:C.datum||'?',base:Object.assign({},(G.height_base||{})[s.city]||{},{src:(((R.height_base||{})[s.city])||{}).src||'?'})};
+  if(!q){ out.none=true; return out; }
+  const d=x=>Math.round(x)/10; Object.assign(out,{min:d(q[0]),p10:d(q[1]),med:d(q[5]),max:d(q[10]),cover:q[11]});
+  const FC=R.fcl;  
+  if(s.city==='van'&&FC&&s.floodD){ const F=+FC.v, dm=F*10;
+     
+    let below=0; if(dm>=q[10]) below=100; else if(dm>q[0]){ for(let i=0;i<10;i++){ if(dm<=q[i+1]){ below=10*i+(q[i+1]>q[i]?10*(dm-q[i])/(q[i+1]-q[i]):0); break; } } }
+    out.fcl={v:F,datum:FC.datum,src:FC.src,inShare:s.floodD,below:Math.round(below),raise:Math.max(0,d(dm-q[0])),
+      floor:A.built!=='existing'&&q[0]<dm, gens:A.gens!=='none'&&(A.genAt||'yard')==='yard'&&q[0]<dm}; }
+  return out; }
+ 
+function hallOptions(q,D,kMax,m,ftf,frontLo){ const g=m.Z&&m.Z.ground?1:0, Lq=q[1]-q[0], Wq=q[3]-q[2], out=[], seen=new Set(), MIN=6;
+  for(let k=Math.max(1,kMax);k>=1;k--){ const fa=D/k; if(fa>Lq*Wq+0.01) break; const top=ftf.ground+(k+g-1)*ftf.up[1]; if(top>m.H+0.01) continue;
+    for(const along of ['back','side']) for(const a of [1,1.5,2,3,4,0]){ let du,dv;
+      if(along==='back'){ dv=a?Math.min(Wq,Math.sqrt(fa*a)):Wq; du=fa/dv; } else { du=a?Math.min(Lq,Math.sqrt(fa*a)):Lq; dv=fa/du; }
+      if(du>Lq+0.01||dv>Wq+0.01||Math.min(du,dv)<MIN-0.01) continue;
+      const u=frontLo?[q[1]-du,q[1]]:[q[0],q[0]+du], v=[q[2],q[2]+dv], key=k+':'+u.map(x=>x.toFixed(1)).join(',')+':'+dv.toFixed(1); if(seen.has(key)) continue; seen.add(key);
+      out.push({key,k,st:k+g,top,along,a,u,v,fa}); } }
+  return out; }
+ 
+function yardsOfFrame(m,Z,side,fl){ const y=Z.yards||{front:0,side:0,rear:0}, out={front:y.front,rear:y.rear,s0:y.side,s1:y.side,max:y.max,by:'zone'}; const LSD=BD.data.lotside;
+  const SB=m.city==='edm'&&!Z.assumed&&!BD.S.answers.userFSR&&LSD&&LSD.edmSetback[Z.key]; if(!SB||!side||!side.any) return out;
+  const res=z=>LSD.edmResidential.part2.includes(z)||LSD.edmResidential.special.includes(z), ind=z=>LSD.edmIndustrial.zones.includes(z);
+  const val=f=>{ if(f.street) return Z.key==='BE'&&['collector','local'].includes(f.street.cls)?SB.streetCL:SB.street; if(f.alley) return SB.alley;
+    if(f.nbr.some(res)&&SB.res!=null) return SB.res; if(SB.nonInd!=null&&f.nbr.some(z=>!ind(z))) return SB.nonInd; return SB.site; };
+  const S0=side.S, fe=fl>0?'u0':'u1', re=fl>0?'u1':'u0'; return {front:val(S0[fe]),rear:val(S0[re]),s0:val(S0.v0),s1:val(S0.v1),max:y.max,by:'side facts',src:((BD.data.raw.lotside||{edmSetback:{}}).edmSetback[Z.key]||{}).src||['?']}; }
+ 
+function frontYard(m){ const F=m.F, dir=m.dir, sf=m.serverFoot&&m.sizedTo&&!m.sizedTo.ratio?m.serverFoot:m.foot, P=[];     if(!F||!sf) return;
+  for(let i=0;i<sf.length;i+=2) P.push(F.toL(sf[i],sf[i+1]));
+  const face=dir<0?Math.min(...P.map(p=>p[0])):Math.max(...P.map(p=>p[0])), vs=P.map(p=>p[1]), vA=Math.min(...vs), vB=Math.max(...vs);
+  const R=m.yardOff&&!m.yardOffBad?m.yardOff:m.ring, D=[];
+  for(let v=vA+0.25; v<=vB-0.25+1e-9; v+=0.5){ let d=0; for(; d<200; d+=0.1){ const [x,y]=F.toW(face+dir*(d+0.1),v); if(!BD.pip(x,y,R)) break; } D.push(Math.round(d*10)/10); }
+  if(!D.length) return;
+  const fr=(m.edgeYards||[]).find(e=>e.kind==='front'), dMin=Math.min(...D), dMax=Math.max(...D), m2=Math.round(D.reduce((a,b)=>a+b,0)*0.5);
+  m.frontYard={m2,dMin,dMax,public:dMin>=6,toStreet:fr?fr.abuts==='street':null,beside:!!m.sideDrive,capFront:m.capFront||0,
+    heat:'covered beds and heated paths fed by data-centre heat (project decision gate 10 Nov; figures ? until the heat cascade research)', why:'the author’s review, 10 Nov 2026: building against the plant yard; depth from the building face to the front yard line, every 0.5 m across the building (our arithmetic); public yard ≥ 6 m deep (project decision, 10 Nov, drawing choice); maximum front setback not read (?); noise at the yard not checked (?)'}; }
+
+ 
+const LANE_HALF=6.1/2;    
+function yardsOf(m,Z,side,fl){ const E=(BD.S.sel&&BD.S.sel.edges)||[], cls=side&&side.cls; if(!cls||!cls.lines.length||!E.length) return yardsOfFrame(m,Z,side,fl);
+  const A=BD.S.answers, LSD=BD.data.lotside, F=m.F, y=Z.yards||{front:0,side:0,rear:0}, FLK=((LSD.lines||{}).vanFlankAsFront||{}).zones||[];
+  const SB=m.city==='edm'&&!Z.assumed&&!A.userFSR&&LSD&&LSD.edmSetback[Z.key];
+  const EFS=((LSD.lines||{}).edmFlankStreet||{}).zones||[], dk={front:y.front,rear:y.rear,side:y.side,flank:!Z.assumed&&(m.city==='van'?FLK.includes(Z.vkey):EFS.includes(Z.key))?y.front:y.side};  
+  const res=z=>LSD.edmResidential.part2.includes(z)||LSD.edmResidential.special.includes(z), ind=z=>LSD.edmIndustrial.zones.includes(z);
+  const ab=e=>{ if(e.street) return e.street.cls==='alley'?['alley',SB.alley]:['street',Z.key==='BE'&&['collector','local'].includes(e.street.cls)?SB.streetCL:SB.street];
+    const zm=e.zoneFromMap?' (zone from the zoning map)':''; if(e.nbr.some(res)&&SB.res!=null) return ['residential lot'+zm,SB.res]; if(SB.nonInd!=null&&e.nbr.some(z=>!ind(z))) return ['non-industrial lot'+zm,SB.nonInd]; if(e.nbr.length) return [e.zoneFromMap?'lot (zone from the zoning map)':'lot',SB.site];
+     
+    const allD=Math.max(...['street','streetCL','alley','site','res','nonInd'].map(k=>SB[k]).filter(v=>typeof v==='number'));
+    return [e.lotNoZone?'a parcel with no zone on record or on the zoning map (?)':'nothing found (?)',allD,allD!==SB.site]; };
+  const sw=k=>A.flip?(k==='front'?'rear':k==='rear'?'front':k):k, out=[], ins={u0:0,u1:0,v0:0,v1:0};
+  for(const l of cls.lines) for(const k of l.e){ const e=E[k]; if(!e) continue; const kind=sw(l.kind), cand=l.cand?l.cand.map(sw):null; let d, abuts=null;
+    let unA=false; if(SB){ const a=ab(e); abuts=a[0]; d=a[1]; unA=!!a[2]; } else { d=kind==='unclear'?Math.max(...cand.map(c=>dk[c]||0)):(dk[kind]||0);
+       
+      abuts=e.street?(e.street.cls==='alley'?'alley':'street'):(e.nbr&&e.nbr.length?'lot':null); }
+     
+    let laneCL=false; if(m.city==='van'&&Z.vkey==='I-2'&&!Z.assumed&&kind==='rear'&&abuts==='alley'&&d>0){ d=Math.max(0,Math.round((d-LANE_HALF)*100)/100); laneCL=true; }
+    out.push({i:e.i,ax:e.ax,ay:e.ay,bx:e.bx,by:e.by,kind,cand,why:l.why,d,abuts,unA,len:e.len,...(laneCL?{laneCL:true}:{})});
+    if(d>0){ const nu=e.nx*F.ux+e.ny*F.uy, nv=-e.nx*F.uy+e.ny*F.ux, side4=Math.abs(nu)>=Math.abs(nv)?(nu<0?'u0':'u1'):(nv<0?'v0':'v1'), p=F.toL(e.ax,e.ay), q=F.toL(e.bx,e.by), T=0.5;  
+      const touch={u0:Math.min(p[0],q[0])<=-F.L/2+T,u1:Math.max(p[0],q[0])>=F.L/2-T,v0:Math.min(p[1],q[1])<=-F.W/2+T,v1:Math.max(p[1],q[1])>=F.W/2-T}[side4]; if(touch) ins[side4]=Math.max(ins[side4],d); } }
+  const src=SB?(((BD.data.raw.lotside||{edmSetback:{}}).edmSetback[Z.key]||{}).src||['?']).concat(['lot_edm_820_lines']):[Z.srcId].concat(m.city==='van'?['lot_van_s2_lines','lot_van_s10_frontage']:['lot_edm_820_lines','lot_edm_5130']).concat(m.city==='van'?['lot_van_exterior_side']:EFS.includes(Z.key)?['arch_zns_edmEETP']:[]).concat(m.city==='edm'?['edmZoningGeo']:[]);
+  return {front:fl>0?ins.u0:ins.u1,rear:fl>0?ins.u1:ins.u0,s0:ins.v0,s1:ins.v1,max:y.max,by:SB?'abutting, per line':'lot lines',src:[...new Set(src.filter(Boolean))],edges:out,unclear:out.filter(e=>e.kind==='unclear').length,unAbut:out.filter(e=>e.unA).length}; }
+ 
+function yardLines(m){ const y=m.yards, r=m.ring; m.edgeYards=y&&y.edges?y.edges:null; m.yardOff=null; m.yardLine=null; if(!m.edgeYards||!r) return;
+  const n=r.length/2, D=new Array(n).fill(null); for(const e of m.edgeYards) D[e.i]=e.d; for(let i=0;i<n;i++) if(D[i]==null) D[i]=Math.max(D[(i+n-1)%n]||0,D[(i+1)%n]||0);
+  const off=offsetRing(r,D); m.yardOffBad=!off; if(!off) return; m.yardOff=off; if(m.yardRect) m.yardLine=clipYards(m,m.yardRect); }
+ 
+function clipYards(m,rr){ const c=clip(m.ring,rr); if(!m.yardOff||!m.edgeYards) return c; for(const e of m.edgeYards) if(e.d>0&&rectSegDist(rr,e)<e.d-1e-3) return clip(m.yardOff,rr); return c; }
+BD.buildArea=M=>M.inset?clipYards(M,M.inset):M.ring; BD.clipYards=clipYards;
+function setHall(m,o){ if(!o){ m.serverFoot=m.hallFull; delete m.hallTop; delete m.hallStoreys; delete m.hallData; delete m.hallOpt; m.hallFallback=true; return; }
+  m.serverFoot=rectW(m.F,o.u[0],o.u[1],o.v[0],o.v[1]); m.hallTop=o.top; m.hallStoreys=o.st; m.hallData=o.k; m.hallOpt=o.key; m.hallFallback=false; }
+BD.siteGeo={rectW,inscribe,clip,frameOf}; BD.model=model; BD.modelReset=()=>{ cache.key=null; fsCache.key=null; fpCache.key=null; };
+ 
+function setupProblems(noFloor){ const m=model(); if(!m||!m.F) return []; const p=(m.warn||[]).slice();
+  if(m.plant&&m.plant.miss) p.push(...m.plant.miss.map(x=>x.charAt(0).toUpperCase()+x.slice(1)+'.'));
+  if(!noFloor) try{ const A=BD.S.answers; if(A.mw&&BD.eng){ const keep=A.mw; A.mw=null; cache.key=null; const hi=BD.eng.siteFacts().mw[1]; A.mw=keep; cache.key=null; model();
+    if(keep>hi+0.05) p.push(`${keep} MW of servers need more floor than this building can hold (up to ${hi.toFixed(1)} MW).`); } }catch(e){}
+  return p; }
+ 
+ 
+function hallRows(){ return (BD.data.dc_rooms&&BD.data.dc_rooms.rooms)||[]; }
+function hallDensity(opt){ const H=hallRows().find(r=>r.id==='hall'); if(opt&&opt.hall!=null) return opt.hall; const ins=(opt&&opt.inside)||BD.S.answers.inside||'air';
+  if((ins==='liquid'||ins==='immersion')&&H&&H.perMWLiquid!=null) return +H.perMWLiquid; return H&&H.perMW?H.perMW[1]:630; }
+function perHiOf(opt){ const R=hallRows(), all=R.filter(r=>r.split&&r.perMW).reduce((t,r)=>t+r.perMW[1],0), H=R.find(r=>r.id==='hall'), hallAir=H&&H.perMW?H.perMW[1]:0;
+  if(!(all>0)) return {per:630,air:630}; return {per:all-hallAir+hallDensity(opt),air:all}; }
+function fitMax(opt){ const asIs=!!(opt&&opt.asIs); if(asIs){ roomOff=true; cache.key=null; } try{ return fitMax0(opt); }finally{ if(asIs){ roomOff=false; cache.key=null; } } }  
+function fitMax0(opt){ fitMax0.beyond=false; const A=BD.S.answers, keep=A.mw; A.mw=null; cache.key=null; let hi=0; try{ hi=BD.eng.siteFacts().mw[1]; }catch(e){}
+   
+  const PH=perHiOf(opt), perHi=PH.per; if(PH.air>perHi) hi*=PH.air/perHi;    
+  const supHi=(()=>{ const g=BD.data.arch&&BD.data.arch.ratioGround&&BD.data.arch.ratioGround.support; return g&&g[1]>0&&g[1]<1?g[1]:0.33; })();
+   
+   
+  const roomWhy=mw=>{ const m=model(); if(!m||m.existing||!m.foot||!BD.eng) return null; if(m.plant&&m.plant.bigYard){ fitMax0.beyond=true; return {k:'yard',depth:m.plant.bigYard,lim:21.7,t:`the generators need a plant yard ${m.plant.bigYard} m deep, deeper than the 21.7 m of the tested lots`}; }
+    const all=m.nF?m.nF[0]:1, g=!!(m.Z&&m.Z.ground), up=Math.max(1,g?all-1:all), fa=BD.area(m.foot), n1=mw*perHi, n2=mw*perHi/(1-supHi), h1=fa*up, h2=fa*(g?up+1:up);
+    if(h1<n1-0.5) return {k:'floor',need:n1,have:h1,t:`the hall, UPS and battery rooms need about ${Math.round(n1).toLocaleString('en-CA')} m² on the ${up} storey${up>1?'s':''} that may hold them; the building gives ${Math.round(h1).toLocaleString('en-CA')} m²`};
+    if(h2<n2-0.5) return {k:'floor',need:n2,have:h2,t:`the data centre with its support rooms needs about ${Math.round(n2).toLocaleString('en-CA')} m²; the building gives ${Math.round(h2).toLocaleString('en-CA')} m²`};
+    return null; };
+  const roomOK=mw=>!roomWhy(mw);
+  const ok=mw=>{ A.mw=mw; cache.key=null; return !setupProblems(true).length&&roomOK(mw); };
+  let lo=0, best=null, top=Math.floor((hi||0)*10);
+   
+  if(BD.eng&&A.gens!=='none'&&(A.genAt||'yard')==='roof'){ const R=BD.eng.R; top=Math.min(top,Math.floor(BD.data.equipment.roofTank.line/(R.pue[1]*1000*R.fuelHours*R.fuelLkWh)*10)); }  
+  if(top>=1&&ok(top/10)) best=top/10; else { let a=1, b=top-1; while(a<=b){ const mid=(a+b)>>1; if(ok(mid/10)){ best=mid/10; a=mid+1; } else b=mid-1; } }
+   
+  fitMax0.why=null; try{ const nx=best!=null?Math.round((best+0.1)*10)/10:0.1;
+    if(nx>(hi||0)+1e-9) fitMax0.why={mw:nx,k:'range',t:`${nx} MW is beyond what the building's floor space holds (up to ${(hi||0).toFixed(1)} MW)`};
+    else { A.mw=nx; cache.key=null; const p=setupProblems(true); fitMax0.why=p.length?{mw:nx,k:'setup',t:p[0],all:p}:Object.assign({mw:nx},roomWhy(nx)||{k:'none',t:null}); } }catch(e){ fitMax0.why=null; }
+  A.mw=keep; cache.key=null; return best; }
+ 
+let fsCache={key:null,v:null};
+function fitSizes(){ const A=BD.S.answers, keep=A.mw, B=Object.assign({},A); delete B.mw; delete B.mwPick; delete B.mwSite; delete B.resNote;
+  const key=JSON.stringify([BD.S.sel&&BD.S.sel.city,BD.S.sel&&BD.S.sel.id,B]); if(fsCache.key===key) return fsCache.v;
+  const fm=fitMax(), out={ok:[],min:null,max:null};
+  if(fm!=null){ const ST=(BD.eng&&BD.eng.R.steps)||[]; for(const v of ST.filter(s=>s<fm-1e-9).concat([fm])){ A.mw=v; cache.key=null; if(!setupProblems(true).length) out.ok.push(v); }
+    A.mw=keep; cache.key=null; }
+  if(out.ok.length){ out.min=out.ok[0]; out.max=out.ok[out.ok.length-1]; } fsCache={key,v:out}; return out; }
+ 
+function sizePasses(v){ const A=BD.S.answers, keep=A.mw; A.mw=v; cache.key=null; let ok=false; try{ ok=!setupProblems().length; }finally{ A.mw=keep; cache.key=null; } return ok; }
+ 
+function fitNear(want){ if(want!=null&&sizePasses(want)) return want; const S=fitSizes(); if(!S.ok.length) return null; const below=S.ok.filter(v=>v<=(want||0)+1e-9); return below.length?below[below.length-1]:S.ok[0]; }
+ 
+function measureOf(m){ if(!m) return null; const A=BD.S.answers, mi=m.noise&&m.noise.mit, o=(mi&&mi.option)||'', t=[], id=[];
+  if(/ln/.test(o)){ t.push('low-noise chillers'); id.push('ln'); }
+  if(/fan/.test(o)){ t.push('night fan speed'); id.push('fan'); }
+  if(/scr/.test(o)&&mi.screen){ t.push(`a ${mi.screen.h.toFixed(1)} m solid screen`); id.push('scr'); }
+  const own=A.vis==='indoors'&&m.plant&&m.plant.coolRoofIndoor>0, room=!!m.noiseRoom||own;
+  if(room){ t.push(`an enclosed plant room${m.noiseRoom?' (needed for the noise by-law)':A.visDefault==='arch'?' (the Architecture default)':' (as set up)'}`); id.push('room'); }
+  return {id:id.join('+')||'none',room,auto:!!m.noiseRoom,t:t.length?'with '+t.join(' and '):'with no noise measure'}; }
+ 
+let fpCache={key:null,v:null};
+function fitPlan(){ const A=BD.S.answers, B=Object.assign({},A); delete B.mw; delete B.mwPick; delete B.mwSite; delete B.resNote;
+  const key=JSON.stringify([BD.S.sel&&BD.S.sel.city,BD.S.sel&&BD.S.sel.id,B]); if(fpCache.key===key) return fpCache.v;
+  const fm=fitMax(), v={mw:fm,measure:null,asIs:null};
+  if(fm!=null){ const keep=A.mw; A.mw=fm; cache.key=null; try{ v.measure=measureOf(model()); }finally{ A.mw=keep; cache.key=null; }
+    if(v.measure&&v.measure.auto){ v.asIs=fitMax({asIs:true}); } }
+  fpCache={key,v}; return v; }
+const planText=v=>v&&v.mw!=null?`up to ${v.mw.toFixed(1)} MW ${v.measure?v.measure.t:''}${v.measure&&v.measure.auto?`; ${v.asIs!=null?v.asIs.toFixed(1)+' MW':'no size'} with the plant on the roof as set up`:''}`:null;
+BD.measureOf=measureOf; BD.fitPlan=fitPlan; BD.planText=planText;
+ 
+function fitStep(mw,opt){ const A=BD.S.answers, keep=A.mw, per=perHiOf(opt).per;
+  const at=v=>{ A.mw=v; cache.key=null; const m=model(); if(!m||!m.foot||m.existing) return null; const P=m.plant||{}, s=P.s||{}, all=m.nF?m.nF[0]:1, up=Math.max(1,m.Z&&m.Z.ground?all-1:all), fa=BD.area(m.foot);
+    return {mw:v,gN:s.gN||0,gNeed:s.gNeed||0,setL:s.g?s.g.L:null,perRow:P.genPerRow||null,width:m.v?m.v[1]-m.v[0]:null,yard:m.plantYardDepth||0,foot:fa,up,floor:fa*up,need:v*per}; };
+  try{ return {per,a:at(mw),b:at(Math.round((mw+0.1)*10)/10)}; } catch(e){ return null; } finally{ A.mw=keep; cache.key=null; } }
+BD.fitStep=fitStep; BD.hallDensity=hallDensity;
+ 
+function hallNote(){ const ins=BD.S.answers.inside||'air';
+  if(ins==='liquid') return {kind:'liquid',t:'hall at about 150 m² per MW: maker’s reference design (Schneider RD99, direct-to-chip hybrid hall)'};
+  if(ins==='immersion') return {kind:'immersion',t:'hall at about 150 m² per MW: stand-in from a direct-to-chip design; immersion density not sourced yet (Schneider RD99)'};
+  return {kind:'air',t:'hall at 560–640 m² per MW: four built Canadian halls'}; }
+function denseLine(){ let mw=null; try{ mw=fitMax({hall:400}); }catch(e){} const n=hallNote();
+  const lab=n.kind==='air'?'With a modern denser hall (2.5–4.0 kW/m² net white space, RICS Construction Journal)':'Conservative end (RICS Construction Journal, 2.5–4.0 kW/m² net white space)';
+  return {mw,lab,t:lab+': '+(mw!=null&&mw>=0.05?'about '+mw.toFixed(1)+' MW':'none fits')+(n.kind==='air'?' (shown, not the default)':'')}; }
+BD.hallNote=hallNote; BD.denseLine=denseLine;
+BD.fitWhy=()=>{ fitMax(); return fitMax0.why; }; BD.setupProblems=setupProblems; BD.fitMax=fitMax; BD.fitBeyond=()=>!!fitMax0.beyond; BD.fitSizes=fitSizes; BD.fitNear=fitNear; BD.sizePasses=sizePasses;
+ 
+function yardEdges(m){ if(m.edgeYards) return m.edgeYards.filter(e=>e.d>0);   const A=BD.S.answers, F=m.F, y=m.yards, r=m.ring; if(!F||!y||!r) return []; const fl=(!!(m.side&&m.side.autoU1))!==(!!A.flip)?-1:1, E=[];
+  for(let i=0;i<r.length;i+=2){ const j=(i+2)%r.length, ax=r[i], ay=r[i+1], bx=r[j], by=r[j+1], L=Math.hypot(bx-ax,by-ay); if(L<0.5) continue;
+    const mx=(ax+bx)/2, my=(ay+by)/2; let nx=-(by-ay)/L, ny=(bx-ax)/L; if(BD.pip(mx+nx*0.3,my+ny*0.3,r)){ nx=-nx; ny=-ny; }
+    const nu=nx*F.ux+ny*F.uy, nv=-nx*F.uy+ny*F.ux; let kind, d; if(Math.abs(nu)>=Math.abs(nv)){ kind=(nu<0)===(fl>0)?'front':'rear'; d=y[kind]; } else { kind='side'; d=nv<0?y.s0:y.s1; }
+    if(d>0) E.push({ax,ay,bx,by,kind,d}); }
+  return E; }
+function segDist(px,py,e){ const dx=e.bx-e.ax, dy=e.by-e.ay, L2=dx*dx+dy*dy; let t=L2?((px-e.ax)*dx+(py-e.ay)*dy)/L2:0; t=Math.max(0,Math.min(1,t)); return Math.hypot(px-(e.ax+t*dx),py-(e.ay+t*dy)); }
+ 
+function yardRuns(m,R){ const out=[]; if(!m||!R) return out; const E=yardEdges(m);
+  for(let i=0;i<R.length;i+=2){ const j=(i+2)%R.length, ax=R[i], ay=R[i+1], bx=R[j], by=R[j+1], L=Math.hypot(bx-ax,by-ay), n=Math.max(1,Math.ceil(L));
+    for(let k=0;k<n;k++){ const x0=ax+(bx-ax)*k/n, y0=ay+(by-ay)*k/n, x1=ax+(bx-ax)*(k+1)/n, y1=ay+(by-ay)*(k+1)/n, cx=(x0+x1)/2, cy=(y0+y1)/2;
+      let e=null; for(const q of E) if(segDist(cx,cy,q)<q.d-0.3){ e=q; break; } out.push({x0,y0,x1,y1,len:L/n,yard:e?e.kind:null}); } }
+  return out; }
+BD.yardRuns=yardRuns;
+
+ 
+const css=document.createElement('style'); css.textContent=`
+#drawer{position:absolute;top:0;left:0;bottom:0;width:min(440px,92%);background:var(--panel);border-right:1px solid var(--line-2);z-index:8;overflow:auto;padding:16px 18px 28px;box-shadow:var(--shadow)}
+#drawer[hidden]{display:none}
+#drawer .dx{float:right;background:transparent;border:1px solid var(--line-2);border-radius:6px;padding:2px 9px;cursor:pointer;color:var(--muted);font-size:12.5px}
+#drawer h2{font-size:18px;font-weight:400;margin:4px 0 6px;line-height:1.3}
+#drawer h3{font-size:12px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);font-weight:600;margin:18px 0 6px;padding-top:12px;border-top:1px solid var(--line)}
+.steps{display:flex;gap:4px;margin:10px 0 12px}.steps button{flex:1;height:4px;border:0;border-radius:2px;background:var(--line-2);padding:0;cursor:pointer}.steps button.on{background:var(--accent)}.steps button.done{background:var(--muted)}
+.choice{display:grid;gap:6px;margin:8px 0}.choice button{text-align:left;background:var(--bg);border:1px solid var(--line-2);border-radius:6px;padding:8px 10px;cursor:pointer;color:var(--fg);font:inherit;font-size:13px}
+.choice button[aria-pressed="true"]{border-color:var(--accent)}.choice button small{display:block;color:var(--muted);font-size:12px;margin-top:2px}.choice button .def{float:right;font-size:10.5px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+.cl{width:100%;border-collapse:collapse;font-size:12.5px;margin-top:6px}.cl td{border-top:1px solid var(--line);padding:5px 6px 5px 0;vertical-align:top}.cl td:first-child{color:var(--muted);width:92px}.cl td small{display:block;color:var(--faint);font-size:11px}
+.warnbox{border:1px solid #CC746C;border-radius:6px;padding:8px 10px;font-size:12.5px;margin:8px 0;color:var(--accent-2)}
+.navb{display:flex;gap:8px;margin-top:18px;align-items:center}.navb button{border-radius:6px;padding:7px 14px;cursor:pointer;font:inherit}.navb .pri{background:var(--fg);color:var(--on-ink);border:0;font-weight:600}.navb .sec{background:transparent;border:1px solid var(--line-2);color:var(--fg)}
+.numin{display:flex;gap:10px;flex-wrap:wrap;margin-top:6px}.numin label{font-size:12.5px;color:var(--muted)}.numin input{width:84px;margin-left:6px;background:var(--bg);border:1px solid var(--line-2);border-radius:4px;padding:3px 6px;color:var(--fg)}
+.sumrow{display:grid;grid-template-columns:88px 1fr auto;gap:8px;font-size:12.5px;padding:5px 0;border-top:1px solid var(--line);align-items:baseline}.sumrow span:first-child{color:var(--muted)}.sumrow a{font-size:12px}
+.live{border:1px solid var(--line-2);border-radius:6px;padding:8px 10px;margin:10px 0;font-size:12.5px}.live b{font-weight:400;font-size:16px}
+`; document.head.appendChild(css);
+const dr=document.createElement('div'); dr.id='drawer'; dr.hidden=true; dr.setAttribute('role','dialog'); dr.setAttribute('aria-label','Card');
+document.getElementById('map').appendChild(dr); for(const ev of ['pointerdown','wheel']) dr.addEventListener(ev,e=>e.stopPropagation());
+BD.drawer={ open(html,wire){ dr.innerHTML=`<button class="dx" id="dxc" title="Close (Esc)">×</button>`+html; dr.hidden=false; dr.scrollTop=0; $('#dxc').onclick=()=>BD.drawer.close(); if(wire) wire(dr); },
+  close(){ dr.hidden=true; dr.innerHTML=''; if(BD.onDrawerClose){ const f=BD.onDrawerClose; BD.onDrawerClose=null; f(); } }, el:dr, isOpen:()=>!dr.hidden };
+document.addEventListener('keydown',e=>{ if(e.key==='Escape'&&!dr.hidden){ e.stopPropagation(); BD.drawer.close(); } },true);
+
+ 
+const STEPS=['What is being built','Footprint','Height','Cooling and where its plant goes','Standby power'];
+function ch(name,opts,val){ return `<div class="choice" data-q="${name}">${opts.map(o=>`<button data-v="${o.v}" aria-pressed="${String(o.v)===String(val)}">${o.def?'<span class="def">default</span>':''}${esc(o.t)}${o.s?`<small>${o.s}</small>`:''}</button>`).join('')}</div>`; }
+ 
+function sideHTML(m){ const S=m.side; if(!S) return ''; const fl=(S.autoU1)!==!!BD.S.answers.flip?-1:1, nm={u0:fl>0?'Front':'Rear',u1:fl>0?'Rear':'Front',v0:'Side',v1:'Other side'};
+  const t=f=>f.street?`${esc(f.street==='unclassified'?'a street (class ?)':(/^[aeiou]/.test(f.street)?'an ':'a ')+f.street+' street')} (City class "${esc(f.road||'?')}", centreline about ${f.d} m out)`:f.alley?'an alley or lane':f.nbr.length?(f.nbr.length>1?'lots':'a lot')+' zoned '+esc(f.nbr.join(', ')):'nothing in the street or zoning files (?)';
+  const y=m.yards, yv={u0:fl>0?y&&y.front:y&&y.rear,u1:fl>0?y&&y.rear:y&&y.front,v0:y&&y.s0,v1:y&&y.s1};
+  return `<table class="cl">${['u0','u1','v0','v1'].map(k=>`<tr><td>${nm[k]}</td><td>faces ${t(S[k])}${y&&y.by==='side facts'?` · setback ${yv[k]} m`:''}</td></tr>`).join('')}</table>${S.rot?'<p class="sub">The lot is turned so the street side is an end (a drawing choice).</p>':''}${y&&y.by==='side facts'?`<p class="src">Setbacks by what each side faces: ${esc(m.Z.key)} Table 4.1 (register ${esc(y.src.join(', '))}). Street class from the City's road file (register ${esc(S.src[0])}); neighbours' zones from the zoning map (register ${esc(S.src[1])}). Which zones count as residential: Bylaw 20001 Part 2 and Special Area zones named residential, row housing or apartment (the latter our reading ?).</p>`:''}`; }
+ 
+const KN={front:'Front',flank:'Flanking side',rear:'Rear',side:'Side',unclear:'Unclear'};
+function linesHTML(m){ const E=m.edgeYards; if(!E||!E.length) return ''; const L=[]; let cur=null;
+  for(const e of E){ if(cur&&cur.why===e.why&&cur.kind===e.kind&&cur.unA===!!e.unA){ cur.len+=e.len; cur.d=Math.max(cur.d,e.d); if(e.abuts&&!cur.ab.includes(e.abuts)) cur.ab.push(e.abuts); } else { cur={kind:e.kind,cand:e.cand,why:e.why,len:e.len,d:e.d,ab:e.abuts?[e.abuts]:[],unA:!!e.unA}; L.push(cur); } }
+  const un=L.filter(l=>l.kind==='unclear'), y=m.yards;
+  return `<h3>Lot lines</h3><table class="cl">${L.map(l=>`<tr><td>${KN[l.kind]||esc(l.kind)}</td><td>${fmt(Math.round(l.len))} m · yard ${l.d} m${l.ab.length?' (abuts '+esc(l.ab.join(', '))+')':''}<small>${esc(l.why)}${l.kind==='unclear'?` · <span class="k">which yard this edge has is not known (?)</span>: could be ${esc((l.cand||[]).map(c=>(KN[c]||c).toLowerCase()).join(' or '))}; the deepest is applied`:''}${l.unA?` · <span class="k">which setback this edge has is not known (?)</span>: what it abuts is not known; the deepest is applied`:''}</small></td></tr>`).join('')}</table>
+    <p class="src">Classes by the by-laws' definitions (register ${esc((y&&y.src||[]).join(', '))}); tests in checks/research_arch_v1/lotlines.md.${m.yardOffBad?' The line of the yards folds on this lot (a yard deeper than a notch is wide), so it is drawn approximately; the building is still kept out of every yard (?).':''}${un.length?` ${un.length} line${un.length>1?'s':''} unclear.`:''}</p>`; }
+function clauses(Z){ return `<table class="cl">${Z.cl.map(c=>`<tr><td>${esc(c[0])}</td><td>${esc(c[1])}<small>${esc(c[2])}</small></td></tr>`).join('')}</table>`; }
+function setDefaults(){ const A=BD.S.answers; const d={foot:'max',cover:70,hmode:'out',plantAt:'roof',outside:'dry',inside:'air',spares:'n1',gens:'yes',genAt:'yard',genSpares:'n1'}; for(const k in d) if(A[k]==null) A[k]=d[k]; }
+function liveBox(){ const m=model(); if(!m||!BD.eng) return ''; const f=BD.eng.siteFacts(); const P=m.plant;
+  return `<div class="live"><div class="kind">Updates as you choose</div>${draft('')}<b>${BD.eng.rng(f.mw[0],f.mw[1],'MW')}</b> of servers on floor space alone · ${BD.eng.rng(f.gross[0],f.gross[1],'m²')} floor area${m.footArea?` · footprint ${fmt(m.footArea)} m²`:''}${m.nF?` · ${m.nF[0]===m.nF[1]?m.nF[0]:m.nF[0]+'–'+m.nF[1]} storeys`:''}${P&&P.short?`<div class="draft" style="margin-top:4px">${esc(P.short)}</div>`:''}</div>`; }
+function card(step){
+  setDefaults(); const S=BD.S, A=S.answers, m=model(); if(!m) return; const Z=m.Z, hb=(S.sel.blds||[]).filter(b=>b.f!==3).length>0;
+  A.step=step;
+  let h=`<div class="kind">Set up the site · step ${step} of 5</div><div class="steps">${STEPS.map((t,i)=>`<button data-step="${i+1}" class="${i+1===step?'on':i+1<step?'done':''}" title="${esc(t)}" aria-label="Step ${i+1}: ${esc(t)}"></button>`).join('')}</div><h2>${esc(STEPS[step-1])}</h2>`;
+  if(step===1){
+    h+=`<p class="sub">${draft('A new building can be sized to the zone; an existing one is what it is.')}</p>${ch('built',[{v:'new',t:'New building',def:true,s:'sized to the zone\'s floor area, height and setbacks'},{v:'existing',t:'Existing building',s:hb?'the building on the lot now, as measured':'no building recorded on this lot'}],A.built)}
+    <h3>Whole building or part</h3>${ch('extent',[{v:'whole',t:'Whole building',def:true},{v:'part',t:'Part of one',s:A.built==='new'?'the options compare basement, ground, upper floor and roof':'choose the floor below'}],A.extent)}
+    ${A.built==='existing'&&A.extent==='part'?`<h3>Which floor</h3>${ch('floor',[{v:'basement',t:'Basement'},{v:'ground',t:'Ground'},{v:'upper',t:'Upper floor'},{v:'roof',t:'Roof'}],A.floor)}`:''}`;
+  }
+  if(step===2){
+    if(A.built==='existing'){ h+=`<p class="sub">The existing building: ${fmt(m.footArea)} m² in plan.</p><p class="sub">${draft('Plant that does not fit inside or on the roof goes in the yard (step 4).')}</p>`; }
+    else { const LN=m.loadingNeed;
+      h+=`<p class="sub">${draft('How much of the lot the building covers. The default takes the most the zone allows, less its setbacks and a loading strip.')}</p>
+      ${ch('foot',[{v:'max',t:'Most the zone allows',def:true,s:'lot less setbacks, less loading'+(A.plantAt!=='roof'?', less the plant yard':'')},{v:'existing',t:'Match the existing building',s:hb?'same footprint as what stands there':'no building recorded'},{v:'cover',t:'Set the coverage',s:'a share of the lot'}],A.foot)}
+      ${A.foot==='cover'?`<div class="numin"><label>Coverage <input type="range" id="cov" min="20" max="100" step="5" value="${A.cover}"> <b id="covv">${A.cover}%</b></label></div>`:''}
+      ${Z.key==='I-2'&&!Z.assumed?`<h3>Sub-area</h3><p class="sub">Part of the False Creek Flats (bounded by Prior St, Clark Dr, Great Northern Way and Main St) is split into sub-areas A and B, with different limits (I-2 s. 1.1, Map 1). The tool does not map them; check Map 1 of the I-2 District Schedule.</p>${ch('subB',[{v:'',t:'Not in sub-area B',def:true,s:'rear yard 3.1 m, no front yard, 30.5 m with approval'},{v:'1',t:'In sub-area B',s:'yards 0.6 / 7.6 / 3.1 m, building at most 61 m wide and deep, 36.5 m and FSR 4.0 with approval'}],A.subB||'')}`:''}
+      <h3>Setbacks</h3>${m.yardNote?`<div class="warnbox">${esc(m.yardNote)}</div>`:''}${clauses({cl:Z.cl.filter(c=>/Yards|Setbacks/.test(c[0]))})}
+      ${sideHTML(m)}${linesHTML(m)}<p class="sub" style="margin-top:6px">${m.side&&m.side.any?'The street end is the front; the rear yard and loading go to the other end.':'No street was found beside this lot in the City\'s street file, so which end faces the street is not known; the rear yard and loading are put at one end.'} <a href="#" id="flip">Swap the ends</a>${A.flip?' (swapped)':''}</p>
+      <h3>Loading</h3><p class="sub">${esc(LN.basis)}</p>${ch('loadIn',[{v:'',t:'Outside, at the rear',def:true,s:`a strip ${(LN.len+LN.aisle).toFixed(1)} m deep: space plus aisle`},{v:'1',t:'Inside the building'+(A.loadDefault==='arch'&&A.loadIn==='1'?' (Architecture default)':''),s:'a loading bay on the ground floor; no strip'}],A.loadIn||'')}`; }
+  }
+  if(step===3){
+    if(A.built==='existing') h+=`<p class="sub">The existing building is ${m.H.toFixed(1)} m tall (${S.city==='van'?'City LiDAR 2022':'City 3D buildings or estimate'}), about ${m.nF[0]} storey${m.nF[0]>1?'s':''} at 4 m.${m.hUnknown?' <span class="draft">Some parts have no measured height; those are taken as one storey at 4 m (an assumption ?).</span>':''}</p>`;
+    else {
+      h+=`<p class="sub">${draft('Data-hall floors are tall: 5.5–6.0 m floor to floor, with a 6.0 m ground floor.')}</p>
+      ${ch('hmode',[{v:'out',t:`Outright: ${Z.hOutright} m`,def:true,s:'what the zone allows without the City\'s discretion'}].concat(Z.hx&&!A.userH?[{v:'cond',t:`With the City's approval: ${Z.hx[0]===Z.hx[1]?Z.hx[0]:Z.hx[0]+'–'+Z.hx[1]} m`,s:'the City may allow this; the tool uses '+Z.hx[0]+' m'}]:[]).concat([{v:'storeys',t:'Set the storeys',s:'height follows from 6.0 m + 6.0 m a storey'}]),A.hmode)}
+      ${A.hmode==='storeys'?`<div class="numin"><label>Storeys <input type="number" id="sto" min="1" max="${m.maxStoreys||12}" value="${A.storeys||2}"></label></div>${m.hClamp?`<div class="warnbox">${esc(m.hClamp.text)}</div>`:''}`:''}
+      <p class="sub">Gives about ${m.nF[0]===m.nF[1]?m.nF[0]:m.nF[0]+'–'+m.nF[1]} storeys in ${m.H.toFixed(1)} m.</p>
+      <h3>The zone's limits</h3>${Z.warn?`<div class="warnbox">${Z.warn}</div>`:''}${clauses(Z)}
+      <h3>Your own limits</h3><p class="sub">If you know this lot's limits differ (a rezoning, a CD-1, a variance), set them here. They replace the zone's figures above.</p>
+      <div class="numin"><label>Floor-space ratio <input type="number" id="ufsr" step="0.1" min="0.1" max="12" value="${A.userFSR||''}" placeholder="${Z.base.fsr[1]}"></label><label>Height, m <input type="number" id="uh" step="0.5" min="4" max="200" value="${A.userH||''}" placeholder="${Z.base.h}"></label></div>`; }
+  }
+  if(step===4){ const P=m.plant||{};
+    h+=`<p class="sub">${draft('A data centre must reject almost all the electricity it uses as heat. The default is the simplest: air inside, dry coolers outside, on the roof. Each choice changes heat, water, sound and space; the Cooling card compares them.')}</p>
+    <h3>Inside: how servers are cooled</h3>${ch('inside',[{v:'air',t:'Air',def:true,s:'fans and cooling coils; heat leaves at about 25–35 °C'},{v:'plate',t:'Liquid to the chip (cold plate)',s:'57–75% of heat captured into liquid (LBNL); warmer, easier to reuse'},{v:'immersion',t:'Immersion',s:'servers in a fluid bath; capture share not yet verified'}],A.inside)}
+    <h3>Outside: how heat leaves</h3>${ch('outside',[{v:'dry',t:'Dry coolers',def:true,s:'no water; fans and roof space; with air cooling, air-cooled chillers with free-cooling coils instead, since dry coolers cannot make water cold enough in summer'},{v:'towers',t:'Cooling towers',s:'evaporate water; smaller; operating permit and Legionella rules'},{v:'hybrid',t:'Hybrid (adiabatic) coolers',s:'dry most of the year, water on hot days; in Vancouver treated as a cooling tower'}],A.outside)}
+    <h3>Where the plant goes</h3>${ch('plantAt',[{v:'roof',t:'Roof',def:true},{v:'yard',t:'Yard',s:'the building gets shorter to leave room'},{v:'split',t:'Split',s:'half on the roof, half in the yard'}],A.plantAt)}
+    <h3>Spare units</h3>${ch('spares',[{v:'n',t:'None (N)',s:'like Uptime Tier I: basic capacity; shuts down for maintenance'},{v:'n1',t:'One spare (N+1)',def:true,s:'like Tier II–III: redundant capacity components'},{v:'2n',t:'Double (2N)',s:'like Tier IV: independent systems'}],A.spares)}<p class="src">Spares: Uptime Institute describes Tier II and above as having "redundant capacity components" for cooling and heat rejection, and Tier IV as "independent and physically isolated systems". It does not use the terms N+1 or 2N; reading one spare as Tier II–III and double as Tier IV is the project’s.</p>
+    ${P.lines?`<h3>Sized from the load</h3><ul class="lim">${P.lines.map(l=>`<li>${l}</li>`).join('')}</ul>`:''}`;
+  }
+  if(step===5){ const P=m.plant||{};
+    h+=`<p class="sub">${draft('Standby generators carry the load if the grid fails; batteries (UPS) carry it for the minutes until they start. Shown as generic equipment only.')}</p>
+    ${ch('gens',[{v:'yes',t:'Standby generators',def:true,s:'sized to the peak load'},{v:'none',t:'None',s:'relies on the grid and UPS batteries only'}],A.gens)}
+    ${A.gens!=='none'?`<h3>Where</h3>${ch('genAt',[{v:'yard',t:'Yard',def:true},{v:'roof',t:'Roof',s:'done on a Paris-region conversion (DRIEE 2010); heavy'}],A.genAt)}<h3>Spares</h3>${ch('genSpares',[{v:'n',t:'None (N)'},{v:'n1',t:'One spare (N+1)',def:true},{v:'2n',t:'Double (2N)'}],A.genSpares)}`:''}
+    <p class="sub">UPS batteries sit inside, in the electrical rooms (about 2.4–3.3 m² per MW for the UPS plus 1.0–1.8 m² for lithium-ion batteries; manufacturer claims, register component_space).</p>${'' }
+    ${P.genLines?`<h3>Sized from the load</h3><ul class="lim">${P.genLines.map(l=>`<li>${l}</li>`).join('')}</ul>`:''}`;
+  }
+  if(m.warn.length) h+=m.warn.map(w=>`<div class="warnbox">${esc(w)}</div>`).join('');
+  if(m.notes&&m.notes.length) h+=m.notes.map(w=>`<p class="nflag" data-tl="1">${esc(w)}</p>`).join('');  
+  h+=liveBox();
+  h+=`<div class="navb">${step>1?'<button class="sec" id="sb">← Back</button>':''}<button class="pri" id="sn">${step<5?'Next →':'What fits here →'}</button><span class="sub">or keep the defaults</span></div>`;
+  BD.drawer.open(h,el=>{
+    el.querySelectorAll('.choice[data-q] button').forEach(b=>b.onclick=()=>{ A[b.parentNode.dataset.q]=b.dataset.v; changed(step); });
+    el.querySelectorAll('.steps button').forEach(b=>b.onclick=()=>card(+b.dataset.step));
+    const cov=$('#cov'); if(cov){ cov.oninput=()=>{ $('#covv').textContent=cov.value+'%'; }; cov.onchange=()=>{ A.cover=+cov.value; changed(step); }; }
+    const sto=$('#sto'); if(sto) sto.onchange=()=>{ A.storeys=Math.max(1,Math.min(12,+sto.value||1)); changed(step); };
+    const uf=$('#ufsr'); if(uf) uf.onchange=()=>{ A.userFSR=uf.value?+uf.value:null; changed(step); };
+    const uh=$('#uh'); if(uh) uh.onchange=()=>{ A.userH=uh.value?+uh.value:null; changed(step); };
+    const fl=$('#flip'); if(fl) fl.onclick=e=>{ e.preventDefault(); A.flip=!A.flip; changed(step); };
+    const sb=$('#sb'); if(sb) sb.onclick=()=>card(step-1);
+    $('#sn').onclick=()=>{ if(step<5) card(step+1); else { A.setupDone=true; BD.drawer.close(); if(BD.flow&&BD.flow.on) BD.flow.next(); else BD.fitsView(); } };
+  });
+  BD.showModel&&BD.showModel();
+}
+function changed(step){ const A=BD.S.answers; A.mw=null; if(A.built==='existing'&&A.foot==='max') {} BD.modelReset(); card(step); if(BD.S.view2==='fits') BD.fitsView(); else BD.card(); }
+ 
+function sideBox(){ const m=model(); if(!m||!m.F) return ''; const A=BD.S.answers;
+  return `<div class="dside"><h3>What each side faces</h3>${sideHTML(m)}${linesHTML(m)}<p class="sub">${m.side&&m.side.any?'The street end is the front; the rear yard and loading go to the other end.':'No street was found beside this lot in the City\'s street file, so which end faces the street is not known; the rear yard and loading are put at one end.'} <a href="#" id="flip">Swap the ends</a>${A.flip?' (swapped)':''}</p>${A.flip&&m.side&&m.side.any?`<div class="warnbox">Swapped: the rear yard and loading now face the street.${m.city==='edm'&&m.Z&&m.Z.key==='BE'?' BE s. 2.120 5.8 keeps loading from between a building and a street (register arch_hb_edmBE).':''}</div>`:''}</div>`; }
+ 
+function subBox(){ const m=model(); if(!m||!m.Z||m.Z.assumed||m.city!=='van') return ''; const A=BD.S.answers, k=m.Z.key;
+  if(k==='FC-2'){ const o=[['','Not chosen'],['A','A'],['B','B'],['C1','C1'],['C2','C2'],['D','D'],['E','E']];
+    return `<div class="dside"><h3>FC-2 sub-area</h3><p class="sub">Floor area and height differ by sub-area (FC-2 ss. 3.1–3.4; register van_zdb_fc2). The tool does not map them: check the FC-2 map.</p><label class="dnum">Sub-area <select data-zsub="fcSub">${o.map(([v,t])=>`<option value="${v}"${(A.fcSub||'')===v?' selected':''}>${t}</option>`).join('')}</select></label></div>`; }
+  if(k==='I-2') return `<div class="dside"><h3>I-2 sub-area</h3><p class="sub">Sub-area B has its own yards and limits (I-2 s. 3.2; register van_zdb_i2). The tool does not map it: check Map 1.</p><label class="dnum">Sub-area <select data-zsub="subB"><option value=""${A.subB?'':' selected'}>Not in sub-area B</option><option value="1"${A.subB?' selected':''}>In sub-area B</option></select></label></div>`;
+  if(k==='I-3') return `<div class="dside"><p class="sub">I-3: a data centre is allowed only in sub-area A (I-3 s. 2.1; register van_zdb_i3). The tool does not map the sub-areas: check the I-3 map.</p></div>`;
+  return ''; }
+BD.setup={card,model,STEPS,start:()=>card(1),sideBox,subBox};
+
+ 
+BD.setupHTML=function(st){ setDefaults(); const A=BD.S.answers, m=model(); if(!m) return '';
+  const lab={built:{new:'New building',existing:'Existing building'},extent:{whole:'whole',part:'part'},foot:{max:'most the zone allows',existing:'matches the existing building',cover:'coverage '+A.cover+'%'},outside:{dry:'dry coolers',towers:'cooling towers',hybrid:'hybrid coolers'},inside:{air:'air',plate:'liquid to the chip',immersion:'immersion'},plantAt:{roof:'on the roof',yard:'in the yard',split:'roof and yard'}};
+  const rows=[[1,'Building',`${lab.built[A.built]}, ${lab.extent[A.extent]}${A.extent==='part'&&A.floor?' ('+A.floor+')':''}`],
+   [2,'Footprint',A.built==='existing'?`${fmt(m.footArea)} m² (existing)`:`${fmt(m.footArea||0)} m², ${lab.foot[A.foot]}`],
+   [3,'Height',A.built==='existing'?`${(m.H||0).toFixed(1)} m (existing)`:`${(m.H||0).toFixed(1)} m, ${m.nF[0]===m.nF[1]?m.nF[0]:m.nF[0]+'–'+m.nF[1]} storeys${A.userH||A.userFSR?' (your limits)':''}`],
+   [4,'Cooling',`${lab.inside[A.inside]} inside; ${A.outside==='dry'&&BD.dryName?BD.dryName():lab.outside[A.outside]} ${lab.plantAt[A.plantAt]}${A.vis==='indoors'&&A.plantAt!=='yard'?', the roof plant in an enclosed plant room'+(A.visDefault==='arch'?' (Architecture default)':''):m.noiseRoom?', the roof plant in an enclosed plant room (needed for the noise by-law at this size)':''}`],
+   [5,'Standby',A.gens==='none'?'no generators':`generators in the ${A.genAt}`]];
+   
+  { let fp=null; try{ fp=A.built==='new'?fitPlan():null; }catch(e){} if(fp) rows.push([4,'Largest that fits',(fp.mw!=null?planText(fp):'none with this set-up (plant, generators, fuel or noise)')+(fitMax0.beyond?'; larger sizes are beyond the tested range (a generator yard deeper than the 21.7 m of the test lots)':'')]); }
+  const g=m.grade||{}, gd=(g.none?'? (no ground data for this lot)':`${g.min.toFixed(1)}–${g.max.toFixed(1)} m, median ${g.med.toFixed(1)} m (datum ${g.datum}${g.cover<100?`; ${g.cover}% of the lot covered`:''})`)+(g.base&&g.base.settled===false?'; height base ?':'');
+  const fl=g.fcl, gflags=[]; if(fl){ if(fl.floor) gflags.push(`Grade is below the ${fl.v} m flood construction level on about ${fl.below}% of the lot: a ground floor there must be raised to ≥${fl.v} m (up to ${fl.raise.toFixed(1)} m).`); if(fl.gens) gflags.push(`Generators in the yard: where the yard is below ${fl.v} m, their pads must be raised to ≥${fl.v} m.`);
+     
+    if(gflags.length){ const RG=(BD.data.raw.grade||{})[m.city]||{}; if(RG.sameAsFcl) gflags.push(`Lot grade and the flood construction level are both in ${RG.datum} (${RG.sameAsFcl}).`); else gflags.push(`Lot grade from LiDAR (datum ${g.datum||'?'}) vs the level in ${fl.datum}: same datum not confirmed (?).`); } }
+  const gradeHTML=`<div class="sumrow"><span>Grade</span><span>${esc(gd)}</span><span></span></div>${g.none?'':`<div class="src">Height base: ${esc(g.base.rule||'?')}</div>`}${gflags.length?`<div class="warnbox">${gflags.map(esc).join('<br>')}</div>`:''}<div class="src">Grade: ${esc(g.label)}; min–max and median of 2 m cells (our arithmetic).</div>`;
+  return `<h3>The site as set up</h3>${m.Z.warn?`<div class="warnbox">${m.Z.warn}</div>`:''}${rows.map(r=>`<div class="sumrow"><span>${r[1]}</span><span>${esc(r[2])}</span><a href="#" data-setup="${r[0]}">Change ›</a></div>`).join('')}${gradeHTML}
+  <div class="next"><button id="fits">What fits here →</button><button id="setup1" style="background:transparent;border:1px solid var(--line-2);color:var(--fg)">Set up step by step</button></div>
+  <div class="draftnote">Labelled defaults are used until you change them. </div>`; };
+BD.setupWire=function(){ document.querySelectorAll('#side [data-setup]').forEach(a=>a.onclick=e=>{ e.preventDefault(); BD.setup.card(+a.dataset.setup); }); const s1=$('#setup1'); if(s1) s1.onclick=()=>BD.setup.start(); };
+})();

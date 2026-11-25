@@ -1,0 +1,158 @@
+ 
+(function(){
+'use strict';
+const BD=window.BD; const {fmt}=BD;
+const SRC={
+ chill:'Air-cooled chillers with free-cooling coils (air cooling): an air-cooled hall needs chilled water at about 13 °C or warmer (NREL for DOE FEMP, Best Practices Guide 2024, s. 5.2.1), and a dry cooler cannot cool water below the outdoor air (rated units leave it 3–11 K above), so chillers carry the full load in summer. Basis unit: Vertiv Liebert AFC FIZ135, 12.14 × 2.36 m, 2.90 m high, 1,489 kW at 35 °C ambient, 27.8 → 18.9 °C fluid, 30% glycol, with oversized free-cooling coils (Vertiv SL-71060 R09/24, "Preliminary data"; manufacturer claim). Chosen 29 Oct 2026 as the unit nearest the middle of the makers compared (Vertiv AFC, Airedale TurboChill DCS): 16.4–30.5 m² of unit per MW of heat, median 19.2. The tool sizes for the low end. The datasheet gives no clearances: the dry-cooler clearances are used.',
+ dry:'Dry coolers (liquid cooling, water about 30–45 °C, so no chillers most hours): a 12 m V-type unit, 12 × 2.4 m, 2.88 m high, 20 fans in two rows (EVAPCO EA26MRKT 2026, p.13); 24.5 m² of unit per MW of heat (Thermokey at 48 → 42.7 °C water, 32 °C air; other makers 19.5–30.5 m² per MW: EVAPCO, Mark (no document found ?) — manufacturer claims), so about 1.2 MW a unit — within the 71–1,372 kW range EVAPCO lists for units up to 12 m (manufacturer claim). Clearances for V-coil units 30–40 ft long: 0.9 m end to wall, 2.1 m side to wall, 1.8 m end to end, 4.3 m side to side; the top of the unit level with or above any wall around it (EVAPCO eco-Air layout manual, 2026).',
+ hybrid:'Hybrid (adiabatic) coolers: about 12 × 2.8 m, 2.88 m high (EVAPCO EA26MRKT 2026, p.13: adiabatic width 9\'-7/8", pads outside both coil faces), 0.67–1.37 MW a unit (EVAPCO 270B adiabatic models; BAC TrilliumSeries — manufacturer claims); the tool sizes for the low end. Same clearances as dry coolers; "They cannot be elevated in lieu of spacing" (EVAPCO).',
+ towers:'Cooling tower cells (crossflow, induced draft, factory-assembled). Basis unit: BAC Series 3000 S3E-1222-07R, 690 nominal tons (about 3.0 MW at 95/85/78 °F, converted at 15,000 BTU/h per tower ton), 11\'-10" × 21\'-7", 12\'-9" high (BAC Engineering Data C16, 2023; manufacturer claim). Chosen 29 Oct 2026 as the unit nearest the middle of 140 BAC Series 3000 and Marley NC single cells: 4.7–16.5 m² per MW, median 7.8. Air inlet 1.5–2.7 m from a wall (2.7 m used), cells 1.8 m end to end (BAC, EVAPCO layout guidelines). Vancouver: discharge 2.15 m above sidewalks, 7.6 m from air intakes, 3 m from doors, operable windows and outdoor spaces (VBBL 2025 Art. 6.3.2.15).',
+ gens:'Standby diesel generator sets in Sound Level 2 enclosures with sub-base tanks. Basis units: Rehlko (Kohler) KD2000, 2,000 kW standby (data-centre continuous rating the same), 13.49 × 3.49 m, up to 4.78 m high (G5-626, rev 6/24); KD1000, 1,000 kW, 8.43 × 2.62 m, 3.71 m high with the 12 h tank (G6-154, 12/23). Both EPA Tier 2, cULus (UL 2200, CSA C22.2 No. 100); manufacturer claims. Chosen 29 Oct 2026 as the middle of Cat, Rehlko and Generac: 2 MW 18.5–38.4 m² per MW, 1 MW 19.5–22.4. 1 m clear around each set (Cummins application manual; not checked ?); 1.5 m from wall openings and combustible walls (NFPA 37 s. 4.1.4, a US standard; Vancouver points to CSA C282, not read). Metro Vancouver Bylaw 1329: no Tier 0 or Tier 1 engines within 100 m of hospitals, elementary schools, day care and community care facilities; the sets drawn are EPA Tier 2 (maker claim), so the rule does not bar them; older Tier 0/1 engines would be barred near those uses.',
+};
+ 
+const PU=BD.data.plant_units, KIND=PU.kind, PROV=[BD.data.size.hallShare[0],BD.data.size.m2PerMW[1]]; 
+KIND.towerS.gap=[1.8,4.0]; KIND.towerL.gap=[1.8,6.0];  
+ 
+const EQ=BD.data.equipment; function genTank(mw,s){ const R=BD.eng?BD.eng.R:{pue:EQ.pue,fuelHours:EQ.fuelHours,fuelLkWh:EQ.fuelLkWh}; if(!s||!s.g||!s.gNeed) return null;
+  const L=mw*R.pue[1]*1000*R.fuelHours*R.fuelLkWh/s.gNeed, row=EQ.genTankSep.rows.find(r=>L<=r[0]); return {L,bld:row?row[1]:null,pl:row?row[2]:null,over:!row}; }
+
+
+const spare=(n,s)=>s==='2n'?n*2:s==='n1'?n+1:n;
+function sizeFor(mw,A){
+  const pue=BD.eng?BD.eng.R.pue[1]:BD.data.equipment.pue[1], Q=mw*pue;
+  const out=A.outside||'dry', air=(A.inside||'air')==='air'; 
+  const k=out==='towers'?(Q>6?KIND.towerL:KIND.towerS):out==='hybrid'?KIND.hybrid:air?(Q>6?KIND.chillL:KIND.chillS):KIND.dry;
+  const need=Math.max(1,Math.ceil(Q/k.mw)), n=spare(need,A.spares||'n1');
+  const g=A.gens==='none'?null:(Q>PU.gen2Above?KIND.gen2:KIND.gen1); const gNeed=g?Math.max(1,Math.ceil(Q/g.mw)):0, gN=g?spare(gNeed,A.genSpares||'n1'):0;
+  return {Q,k,need,n,g,gNeed,gN,src:SRC[out==='towers'?'towers':out==='dry'&&air?'chill':out]};
+}
+ 
+let EDGE=null; 
+function segD(px,py,ax,ay,bx,by){ const dx=bx-ax, dy=by-ay, L2=dx*dx+dy*dy; let t=L2?((px-ax)*dx+(py-ay)*dy)/L2:0; t=Math.max(0,Math.min(1,t)); return Math.hypot(px-ax-t*dx,py-ay-t*dy); }
+function edgeD(x,y,r){ let d=1e9; for(let i=0;i<r.length;i+=2){ const j=(i+2)%r.length; d=Math.min(d,segD(x,y,r[i],r[i+1],r[j],r[j+1])); } return d; }
+ 
+const segsOK=(x,y)=>!EDGE||!EDGE.segs||EDGE.segs.every(e=>segD(x,y,e.ax,e.ay,e.bx,e.by)>=e.d-1e-6);
+ 
+const testD=lim=>{ const G=BD.data.noise&&BD.data.noise.gen; return G?7*Math.pow(10,(G.lp7-lim)/20):0; };
+ 
+function pack(F,region,forbid,u0,u1,v0,v1,k,count,rot){
+  const L=rot?k.W:k.L, W=rot?k.L:k.W, wu=rot?k.wall[1]:k.wall[0], wv=rot?k.wall[0]:k.wall[1], gu=rot?k.gap[1]:k.gap[0], gv=rot?k.gap[0]:k.gap[1];
+  const out=[]; const okPt=(a,b,inner)=>{ const [x,y]=F.toW(a,b); return BD.pip(x,y,region)&&!forbid.some(f=>BD.pip(x,y,f)); };
+  const e=0.05; 
+  for(let v=v0+wv+W/2; v<=v1-wv-W/2+1e-6 && out.length<count; v+=W+gv)
+    for(let u=u0+wu+L/2; u<=u1-wu-L/2+1e-6 && out.length<count; u+=L+gu){
+      const cs=[[u-L/2-wu+e,v-W/2-wv+e],[u+L/2+wu-e,v-W/2-wv+e],[u+L/2+wu-e,v+W/2+wv-e],[u-L/2-wu+e,v+W/2+wv-e],[u,v],[u-L/2,v],[u+L/2,v],[u,v-W/2],[u,v+W/2]];
+      if(cs.every(([a,b])=>okPt(a,b))&&(!((k.evap||k.lotSep)&&EDGE)||[[u-L/2,v-W/2],[u+L/2,v-W/2],[u+L/2,v+W/2],[u-L/2,v+W/2],[u-L/2,v],[u+L/2,v],[u,v-W/2],[u,v+W/2]].every(([a,b])=>{ const [x,y]=F.toW(a,b); return BD.pip(x,y,EDGE.ring)&&edgeD(x,y,EDGE.ring)>=EDGE.d-1e-6&&segsOK(x,y); }))) out.push({u,v,L,W}); }
+  return out; }
+function boxOf(F,p,k,base,kind){ const r=BD.geo.rectW(F,p.u-p.L/2,p.u+p.L/2,p.v-p.W/2,p.v+p.W/2);
+  const wu=p.L===k.L?k.wall[0]:k.wall[1], wv=p.L===k.L?k.wall[1]:k.wall[0];
+  const c=BD.geo.rectW(F,p.u-p.L/2-wu,p.u+p.L/2+wu,p.v-p.W/2-wv,p.v+p.W/2+wv); return {ring:r,clear:c,h:k.H,base,kind,name:k.name}; }
+ 
+function zoneArea(mw,A){ const s=sizeFor(mw,A), k=s.k, g=k.gap||[0,0], w=k.wall||[0,0];
+  const pue=BD.eng?BD.eng.R.pue:BD.data.equipment.pue, nLo=spare(Math.max(1,Math.ceil(mw*pue[0]/k.mw)),A.spares||'n1'), nHi=s.n;
+  const blk=(r,c)=>(c*k.L+(c-1)*g[0]+2*w[0])*(r*k.W+(r-1)*g[1]+2*w[1]);
+  let lo=null; for(let r=1;r<=nLo;r++){ const c=Math.ceil(nLo/r), a=blk(r,c); if(!lo||a<lo.a) lo={a,r,c}; }
+  const hi=Math.max(blk(1,nHi),blk(nHi,1));
+  return {lo:lo.a,hi,nLo,nHi,arr:[lo.r,lo.c],unit:k.L*k.W,name:k.name,L:k.L,W:k.W,wall:w.slice(),gap:g.slice(),gapSrc:k===KIND.towerS||k===KIND.towerL?'set in plant.js, no register id (?)':'evapcoLayout2026'}; }
+function localBounds(F,ring){ let a=1e9,b=-1e9,c=1e9,d=-1e9; for(let i=0;i<ring.length;i+=2){ const [u,v]=F.toL(ring[i],ring[i+1]); a=Math.min(a,u); b=Math.max(b,u); c=Math.min(c,v); d=Math.max(d,v); } return [a,b,c,d]; }
+
+BD.plant={
+ KIND,SRC,sizeFor,zoneArea,pack,boxOf,localBounds,
+  
+ place(m){
+  const A=BD.S.answers, F=m.F; if(!F) return;
+  let mw=A.mw; if(!mw){ 
+    const Z=m.Z, lot=m.lotArea, n=m.nF?m.nF[0]:2, up=Z.ground?lot*Z.fsr[0]*(n-1)/n:lot*Z.fsr[0]; mw=+Math.max(0.1,Math.min(40,up*PROV[0]/PROV[1])).toFixed(1);   m.mwProvisional=true; }
+  m.mwSized=mw; const s=sizeFor(mw,A); const P={s,boxes:[],lines:[],genLines:[],short:''}; m.plant=P;
+  const at=A.plantAt||'roof', genAt=A.genAt||'yard';
+  P.coolYard=at==='yard'?s.n:at==='split'?Math.floor(s.n/2):0; P.coolRoof=s.n-P.coolYard;
+  P.genYard=s.g&&genAt==='yard'?s.gN:0; P.genRoof=s.g&&genAt==='roof'?s.gN:0;
+  
+  if(!m.existing&&m.uBuild&&(P.coolYard||P.genYard)){ const wv=m.v[1]-m.v[0]; let depth=0;
+    const gt=genTank(mw,s); P.genTank=gt;  
+     
+    const syL=(m.edgeYards||[]).filter(e=>e.kind!=='front'&&e.kind!=='rear').map(e=>e.d||0).filter(x=>isFinite(x)), sy=syL.length?Math.min(...syL):0;
+    const GNe=BD.data.noise&&BD.data.noise.gen&&BD.data.noise.gen.edm, plE=gt&&gt.pl!=null?(m.city==='edm'&&GNe?Math.max(gt.pl,testD(GNe.nonTest1h)):gt.pl):null;  
+    const endD=k=>k===s.g&&plE!=null?Math.max(k.wall[0],plE-(isFinite(sy)?sy:0)):k.wall[0];
+    const rowDepth=(k,n)=>{ const e=endD(k), per=Math.max(0,Math.floor((wv-2*e+k.gap[0])/(k.L+k.gap[0]))); if(!per) return null; const r=Math.ceil(n/per); return 2*k.wall[1]+r*k.W+(r-1)*k.gap[1]; };
+     
+    const lotR=m.inset?(BD.buildArea?BD.buildArea(m):m.ring):m.ring; let skew=0;
+     
+    for(let v=m.v[0]+0.25; v<=m.v[1]-0.25+1e-9; v+=0.5){ let k=0; for(; k<=60; k++){ const [x,y]=F.toW(m.plantYardStart+m.dir*k*0.05,v); if(BD.pip(x,y,lotR)) break; } if(k<=60) skew=Math.max(skew,k*0.05); }
+    P.skew=skew; P.endExtra=s.g&&gt&&gt.pl!=null?Math.max(0,endD(s.g)-s.g.wall[0]):0;  
+    for(const [k,n] of [[s.k,P.coolYard],[s.g,P.genYard]]){ if(!n||!k) continue; let d=rowDepth(k,n); if(d!=null&&k===s.g&&gt&&gt.pl!=null&&!m.loading){ const rearY=Math.abs(m.plantYardStart-(m.dir<0?F.L/2:-F.L/2)); d+=Math.max(0,gt.pl-rearY-k.wall[1]); } if(d==null){ P.short+=`The lot is too narrow for a ${k.L} m ${k.name.replace(/s$/,'')} across it. `; continue; } depth+=d; }
+    if(s.g&&P.genYard){ const e=endD(s.g); P.genPerRow=Math.max(0,Math.floor((wv-2*e+s.g.gap[0])/(s.g.L+s.g.gap[0]))); }    
+     
+    P.truck=null; { const LI=m.loadInside; if(LI&&LI.n&&(P.coolYard||P.genYard)){ const aisle=(m.loadingNeed&&m.loadingNeed.aisle)||6.1, open=e=>e&&(e.abuts==='street'||e.abuts==='alley');
+      const rear=(m.edgeYards||[]).filter(e=>e.kind==='rear'&&open(e)); if(rear.length){ const w=Math.max(aisle,LI.n*(LI.wid+0.6)+0.6); P.truck={type:'straight',v:[m.v[0],Math.min(m.v[1],m.v[0]+w)],aisle,to:rear[0].abuts}; }
+      else { P.truck={type:'along',aisle}; depth+=aisle; } } }
+    const avail=Math.abs(m.uBuild[1]-m.uBuild[0]);
+     
+    const capD=Math.max(0,Math.min(avail*0.9,avail-12-skew));
+     
+    const truckR=(a00,dep)=>{ const T=P.truck; if(!T) return null; const a1=a00+m.dir*dep; if(T.type==='straight') return BD.geo.rectW(F,Math.min(m.plantYardStart,a1),Math.max(m.plantYardStart,a1),T.v[0],T.v[1]);
+      const b0=a1-m.dir*T.aisle; return BD.geo.rectW(F,Math.min(b0,a1),Math.max(b0,a1),m.v[0]-1,m.v[1]+1); };
+    { const a00=m.plantYardStart+m.dir*skew, ex=P.endExtra||0, trial=dep=>{ const a1=a00+m.dir*dep, u0=Math.min(a00,a1), u1=Math.max(a00,a1); let n=0, used=[]; { const tr=truckR(a00,dep); if(tr) used.push(tr); }
+        for(const [k,c] of [[s.k,P.coolYard],[s.g,P.genYard]]){ if(!c||!k) continue; const isG=k===s.g, keepW=k.wall; if(isG&&gt&&gt.bld!=null) k.wall=keepW.map(w=>Math.max(w,gt.bld));
+          EDGE=isG&&gt&&gt.pl!=null&&m.ring?{ring:m.ring,d:gt.pl}:(k.evap&&m.ring?{ring:m.ring,d:k.evap}:null); if(isG) k.lotSep=!!EDGE;
+          const got=pack(F,lotR,used,u0,u1,m.v[0]+(isG?ex:0),m.v[1]-(isG?ex:0),k,c,true); k.wall=keepW; delete k.lotSep; EDGE=null;
+          n+=c-got.length; used=used.concat(got.map(q=>BD.geo.rectW(F,q.u-q.L/2-1,q.u+q.L/2+1,q.v-q.W/2-1,q.v+q.W/2+1))); } return n; };
+      const step=s.g&&P.genYard?s.g.W+s.g.gap[1]:s.k.W+s.k.gap[1]; let tries=0; while(!m.mwProvisional&&depth>0&&trial(depth)>0&&depth+step<=capD&&tries<20){ depth+=step; tries++; } if(tries) P.deepened=tries; }  
+    if(depth>capD){ P.short+='The plant yard would leave less than a 12 m deep building. '; depth=capD; }
+     
+    { const gd=depth+skew-(P.truck&&P.truck.type==='along'?P.truck.aisle:0); P.bigYard=s.g&&P.genYard&&gd>21.72?Math.round(gd):0; }    
+    m.plantYardDepth=depth+skew; const a0=m.plantYardStart+m.dir*skew, a1=a0+m.dir*depth; P.yard=BD.geo.rectW(F,Math.min(a0,a1),Math.max(a0,a1),m.v[0],m.v[1]); P.yardU=[Math.min(a0,a1),Math.max(a0,a1)];
+    P.truckRing=truckR(a0,depth); if(P.truck&&P.truck.type==='along') P.truck.u=[Math.min(a1-m.dir*P.truck.aisle,a1),Math.max(a1-m.dir*P.truck.aisle,a1)];
+  }
+ },
+  
+ roof(m){
+  const A=BD.S.answers, P=m.plant, F=m.F; if(!P||!F||!m.foot) return; const s=P.s;
+  EDGE=s.k.evap&&m.ring?{ring:m.ring,d:s.k.evap}:null; 
+  
+  
+  const bld=m.sizedTo&&m.serverFoot?m.serverFoot:m.foot;
+  const roofRing=bld, roofH=m.existing?(m.roofH||m.H):(m.hallTop||m.H); 
+  const [ru0,ru1,rv0,rv1]=localBounds(F,roofRing);
+  const put=(k,count,base,where)=>{ if(!count||!k) return 0; let got=[];
+    if(where==='roof'){ got=pack(F,roofRing,[],ru0,ru1,rv0,rv1,k,count,false); 
+      if(got.length<count){ const tk=got.map(p=>BD.geo.rectW(F,p.u-p.L/2-1,p.u+p.L/2+1,p.v-p.W/2-1,p.v+p.W/2+1)); const g2=pack(F,roofRing,tk,ru0,ru1,rv0,rv1,k,count-got.length,true); got=got.concat(g2); } }
+    else { const lotR=m.inset?(BD.buildArea?BD.buildArea(m):BD.geo.clip(m.ring,m.inset)):m.ring;   const forbid=P.boxes.filter(b=>b.kind==='yard').map(b=>b.clear).concat(P.truckRing?[P.truckRing]:[]); if(m.existing) (m.feet||[]).forEach(f=>forbid.push(f.r)); else { if(bld) forbid.push(bld); if(m.loading) forbid.push(m.loading); }
+      
+       
+      if(P.yard&&!m.existing){ const [a,b,c,d]=localBounds(F,P.yard), ex=k===s.g?(P.endExtra||0):0; got=pack(F,lotR,forbid,a,b,c+ex,d-ex,k,count,true); }
+      else { const [a,b,c,d]=localBounds(F,lotR); got=pack(F,lotR,forbid,a,b,c,d,k,count,false); if(got.length<count) got=got.concat(pack(F,lotR,forbid.concat(got.map(p=>BD.geo.rectW(F,p.u-p.L/2-1,p.u+p.L/2+1,p.v-p.W/2-1,p.v+p.W/2+1))),a,b,c,d,k,count-got.length,true)); } }
+    got.forEach(p=>P.boxes.push(boxOf(F,p,k,base,where)));
+    return got.length; };
+  P.boxes=[];
+  
+  P.indoor=0; if(A.vis==='indoors'&&P.coolRoof){ P.indoor=P.coolRoof*(s.k.L+2*s.k.wall[0])*(s.k.W+s.k.gap[1]); P.coolRoofIndoor=P.coolRoof; P.coolRoof=0; }
+  const cr=put(s.k,P.coolRoof,roofH,'roof'), cy=put(s.k,P.coolYard,0,'yard');
+  
+  let gr=0; if(P.genRoof){ const used=P.boxes.filter(b=>b.kind==='roof').map(b=>b.clear); let got=pack(F,roofRing,used,ru0,ru1,rv0,rv1,s.g,P.genRoof,false); if(got.length<P.genRoof) got=got.concat(pack(F,roofRing,used.concat(got.map(p=>BD.geo.rectW(F,p.u-p.L/2-1,p.u+p.L/2+1,p.v-p.W/2-1,p.v+p.W/2+1))),ru0,ru1,rv0,rv1,s.g,P.genRoof-got.length,true)); got.forEach(p=>P.boxes.push(boxOf(F,p,s.g,roofH,'roof'))); gr=got.length; }
+   
+  const gt=P.genTank||genTank(m.mwSized,s); let gy=0; if(s.g&&P.genYard){ const keepW=s.g.wall; if(gt&&gt.bld!=null) s.g.wall=keepW.map(w=>Math.max(w,gt.bld)); EDGE=gt&&gt.pl!=null&&m.ring?{ring:m.ring,d:gt.pl}:null; s.g.lotSep=!!EDGE;
+     
+    const GNe=BD.data.noise&&BD.data.noise.gen&&BD.data.noise.gen.edm, E2=(m.edgeYards||[]).filter(e=>isFinite(e.ax)); P.genTestPlaced=null;
+    if(EDGE&&m.city==='edm'&&GNe&&E2.length){ const n0=P.boxes.length, res=e=>/^residential/.test(e.abuts||'');
+      EDGE.segs=E2.map(e=>({ax:e.ax,ay:e.ay,bx:e.bx,by:e.by,d:Math.max(gt.pl,res(e)?testD(GNe.resTest1h):testD(GNe.nonTest1h))})); gy=put(s.g,P.genYard,0,'yard');
+      if(gy<P.genYard){ P.boxes.length=n0; delete EDGE.segs; gy=put(s.g,P.genYard,0,'yard'); P.genTestPlaced=false; } else P.genTestPlaced=true; }
+    else gy=put(s.g,P.genYard,0,'yard');
+    s.g.wall=keepW; delete s.g.lotSep; } EDGE=null;
+  const kname=s.k.name, miss=[];
+  if(cr<P.coolRoof) miss.push(`${P.coolRoof-cr} of ${P.coolRoof} ${kname} do not fit on the roof`);
+  if(cy<P.coolYard) miss.push(`${P.coolYard-cy} of ${P.coolYard} ${kname} do not fit in the yard`);
+  if(gr<P.genRoof) miss.push(`${P.genRoof-gr} of ${P.genRoof} generators do not fit on the roof`);
+  if(gy<P.genYard) miss.push(`${P.genYard-gy} of ${P.genYard} generators do not fit in the yard`);
+  P.miss=miss; P.placed={cr,cy,gr,gy};
+  if(miss.length){ const tips=[]; if(cr<P.coolRoof||cy<P.coolYard) tips.push(`for the coolers: ${A.plantAt==='roof'?'the yard or a split':'the roof or a split'}${A.outside==='dry'?', cooling towers (smaller, but they use water)':''}`); if(gr<P.genRoof||gy<P.genYard) tips.push(`for the generators: ${A.genAt==='yard'?'a smaller footprint (set the coverage in step 2) or the roof':'the yard'}`); tips.push('or a smaller size'); P.short+=`Doesn't fit: ${miss.join('; ')}. Try ${tips.join('; ')}.`; }
+  const mwT=m.mwSized.toFixed(m.mwSized<10?1:0);
+  P.lines=[`Sized for <b>${mwT} MW</b> of servers${m.mwProvisional?' (a provisional size until one is set on the What fits page)':''}: heat to reject ≈ ${mwT} × PUE 1.55 = <b>${s.Q.toFixed(1)} MW</b> at peak.`,
+   `${s.need} ${kname} carry it${s.k===KIND.hybrid?` (at the low end of 0.67–1.37 MW a unit; ${Math.ceil(s.Q/s.k.mwHi)} at the high end)`:''}; with spares, <b>${s.n}</b>. Placed: ${cr} on the roof, ${cy} in the yard.`,
+   `Each unit about ${s.k.L} × ${s.k.W} m, ${s.k.H} m high, with ${s.k.wall[0]}–${s.k.wall[1]} m to walls and ${s.k.gap[0]}–${s.k.gap[1]} m between units (dashed in 3D).`,
+   ...(s.k.evap?[`Evaporative discharge: each unit kept at least ${s.k.evap} m inside the lot line, because the code keeps it 3 m from doors, operable windows and outdoor spaces, and the neighbours' are not known (NBC 2020 6.3.2.15.(5); register arch_sep_nbc63215full). 7.6 m from air intakes: no intakes are drawn, so not tested (?).`]:[]),
+   `<span class="src">${s.src}</span>`];
+  P.genLines=s.g?[`${s.gNeed} generator set${s.gNeed>1?'s':''} of about ${s.g.mw} MW carry ${s.Q.toFixed(1)} MW; with spares, <b>${s.gN}</b>. Placed: ${gr} on the roof, ${gy} in the yard.`,`Each about ${s.g.L} × ${s.g.W} m, ${s.g.H} m high; 1.5 m from the building, 2 m between sets (1 m clear all round, CSA C282 6.5.1.1; register arch_csa_c282).`,...(gt?[`Fuel in each set's sub-base tank: about ${Math.round(gt.L/100)*100} L. In the yard: ${gt.pl!=null?gt.pl+' m from the property line and '+gt.bld+' m from the building':'? (over 250,000 L, not in the table)'} (CSA B139.1.0 Table 2; register arch_csa_b139). On a roof: at most 1,250 L a tank and 2,500 L a supply line (B139.1.1 6.5.3). FM 5-32 (insurer guidance, not law): not on the roof or in a basement.`]:[]),`<span class="src">${SRC.gens}</span>`]:['No generators.'];
+ }
+};
+})();

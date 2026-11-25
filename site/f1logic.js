@@ -1,0 +1,99 @@
+ 
+(function(){
+'use strict';
+const BD=window.BD; const esc=s=>String(s==null?'':s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const RANK={resident:0,arch:1,full:2,arch_only:9};
+const TABS=[['resident','Resident'],['municipal','Municipal'],['full','Engineering'],['arch','Architecture'],['all','All']];
+ 
+const MUNI_CARD={'Your city':['parcel','zone'],'Your parcel':['parcel','zone'],'Is a data centre allowed?':['zoning_status'],'Height and floor area':['envelope','floor_area','roof_equipment_rule'],'Yards by edge':['envelope'],
+ 'Noise limits around the lot':['noise_limit'],'Storeys and street frontage':['storey_min'],'Approval process':['rezoning_price']};
+ 
+const CARD={ 'Cooling':'setup','Noise':'setup','Backup power':'setup','What fits':'fits','Heat offered':'heat','Who could take it':'heat','Electricity':'energy','Water':'water',  'Heat receivers nearby':'heat','People nearby':'social','Neighbours and views':'social' };
+const WORD=[[100,'arithmetic'],[90,'regulation, tariff or standard read directly'],[80,'government dataset'],[70,'peer-reviewed coefficient from another context'],[60,'derived with a stated assumption'],[50,'operator or industry claim'],[40,'proxy'],[20,'judged'],[0,'gap']];  
+const word=q=>{ if(q==null) return 'not rated'; for(const [v,w] of WORD) if(q>=v) return w; return 'gap'; };
+let L=null, O=null, UP={}, ORDER={}; const S={tab:'full',sel:null,lit:[],label:''};
+const load=async()=>{ if(!L){ L=await fetch('logic.json').then(r=>r.json()); Object.keys(L.nodes).forEach((k,i)=>ORDER[k]=i); for(const [a,b] of L.edges) (UP[b]=UP[b]||[]).push(a); }
+  if(!O) O=await fetch('opps.json').then(r=>r.json()).catch(()=>({sources:{},source_kinds:{}})); };
+const shown=k=>{ const t=L.nodes[k].t; if(S.tab==='all') return true; if(S.tab==='municipal') return !!L.nodes[k].m; if(t==='arch_only') return S.tab==='arch'; return RANK[t]<=RANK[S.tab]; };
+function ancestors(ids){ const s=new Set(), st=[...ids]; while(st.length){ const x=st.pop(); if(s.has(x)) continue; s.add(x); (UP[x]||[]).forEach(p=>st.push(p)); } return s; }
+function visParents(id,V){ const out=new Set(), seen=new Set(), st=[...(UP[id]||[])]; while(st.length){ const x=st.pop(); if(seen.has(x)) continue; seen.add(x); if(V.has(x)) out.add(x); else (UP[x]||[]).forEach(p=>st.push(p)); } return out; }
+const wrap=(t,n)=>{ const w=String(t).split(/\s+/), out=['']; for(const x of w){ const c=out[out.length-1]; if((c+' '+x).trim().length>n&&c){ if(out.length===2){ out[1]=(out[1]+' '+x).trim(); continue; } out.push(x); } else out[out.length-1]=(c+' '+x).trim(); }
+  if(out[1]&&out[1].length>n) out[1]=out[1].slice(0,n-1).trimEnd()+'…'; return out; };
+function diagram(){ const keys=Object.keys(L.nodes).filter(shown).sort((a,b)=>ORDER[a]-ORDER[b]), V=new Set(keys);
+  const focus=S.sel?[S.sel]:S.lit.filter(k=>V.has(k)), A=focus.length?ancestors(focus):new Set();
+  const st=L.stages.map(s=>s[0]), cols={}; st.forEach(s=>cols[s]=[]); keys.forEach(k=>(cols[L.nodes[k].s]||(cols[L.nodes[k].s]=[])).push(k));
+  const bw=150, bh=36, gy=8, cw=184, top=52, P={}; let H=0;
+  st.forEach((s,i)=>(cols[s]||[]).forEach((k,j)=>{ P[k]=[16+i*cw, top+j*(bh+gy)]; H=Math.max(H,top+(j+1)*(bh+gy)); }));
+  const W=16+st.length*cw+140; let ed='', el='';
+  for(const k of keys){ const [x2,y2]=P[k]; for(const q of visParents(k,V)){ const [x1,y1]=P[q], sx=x1+bw, sy=y1+bh/2, ex=x2, ey=y2+bh/2, m=(sx+ex)/2;
+    const d=`M${sx} ${sy}C${m} ${sy} ${m} ${ey} ${ex} ${ey}`; if(A.has(k)&&A.has(q)) el+=`<path d="${d}"/>`; else ed+=`<path d="${d}"/>`; } }
+  const box=k=>{ const n=L.nodes[k], [x,y]=P[k], sel=S.sel===k, lit=A.has(k), gap=n.q==null||n.q===0, ln=wrap(n.n+(gap?' ?':''),20);
+    return `<g class="lp${lit?' lit':''}${sel?' sel':''}${gap?' gap':''}" data-k="${k}" tabindex="0" role="button" aria-label="${esc(n.n)}"><title>${esc(n.n)}</title><rect x="${x}" y="${y}" width="${bw}" height="${bh}" rx="2"/>`+
+      ln.map((t,i)=>`<text x="${x+8}" y="${y+(ln.length===1?bh/2+4.5:14+i*14)}">${esc(t)}</text>`).join('')+'</g>'; };
+  const heads=st.map((s,i)=>`<text class="sh" x="${16+i*cw}" y="20">${esc(L.stages[i][1])}</text><text class="ss" x="${16+i*cw}" y="36">${(cols[s]||[]).length} part${(cols[s]||[]).length===1?'':'s'}</text>`).join('');
+  return {svg:`<svg width="${W}" height="${H+10}" viewBox="0 0 ${W} ${H+10}" role="img" aria-label="The tool's logic: ${keys.length} parts in ${st.length} stages${focus.length?', '+A.size+' lit':''}"><g>${heads}</g><g class="we">${ed}</g><g class="wl">${el}</g>${keys.map(box).join('')}</svg>`,n:keys.length,lit:[...A].filter(k=>V.has(k)).length}; }
+function srcList(ids){ if(!ids||!ids.length) return '<p class="f1l-none">No source listed for this part.</p>';
+  const one=id=>{ const t=(O.sources||{})[id]||id, k=(O.source_kinds||{})[id], m=String(t).match(/https?:\/\/\S+$/), tx=String(t).replace(/\s*[—-]\s*https?:\/\/\S+$/,'');
+    return `<li>${k?`<span class="f1l-kind">${esc(k)}</span>`:''}${esc(tx.length>260?tx.slice(0,257)+'…':tx)}${m?` <a href="${esc(m[0])}" target="_blank" rel="noopener">link</a>`:''}</li>`; };
+   
+  return `<ul class="f1l-src">${one(ids[0])}</ul>`+(ids.length>1?`<details class="f1l-more"><summary>More sources (${ids.length-1})</summary><ul class="f1l-src">${ids.slice(1).map(one).join('')}</ul></details>`:''); }
+function panel(){ if(!S.sel){ const t=TABS.find(x=>x[0]===S.tab)[1];
+    return `<div class="chap">How it works</div><h2>${S.label?esc(S.label):'The interactive logic diagram'}</h2><p class="lead">${S.label?'The parts this card is worked out from are lit. Click a part for its formula, trust and sources.':'One logic runs under all four templates. Every part has a formula, a source and a trust rating. Click a part to see them.'}</p>`+
+`<p class="f1l-note">${t}: ${diagram().n} parts shown.</p>`; }
+  const k=S.sel, n=L.nodes[k], stg=(L.stages.find(s=>s[0]===n.s)||[])[1]||n.s, q=n.q, ins=(UP[k]||[]).filter(x=>L.nodes[x]);
+  return `<div class="chap">${esc(stg)}</div><h2>${esc(n.n)}</h2>${n.w?`<p class="lead">${esc(n.w.charAt(0).toUpperCase()+n.w.slice(1))}.</p>`:''}
+   ${S.lot?`<div class="f1l-hero"><div class="hl">On this lot (${esc(S.lot)})</div><div class="f1l-nv${S.val&&S.sel===S.valFor?' has':''}">${S.val&&S.sel===S.valFor?esc(S.val)+' <span class="f1l-vsrc">(as the card shows it)</span>':'not in the tool yet'}</div></div>`:''}
+   <section><h3>How it is worked out</h3><p class="f1l-f">${esc(n.f||'Read or asked; no formula.')}</p>${ins.length?`<p class="f1l-in">From: ${ins.map(x=>`<button class="f1l-a" data-k="${x}">${esc(L.nodes[x].n)}</button>`).join(', ')}</p>`:''}</section>
+   <section><h3>Trust</h3><div class="f1l-meter"><div class="trk"><div class="bar" style="width:${q==null?0:q}%"></div></div><div class="cap"><span>${q==null?'not rated':q+' of 100'}</span><span>${esc(word(q))}</span></div></div></section>
+   <section><h3>Status</h3><p class="f1l-f">${esc(n.st||'?')}${n.st2?` · ${esc(n.st2)}`:''}</p></section>
+   <section><h3>Sources</h3>${srcList(n.src)}</section>`; }
+function draw(){ const W=document.getElementById('f1l'); if(!W||!L) return; const D=diagram();
+  W.innerHTML=`<header class="f1v-head"><a class="f1-app" href="#" data-close="home">Beyond Data</a><span class="tpl">How it works</span>
+     <div class="f1l-tabs" role="tablist" aria-label="Template">${TABS.map(([id,nm])=>`<button role="tab" data-tab="${id}" aria-selected="${S.tab===id}">${nm}</button>`).join('')}</div>
+     <span class="f1v-where">${S.label?esc(S.label)+' · ':''}${D.lit?D.lit+' of ':''}${D.n} parts</span><button class="f1v-x" data-close>Close</button></header>
+   <div class="f1v-body"><main class="f1v-main"><div class="f1l-wrap"><div class="f1l-box">${D.svg}</div></div>
+     <div class="f1l-key"><span><i class="k sel"></i>selected</span><span><i class="k lit"></i>feeds the selection</span><span><i class="k gap"></i>gap (?)</span><span><i class="k"></i>the rest</span></div>
+     <details class="f1v-src"><summary>Sources and assumptions</summary><p>Parts, wires, formulas, trust and template tags: tool/logic.json (built from the register by make_templates.py). Source texts and kinds: tool/opps.json. Trust words: CLAUDE.md §3. Display only.</p></details></main>
+    <aside class="f1v-panel">${panel()}</aside></div>`;
+   
+  const box=W.querySelector('.f1l-box'), wr=W.querySelector('.f1l-wrap'), fade=()=>{ wr.classList.toggle('more-r',box.scrollLeft+box.clientWidth<box.scrollWidth-2); wr.classList.toggle('more-l',box.scrollLeft>2); };
+  box.addEventListener('scroll',fade,{passive:true}); fade(); }
+async function open(o){ o=o||{}; await load(); S.tab=o.tab||S.tab; S.sel=null; S.label=o.label||''; S.lot=o.lot||''; S.val=o.val||''; S.valFor=o.sel||null;   S.lit=(o.ids||[]).filter(k=>L.nodes[k]); if(o.sel&&L.nodes[o.sel]){ S.sel=o.sel; if(!shown(o.sel)) S.tab='all'; } if(S.lit.length&&!S.lit.some(k=>shown(k))) S.tab='all';      
+  let W=document.getElementById('f1l'); if(!W){ W=document.createElement('div'); W.id='f1l'; W.setAttribute('role','dialog'); W.setAttribute('aria-modal','true'); document.body.appendChild(W);
+    W.addEventListener('click',e=>{ const t=e.target.closest('[data-k],[data-tab],[data-close]'); if(!t) return; e.preventDefault();
+      if(t.dataset.close!=null){ W.remove(); return; } if(t.dataset.tab){ S.tab=t.dataset.tab; if(S.sel&&!shown(S.sel)) S.sel=null; draw(); return; }
+      if(t.dataset.k){ S.sel=S.sel===t.dataset.k?null:t.dataset.k; draw(); } });
+    if(!window.__f1lEsc){ window.__f1lEsc=true; document.addEventListener('keydown',e=>{ const L=document.getElementById('f1l'); if(L&&e.key==='Escape'){ e.preventDefault(); e.stopImmediatePropagation(); L.remove(); } },true); }    
+    W.addEventListener('keydown',e=>{ const g=e.target.closest&&e.target.closest('g[data-k]'); if(g&&(e.key==='Enter'||e.key===' ')){ e.preventDefault(); S.sel=g.dataset.k; draw(); } }); }
+  draw(); }
+ 
+ 
+const SITE={'Your city':{_:['zoning_status','zone']},
+ 'Your parcel':{_:['parcel','zone','zoning_status'],f:[[/address|lot area/i,['parcel']],[/^zone/i,['zone']],[/data centre|approval|clause/i,['zoning_status']]]}};
+const FIG={
+ municipal:{'Industrial land':{_:['zoned_land','industrial_jobs'],f:[[/lot zone/i,['zone']],[/lot area/i,['parcel']],[/designation|policy/i,['zoned_land','zoning_status']],[/./,['zoned_land']]]}},
+ full:Object.assign({},SITE),
+ arch:Object.assign({},SITE,{
+ 'Programs nearby':{_:['programs_nearby']},
+ 'What the lot allows':{_:['envelope','floor_area','storey_min'],f:[[/height/i,['envelope']],[/floor space ratio|floor area/i,['floor_area','plot_ratio']],[/yard/i,['envelope']],[/ground floor/i,['storey_min','zoning_status']]]},
+ 'Ground and flood':{_:['site_grade','flood_exposure'],f:[[/flood|slab/i,['flood_exposure','flood_area']],[/ground|datum/i,['site_grade']]]},
+ 'Pick a typology':{_:['arch_program_catalogue','typology_spec_rules'],f:[[/minimum ground|cover/i,['arch_space_budget']],[/data centre here/i,['zoning_status']],[/./,['arch_program_catalogue','typology_spec_rules']]]},
+ 'Variant and add-ons':{_:['arch_placement','arch_space_budget'],f:[[/refuge/i,['arch_placement','refuge_people']],[/heat hub/i,['arch_space_budget','arch_dc_ets']],[/solar/i,['pv_roof']],[/ev charging/i,['ev_stalls']],[/fit/i,['arch_space_budget']]]},
+ 'Variant':{_:['arch_placement','arch_space_budget'],f:[[/refuge/i,['arch_placement','refuge_people']],[/heat hub/i,['arch_space_budget','arch_dc_ets']],[/solar/i,['pv_roof']],[/ev charging/i,['ev_stalls']],[/fit/i,['arch_space_budget']]]},    
+ 'The governing principle':{_:['hub_layout'],f:[[/ground floor/i,['storey_min','zoning_status']]]},
+ 'The numbers':{_:['floor_area','size_fit','heat_delivered'],f:[[/floor area/i,['floor_area']],[/it load/i,['size_fit']],[/envelope/i,['envelope']],[/heat/i,['heat_delivered']]]},
+ 'What’s left for neighbours':{_:['arch_heat_budget','receivers_nearby'],f:[[/heat made/i,['heat_delivered']],[/left|used by/i,['arch_heat_budget']],[/homes/i,['homes_heated']],[/district energy/i,['competing_sources']],[/demand/i,['receiver_demand']],[/receivers/i,['receivers_nearby']]]},
+ 'Rooms':{_:['hub_layout'],f:[[/t-reach/i,['t_reach']],[/dead end/i,['dead_ends']],[/t-width|width/i,['room_widths']],[/refuge people/i,['refuge_people','hub_layout']],[/hall/i,['arch_dc_hall','hub_layout']]]},
+ 'Separations':{_:['fire_separations'],f:[[/battery/i,['fire_separations','battery_code_path']]]},
+ 'Exits':{_:['travel_distance','exit_separation'],f:[[/t-reach/i,['t_reach']],[/dead end/i,['dead_ends']],[/stair shaft/i,['fire_separations']],[/egress doorway/i,['egress_doorways']],[/travel/i,['travel_distance']],[/apart|discharge/i,['exit_separation']],[/exit doors/i,['hub_layout']]]},
+ 'Plant and site':{_:['plant_clearances'],f:[[/generator tank/i,['fuel_on_site','plant_clearances']],[/generator/i,['generator_sets','plant_clearances']],[/edmonton cooling/i,['chiller_winter_range']],[/chiller/i,['cooling_units','plant_clearances']],[/loading/i,['loading_need']],[/height/i,['building_height']],[/street|slab|step-free/i,['step_free_entry','site_grade']]]},
+ 'Heat flow':{_:['heat_delivered','arch_heat_budget'],f:[[/offers/i,['heat_delivered']],[/size tested/i,['size_fit']],[/temperature/i,['heat_temp']],[/./,['arch_heat_budget']]]},
+ 'Program diagram':{_:['hub_layout','arch_space_budget'],f:[[/asked for/i,['arch_space_budget','arch_program_catalogue']],[/net in the plan|storeys/i,['hub_layout']],[/data hall|data-centre floor/i,['arch_dc_hall']],[/"\?"/i,['typology_spec_rules']],[/height limit/i,['envelope']]]},
+ 'Drawing styles':{_:['storey_min','envelope'],f:[[/height limit/i,['envelope']],[/storeys/i,['storey_min','hub_layout']],[/./,['massing']]]},
+ 'Compare':{_:['heat_delivered','arch_heat_budget'],f:[[/offered/i,['heat_delivered']],[/not placed/i,['arch_placement']],[/./,['arch_heat_budget']]]}})};
+const step=k=>BD.logic&&BD.logic.stepNodes?BD.logic.stepNodes(k):[];
+function cardIds(title,tab){ const F=FIG[tab]&&FIG[tab][title]; if(F) return F._; if(title==='Report') return step('report');    
+  if(tab==='municipal') return MUNI_CARD[title]||[]; const k=CARD[title]; return k?step(k):[]; }
+function figIds(title,tab,label){ const F=FIG[tab]&&FIG[tab][title]; if(F&&F.f) for(const [rx,ids] of F.f) if(rx.test(label||'')) return ids; return cardIds(title,tab); }
+BD.f1logic={open,cardIds,figIds,FIG};
+})();
