@@ -5,7 +5,7 @@ const BD=window.BD; const esc=s=>String(s==null?'':s).replace(/[&<>"]/g,c=>({'&'
 const LOTS={van:{city:'van',tile:'1_1',id:'63819485',name:'Vancouver'},edm:{city:'edm',tile:'-1_1',id:'146402',name:'Edmonton'}};
 const C=(chap,list)=>list.map(t=>({chap,t}));
  
-BD.F1FLAGS=Object.assign({landing2:true,addons:false,engOld3d:false,introLive:false,archRecvCard:false,archLeftCard:false,archCompareCard:false},BD.F1FLAGS||{});            
+BD.F1FLAGS=Object.assign({typoIntro:true  ,landing3:'c',heroAnim:true,arch8:true,engSimple:true,landing2:true,logicMap:true,paletteB:true,addons:false,engOld3d:false,introLive:false,archRecvCard:false,archLeftCard:false,archCompareCard:false},BD.F1FLAGS||{});            
 const VARIANT=BD.F1FLAGS.addons?'Variant and add-ons':'Variant';
  
 const TELLS={resident:'Find a data centre that already exists in your city. See what it is, who runs it and what’s inside it, and get a short report on the one near you.',
@@ -22,7 +22,7 @@ const TPL=[
   cards:[...C('Find',['Find a data centre']),    ...C('The facility',['What it is','What’s inside','What it means next door']),...C('Report',['Report'])]},
  {id:'municipal',name:'Municipal',tier:null,tab:'municipal',step:3,who:'For planners and councillors. One parcel’s rules, one rule per card: limits, not designs.',img:'municipal',
   cards:[...C('Site',['Your parcel']),...C('Use',['Is a data centre allowed?','Industrial land']),...C('Building rules',['Height and floor area','Yards by edge','Noise limits around the lot','Storeys and street frontage']),...C('Process',['Approval process']),...C('Report',['Report'])]},
- {id:'engineering',name:'Engineering',tier:'full',tab:'full',step:4,who:'For engineers and operators. What fits on the lot, the cooling and backup choices, and what it could exchange with the city.',img:'engineering',
+ {id:'engineering',name:'Power, heat and water',tier:'full',tab:'full',step:4,who:'For engineers and operators. What fits on the lot, the cooling and backup choices, and what it could exchange with the city.',img:'engineering',
   cards:[...C('Site',['Your parcel']),...C('Set-up',['What fits','Cooling','Backup power','Noise']),...C('Exchanges',['Heat offered','Who could take it','Electricity','Water']),...C('District',['Shared energy district']),...C('Report',['Report'])]},  
  {id:'architecture',name:'Architecture',tier:'arch',tab:'arch',step:2,who:'For architects. A data centre and public programs on one lot, laid out from a library and checked against the main code moves.',img:'architecture',
   cards:[...C('Site',['Your parcel','People nearby','Programs nearby',...(BD.F1FLAGS.archRecvCard?['Heat receivers nearby']:[]),'What the lot allows','Ground and flood','Neighbours and views']),
@@ -44,25 +44,26 @@ function howSvg(){
   const go=()=>{ new MutationObserver(sync).observe(document.body,{childList:true}); sync(); };
   if(document.body) go(); else document.addEventListener('DOMContentLoaded',go); })();
 function landing(){ let L=document.getElementById('f1'); if(L) L.remove(); L=document.createElement('div'); L.id='f1';
-  const L2=!!(BD.f1land2&&BD.f1land2.on()); if(L2) L.classList.add('f1-l2');    
-  L.innerHTML=L2?BD.f1land2.html():`<div class="f1-wrap">
-   <header class="f1-head"><a class="f1-app" href="#" data-go="top">Beyond Data</a><nav class="f1-nav" aria-label="Site"><a href="#f1-work">Templates</a><a href="#" data-go="typ">Typologies</a><a href="#" data-go="logic">How it works</a><a href="#" data-go="lib">Library</a><a href="#" data-go="found">What the tool found</a></nav></header>
+  const L3=!!(BD.f1land3&&BD.f1land3.on()); if(L3) L.classList.add('f1-l3');    
+  const L2=!L3&&!!(BD.f1land2&&BD.f1land2.on()); if(L2) L.classList.add('f1-l2');    
+  L.innerHTML=L3?BD.f1land3.html():L2?BD.f1land2.html():`<div class="f1-wrap">
+   <header class="f1-head"><a class="f1-app" href="#" data-go="top">Beyond Data</a><nav class="f1-nav" aria-label="Site"><a href="#f1-work">Templates</a><a href="#" data-go="typ">Typologies</a><a href="#" data-go="logic">Source breakdown</a><a href="#" data-go="lib">Library</a><a href="#" data-go="found">What the tool found</a></nav></header>
    <section class="f1-hero"><div><h1>What could a data centre give the city around it?</h1>
      <p class="f1-lead">Test real lots in Vancouver and Edmonton: what a data centre could share with its neighbours, and what stands in the way.</p>
-     <div class="f1-acts"><button class="f1-btn" data-go="work">Choose a template</button><button class="f1-link" data-go="logic">How it works</button><button class="f1-link quiet" data-go="intro">Watch the intro</button></div></div>
+     <div class="f1-acts"><button class="f1-btn" data-go="work">Choose a template</button><button class="f1-link" data-go="logic">Source breakdown</button><button class="f1-link quiet" data-go="intro">Watch the intro</button></div></div>
     <figure class="f1-heroimg"><img src="f1/img/hero.png" alt="339 1st Ave E, Vancouver, in the tool's 3-D view: the data centre's massing, cooling plant and generators among the neighbouring buildings"><figcaption class="f1-cap">339 1st Ave E, Vancouver. The tool's 3-D view: a data centre's massing, cooling plant and generators among its neighbours.</figcaption></figure></section>
    <section class="f1-about"><div class="f1-about-t"><h2>Beyond Data</h2><p>A thesis project, M.Arch, UBC School of Architecture and Landscape Architecture, 2027.</p></div>
     ${ABOUT.map(([h,t])=>`<div class="f1-about-r"><h3>${h}</h3><p>${t}</p></div>`).join('')}</section>
    <section id="f1-work"><div class="f1-sechead"><h2>How to use it, and what each template tells you</h2><span>Pick a template, then a lot, and follow the steps along the bottom. Each template ends in its own report.</span></div>
-    ${TPL.map(t=>`<div class="f1-row"><h3>${t.name}</h3><div><p class="who">${esc(TELLS[t.id]||t.who)}</p><div class="ract"><button class="f1-btn" data-start="${t.id}">Start</button><button class="f1-link" data-see="${t.id}">See the workflow</button><button class="f1-link" data-logic="${t.tab}">Logic diagram →</button></div></div>
+    ${TPL.map(t=>`<div class="f1-row"><h3>${t.name}</h3><div><p class="who">${esc(TELLS[t.id]||t.who)}</p><div class="ract"><button class="f1-btn" data-start="${t.id}">Start</button><button class="f1-link" data-see="${t.id}">See the workflow</button><button class="f1-link" data-logic="${t.tab}">Source breakdown →</button></div></div>
       <div class="meta">${t.cards.length} steps<br>report</div><img src="f1/img/${t.img}.png" alt="${t.name}: the tool's 3-D view of 339 1st Ave E, Vancouver" loading="lazy"></div>`).join('')}
     <div class="f1-typstrip"><span>8 typologies: data centres that share their building with the city</span><button data-go="typ">See the typologies →</button></div></section>
    <section class="f1-about">${ABOUT2.map(([h,t])=>`<div class="f1-about-r"><h3>${h}</h3><p>${t}</p></div>`).join('')}
     <div class="f1-about-r"><h3>The goals</h3><ol>${GOALS.map(g=>`<li>${g}</li>`).join('')}</ol></div></section>
    <section class="f1-ex" id="f1-ex" hidden><div class="f1-sechead"><h2>Example lots with a pre-drawn layout</h2><p>The Architecture template shows a building only where its layout was drawn and checked ahead of time. Open one of these lots.</p></div><ul class="f1-exlots" data-exlist></ul></section>
-   <section class="f1-how" id="f1-how"><div><h2>How it works</h2><p>One logic runs under all four templates. Every number in it is tied to a source and a check status, so a reader can follow any figure back to where it came from.</p><button class="f1-link" data-go="logic">Open the interactive logic diagram</button></div>${howSvg()}</section>
+   <section class="f1-how" id="f1-how"><div><h2>How it works</h2><p>One logic runs under all four templates. Every number in it is tied to a source and a check status, so a reader can follow any figure back to where it came from.</p><button class="f1-link" data-go="logic">Open the source breakdown</button></div>${howSvg()}</section>
    <footer class="f1-foot"><span>Beyond Data · ARCH 540, UBC School of Architecture and Landscape Architecture · 2026</span><span>Data: City of Vancouver and City of Edmonton open data. Contains information licensed under the Open Government Licence – Canada (Public Safety Canada, Canada Structures), the Open Government Licence – Vancouver and the Open Government Licence – City of Edmonton. Maker and operator figures are labelled as claims.</span><a href="#" class="f1-old" data-go="old">Archive: the earlier tool</a></footer></div>`;
-  document.body.appendChild(L); if(L2) BD.f1land2.after(L);
+  document.body.appendChild(L); if(L3) BD.f1land3.after(L); else if(L2) BD.f1land2.after(L);
    
   try{ document.documentElement.lang='en-CA'; const hush=()=>{ const w=document.getElementById('welcome'); if(!w||!L.isConnected) return; w.setAttribute('inert',''); if(w.contains(document.activeElement)||document.activeElement===document.body) (L.querySelector('a,button')||L).focus({preventScroll:true}); }; hush(); setTimeout(hush,150); setTimeout(hush,800); }catch(e){}
    
@@ -76,7 +77,9 @@ function landing(){ let L=document.getElementById('f1'); if(L) L.remove(); L=doc
     if(g.dataset.go==='typ'){ e.preventDefault(); if(BD.f1typ) BD.f1typ.open('lib'); return; }  
     if(g.dataset.go==='intro'){ e.preventDefault(); if(BD.f1intro) BD.f1intro.play(); return; }  
     if(g.dataset.go==='old'){ e.preventDefault(); L.remove(); const w=document.getElementById('welcome'); if(w) w.removeAttribute('inert'); return; }
-    if(g.dataset.go==='logic'){ e.preventDefault(); if(BD.f1logic) BD.f1logic.open({tab:'all'}); return; }
+    if(g.dataset.go==='logic'){ e.preventDefault(); if(BD.f1logicplain) BD.f1logicplain.open(); else if(BD.f1logic) BD.f1logic.open({tab:'all'}); return; }    
+    if(g.dataset.go==='dcmap'){ e.preventDefault(); if(BD.f1dcpage) BD.f1dcpage.open('van'); return; }    
+    if(g.dataset.go==='decides'){ e.preventDefault(); if(BD.f1decides) BD.f1decides.open(); return; }    
     if(g.dataset.go==='work'){ L.querySelector('#f1-work').scrollIntoView({behavior:'smooth'}); return; }
     if(g.dataset.go==='top'){ e.preventDefault(); L.scrollTo({top:0,behavior:'smooth'}); return; }
     if(g.dataset.start){ const t=TPL.find(x=>x.id===g.dataset.start); if(!t) return;  
@@ -86,14 +89,17 @@ function landing(){ let L=document.getElementById('f1'); if(L) L.remove(); L=doc
   if(BD.f1intro) BD.f1intro.first();   }
 
  
+ 
+const DNM={'Pick a plan':'Pick a layout','Available plans':'Available layouts','Site at a glance':'Around the lot','On the site':'On the lot'}, DN=t=>DNM[t]||t;
 const V={t:null,i:0,city:'van',where:'',own:null,pick:false,pcity:'van',hits:[]};    
-async function loadLot(city){ const S=V.own||LOTS[city]; V.where='…'; V.ready=false; draw();
-  try{ if(BD.S.city!==city&&BD.setCity) await BD.setCity(city,true); await BD.select({city:S.city,tile:S.tile,id:S.id,quiet:true}); BD.modelReset(); const M=BD.model(), a=BD.S.sel&&BD.S.sel.a;
+let LLT=0; async function loadLot(city){ const S=V.own||LOTS[city], tk=++LLT; V.where='…'; V.ready=false; draw();
+  try{ if(BD.S.city!==city&&BD.setCity) await BD.setCity(city,true); await BD.select({city:S.city,tile:S.tile,id:S.id,quiet:true}); if(tk!==LLT) return;     try{ if(BD.f1best&&BD.f1best.onLot) BD.f1best.onLot(BD.S.sel); }catch(e){ console.warn('layout',e); }     BD.modelReset(); const M=BD.model(), a=BD.S.sel&&BD.S.sel.a;
     V.where=[a&&a[0]?titleCase(a[0]):S.id, M&&M.Z&&(M.Z.zone||M.Z.key)].filter(Boolean).join(' · '); V.addr=a&&a[0]?titleCase(a[0]):S.id; }
   catch(e){ V.where=S.id+' (lot not loaded: '+String(e.message||e).slice(0,60)+')'; }
   V.ready=true; draw(); }
 const titleCase=s=>String(s).toLowerCase().replace(/\b([a-z])/g,c=>c.toUpperCase()).replace(/\b(\d+)(St|Nd|Rd|Th)\b/g,(m,n,x)=>n+x.toLowerCase()).replace(/\b(Nw|Ne|Sw|Se)\b/g,m=>m.toUpperCase());
-function viewer(id,opt){ V.t=TPL.find(x=>x.id===id); V.i=0; V.pick=!!(opt&&opt.pick); V.own=null; V.hits=[]; V.cand=null; V.ready=false; let W=document.getElementById('f1v'); if(!W){ W=document.createElement('div'); W.id='f1v'; W.setAttribute('role','dialog'); W.setAttribute('aria-modal','true'); document.body.appendChild(W);
+function viewer(id,opt){ if(id==='resident'||id==='municipal'){ if(id==='resident'&&BD.f1dcpage) BD.f1dcpage.open('van'); return; }    
+  V.t=TPL.find(x=>x.id===id); if(id==='architecture'&&BD.f1arch2&&BD.f1arch2.on()&&BD.f1arch2.install()){ V.t=Object.assign({},V.t,{cards:BD.f1arch2.swap(V.t.cards)}); }     if(id==='engineering'&&BD.f1eng2&&BD.f1eng2.on()&&BD.f1eng2.install()){ BD.f1eng2.css(); V.t=Object.assign({},V.t,{cards:BD.f1eng2.LIST.flatMap(([h,l])=>C(h,l)),chaps:BD.f1eng2.LIST.map(([h])=>h)}); }     V.i=0; V.pick=!!(opt&&opt.pick); V.own=null; V.hits=[]; V.cand=null; V.ready=false; let W=document.getElementById('f1v'); if(!W){ W=document.createElement('div'); W.id='f1v'; W.setAttribute('role','dialog'); W.setAttribute('aria-modal','true'); document.body.appendChild(W);
     W.addEventListener('click',e=>{ const fg=e.target.closest('[data-fig]'); if(fg&&BD.f1logic){ const c=V.t.cards[V.i], k=fg.dataset.k||'', ids=k?[k]:(BD.f1logic.figIds?BD.f1logic.figIds(c.t,V.t.tab,fg.dataset.fig||''):BD.f1logic.cardIds(c.t,V.t.tab));
         BD.f1logic.open({tab:V.t.tab,label:c.t+' · '+(fg.dataset.fig||''),ids,lot:V.where,sel:k||(ids.length===1?ids[0]:null),val:(fg.querySelector('.v')||fg).innerText.replace(/\s+/g,' ').trim()}); return; }  
       const b=e.target.closest('button'); if(!b) return; const d=b.dataset;
@@ -105,7 +111,7 @@ function viewer(id,opt){ V.t=TPL.find(x=>x.id===id); V.i=0; V.pick=!!(opt&&opt.p
       if(d.step==='back'&&V.i>0){ V.i--; draw(); } if(d.step==='next'&&V.i<V.t.cards.length-1){ V.i++; draw(); } });
     document.addEventListener('keydown',e=>{ if(!document.getElementById('f1v')) return; if(document.getElementById('f1l')) return;    
       if(e.key==='Escape') document.getElementById('f1v').remove(); if(e.key==='ArrowRight'&&V.i<V.t.cards.length-1){ V.i++; draw(); } if(e.key==='ArrowLeft'&&V.i>0){ V.i--; draw(); } }); }
-  draw(); if(!V.pick) loadLot(V.city); }
+  draw(); if(!V.pick&&!(opt&&opt.noLoad)) loadLot(V.city); }    
  
 function pickHtml(){ if(V.t.id==='resident') return `<div class="f1v-pick"><h2>Choose a city</h2><p class="lead">Resident: pick the city to see every data centre on record there, then find one.</p>
   <div class="f1v-city" role="group" aria-label="City">${Object.values(LOTS).map(l=>`<button data-pcity="${l.city}">${l.name}</button>`).join('')}</div></div>`;
@@ -154,27 +160,31 @@ function draw(){ const W=document.getElementById('f1v'); if(!W||!V.t) return;
      <nav class="f1v-chap" aria-label="Chapters">${t.chaps.map((h,k)=>`<button data-chap="${esc(h)}" class="${k<ci?'past':k===ci?'now':''}"${k===ci?' aria-current="step"':''}>${esc(h)}</button>`).join('')}</nav>
      <span class="f1v-where">${t.id==='resident'?resWhere():V.addr?`<button class="f1v-cityname" data-to="0" title="Change the city: back to step 1">${esc((LOTS[V.city]||{}).name||'')}</button> / ${esc(V.addr)}`:esc(V.where)}</span>
      ${V.own&&t.id!=='resident'?`<button class="f1v-how" data-relot>Change lot</button>`:''}
-     <button class="f1v-how" data-how="all">How it works</button><button class="f1v-x" data-x aria-label="Close the cards">Close</button></header>
+     <button class="f1v-how" data-how="all">Source breakdown</button><button class="f1v-x" data-x aria-label="Close the cards">Close</button></header>
    <div class="f1v-body"><main class="f1v-main"><div class="f1v-chips">${V.i===0&&!V.own?`<div class="f1v-city" role="group" aria-label="City">${Object.values(LOTS).map(l=>`<button data-city="${l.city}" aria-pressed="${l.city===V.city}">${l.name}</button>`).join('')}</div>`:''}${t.id==='resident'?'':spec?(V.own?'<span class="f1v-chip">Your lot</span>':`<span class="f1v-chip">${esc((spec.chip&&String(spec.chip).replace(/\s*·\s*rule sheet v[\d.]+/i,''))||('Example lot: '+(V.addr||V.where||'')+', '+((LOTS[V.city]||{}).name||'')))}</span><button class="f1v-how" data-relot>Use my own lot</button>`):'<span class="f1v-chip">Preview · not built yet</span>'}</div>
      <div class="f1v-draw">${spec?'<p class="f1v-empty">Drawing… (maps and plans can take a few seconds)</p>':''}${spec?'':`<p class="f1v-empty">This card’s drawing and figures are built in ${STEPNAME[t.step]} of the site build. It will read the example lot above and what the cards before it chose.</p>`}</div>
-     <button class="f1v-how" data-how="card">This card in the interactive logic diagram</button><details class="f1v-src"><summary>Sources and assumptions</summary><p>Nothing on this card yet. Every figure will come from the tool, with its source here, or show as a red “?”.</p></details></main>
-    <aside class="f1v-panel"><div class="chap">${esc(c.chap)}</div><h2>${esc(c.t)}</h2><div class="f1c-body">${spec?'':`<p class="lead">${t.name} · card ${V.i+1} of ${n}.</p>`}</div><div class="grow"></div>
+     <button class="f1v-how" data-how="card">This card in the source breakdown</button><details class="f1v-src"><summary>Sources and assumptions</summary><p>Nothing on this card yet. Every figure will come from the tool, with its source here, or show as a red “?”.</p></details></main>
+    <aside class="f1v-panel"><div class="chap">${esc(c.chap)}</div><h2>${esc(DN(c.t))}</h2><div class="f1c-body">${spec?'':`<p class="lead">${t.name} · card ${V.i+1} of ${n}.</p>`}</div><div class="grow"></div>
      <div class="f1v-foot"><div class="f1v-nav"><button class="f1v-back" data-step="back"${V.i?'':' disabled'}>Back</button><button class="f1-btn" data-step="next"${V.i<n-1?'':' disabled'}>${V.i<n-1?'Next':'Last card'}</button></div><div class="f1v-no">${V.i+1} / ${n}</div></div></aside></div>
-   <nav class="f1v-strip" aria-label="All cards">${t.cards.map((x,k)=>`<button data-to="${k}"${k===V.i?' aria-current="true"':''}><span class="n">${k+1}</span><span>${esc(x.t)}</span></button>`).join('')}</nav>`;
+   <nav class="f1v-strip" aria-label="All cards">${t.cards.map((x,k)=>`<button data-to="${k}"${k===V.i?' aria-current="true"':''}><span class="n">${k+1}</span><span>${esc(DN(x.t))}</span></button>`).join('')}</nav>`;
   const cur=W.querySelector('.f1v-strip [aria-current="true"]'), sp=W.querySelector('.f1v-strip'); if(cur&&sp) sp.scrollLeft=Math.max(0,cur.offsetLeft-sp.clientWidth/2+cur.offsetWidth/2);  
    
   if(spec&&V.ready){ const tok=V.tok=(V.tok||0)+1, dr=W.querySelector('.f1v-draw'), pb=W.querySelector('.f1c-body'), se=W.querySelector('.f1v-src');
     Promise.resolve().then(async()=>{ const x=BD.f1cards.ctx(V.city);  
        
-      if(window.BD_PUBLIC&&V.city==='edm'){ const need={municipal:['Yards by edge','Noise limits around the lot'],engineering:['What fits','Backup power','Noise','Heat offered','Who could take it','Water']}, ip=V.t.cards.findIndex(k=>k.t==='Pick a typology');
+      if(window.BD_PUBLIC&&V.city==='edm'){ const need={municipal:['Yards by edge','Noise limits around the lot'],engineering:['What fits','Backup power','Noise','Heat offered','Who could take it','Water','What fits here','Cooling and water','When the power fails','Noise next door','Heat for the neighbours']}, ip=V.t.cards.findIndex(k=>k.t==='Pick a typology');
         if((need[V.t.id]||[]).includes(c.t)||(V.t.id==='architecture'&&ip>=0&&V.i>=ip&&c.t!=='Report')) return {lead:'Edmonton lot outlines aren’t published as open data (the City stopped in Nov 2021); shown in the full version.',
           draw:V.t.id==='architecture'?(window.BD_PUBLIC?'<p class="f1v-empty">Edmonton test fits: in the full version.</p>':'<p class="f1v-empty">The seven Edmonton test fits are shown as images, with their checked figures, on <a href="edm-test-fits.html">Edmonton test fits</a>.</p>')    :'', hero:[], rows:[], src:['City of Edmonton Open Data notice: “As of November 1st, 2021, the City will no longer provide datasets with land parcel boundary polygon geometry” (data.edmonton.ca, stt5-pzaa). See Sources and licences.'], noZoneFlag:true}; }
       if(await needsLayout(V)) return await noLayoutCard(V.city);    
-      if(V.t.id==='architecture'&&BD.f1archNoFit&&V.i>V.t.cards.findIndex(k=>k.t==='Pick a typology')){ const nf=await BD.f1archNoFit(x); if(nf) return nf;
+      if(V.t.id==='architecture'&&BD.f1archNoFit&&V.i>(()=>{ const c=V.t.cards, i=c.findIndex(k=>k.t==='Pick a typology'); return i>=0?i:c.findIndex(k=>k.t==='Pick a plan'); })()){     let nf=await BD.f1archNoFit(x);
+         
+        if(nf){     let lb=null; try{ lb=BD.f1best?await BD.f1best.forLot(x):null; }catch(e){} if(lb&&lb.source!=='rough') nf=null; }
+        if(nf&&V.t.cards[V.i].t==='Who approves it') nf=null;    
+        if(nf) return nf;
         const es=BD.f1archEstimate&&await BD.f1archEstimate(x); if(es){ const r=await spec.build(x); if(r){ r.hero=(r.hero||[]).map(h=>Object.assign({},h,{v:h.u&&/MW/.test(h.u)&&/^[\d.]+$/.test(String(h.v))?(+h.v).toFixed(1):h.v,l:(h.l||'')+(es.basis&&es.basis.k==='borrowed'?' (borrowed, not checked here)':' (first pass, not checked)')}));     r.estimate=es; } return r; } }    
       const r0=await spec.build(x); if(r0&&window.BD_PUBLIC&&V.city==='van'&&['Heat receivers nearby','Who could take it'].includes(c.t)) r0.lead=(r0.lead||'')+' The full version also counts commercial and apartment buildings from a licensed assessment list.'; return r0; }).then(res=>{ if(tok!==V.tok||!res) return; BD.f1cardIndex=V.i; BD.f1cards.render(res,dr,pb,se,V.t.id); svgLabels(dr,c.t); svgMin(dr); trustTags(pb,c.t,V.t.tab,res); if(V.t.id==='architecture'&&/^(Rooms|Separations|Exits|Plant and site)$/.test(c.t)) planViews(dr);    
       if(V.t.id==='architecture'&&V.i>V.t.cards.findIndex(k=>k.t==='Pick a typology')&&c.t!=='Report') needsLayout(V).then(no=>{ if(!no) variantBadge(pb,V.city); });         W.dataset.built=c.t; })
-      .catch(e=>{ if(tok!==V.tok) return; dr.innerHTML=`<p class="f1v-empty">This card could not be drawn: ${esc(String(e&&e.message||e).slice(0,160))}</p>`; console.error('f1 card',c.t,e); }); } }
+      .catch(e=>{ if(tok!==V.tok) return; dr.innerHTML=`<p class="f1v-empty">This card isn’t available for this lot yet: some of the figures it needs are missing. The other cards still apply.</p>`; console.error('f1 card',c.t,e); }); } }
 
  
 const PRE={};
@@ -192,7 +202,12 @@ async function needsLayout(V){ if(V.t.id!=='architecture') return false; const i
   const PD=await predrawn(V.city), s=BD.S.sel, own=s&&PD[String(s.id)], typ=(BD.arch&&BD.arch.typology)||'emergency_hub'; return !(own&&(own.typologies||[]).includes(typ)); }
  
 async function tileOf(city,id,addr){ try{ const r=await BD.addrHits(city,addr||''); const h=(r.hits||[]).find(q=>String(q[2])===String(id)); if(h) return h[1]; }catch(e){}
-  try{ const m=await BD.getJSON(`tiles/${city}/meta.json`); for(const t of m.tiles||[]){ const k=t[0]+'_'+t[1]; let T; try{ T=await BD.loadTile(city,k); }catch(e){ continue; } if((T.par||[]).some(q=>String(q.id)===String(id)||(q.ids||[]).map(String).includes(String(id)))) return k; } }catch(e){} return null; }
+  try{ const m=await BD.getJSON(`tiles/${city}/meta.json`); if(BD.S&&BD.S.meta&&!BD.S.meta[city]) BD.S.meta[city]=m;    
+    const has=T=>T&&(T.par||[]).some(q=>String(q.id)===String(id)||(q.ids||[]).map(String).includes(String(id)));
+    if(city==='edm'&&BD.f1edm&&BD.f1edm.outlines&&m.T){ try{ const O=await BD.f1edm.outlines(), F=O&&O.lots&&O.lots[String(id)]&&O.lots[String(id)].F;    
+      if(F){ const i0=Math.floor(F.cx/m.T), j0=Math.floor(F.cy/m.T), set=new Set((m.tiles||[]).map(t=>t[0]+'_'+t[1]));
+        for(const [di,dj] of [[0,0],[-1,0],[1,0],[0,-1],[0,1],[-1,-1],[1,-1],[-1,1],[1,1]]){ const k=(i0+di)+'_'+(j0+dj); if(!set.has(k)) continue; let T0; try{ T0=await BD.loadTile(city,k); }catch(e){ continue; } if(has(T0)) return k; } } }catch(e){} }
+    for(const t of m.tiles||[]){ const k=t[0]+'_'+t[1]; let T; try{ T=await BD.loadTile(city,k); }catch(e){ continue; } if(!T) continue; if((T.par||[]).some(q=>String(q.id)===String(id)||(q.ids||[]).map(String).includes(String(id)))) return k; } }catch(e){} return null; }
 BD.f1openExample=async(city,id)=>{ const PD=await predrawn(city), e=PD[id]; if(!e) return; const tile=e.tile||await tileOf(city,id,e.addr); if(!tile) return; if(!document.getElementById('f1v')||V.t.id!=='architecture') viewer('architecture');
   V.own={city,tile,id:String(id),label:e.addr||id}; V.city=city; V.pick=false; draw(); loadLot(city); };
 if(!window.__f1ex){ window.__f1ex=true; document.addEventListener('click',e=>{ const b=e.target.closest&&e.target.closest('[data-exlot]'); if(!b) return; e.preventDefault(); const [city,id]=b.dataset.exlot.split('|'); BD.f1openExample(city,id); }); }
@@ -214,7 +229,7 @@ if(!window.__f1pub){ window.__f1pub=true; const MO=new MutationObserver(()=>{ do
  
 function planZoom(root){ if(!root||!BD.f1map) return; root.querySelectorAll('svg[viewBox]').forEach(sv=>{ if(sv.closest('.f1m-wrap')||sv.hasAttribute('data-map')) return; const vb=sv.viewBox.baseVal; if(!vb||vb.width<200) return;
     sv.style.minWidth=''; const sc=sv.parentElement; if(sc&&sc.classList.contains('f1-svgscroll')){ sc.parentNode.insertBefore(sv,sc); sc.remove(); }    
-    sv.setAttribute('data-map',''); sv.setAttribute('data-map-max','8'); sv.setAttribute('data-map-detail',''); sv.removeAttribute('width'); sv.removeAttribute('height'); sv.classList.add('f1-pv-svg'); });
+    sv.setAttribute('data-map',''); sv.setAttribute('data-map-max','8'); sv.setAttribute('data-map-detail',''); sv.removeAttribute('width'); sv.removeAttribute('height'); sv.classList.add('f1-pv-svg'); if(vb.height>vb.width*0.9) sv.style.maxHeight='calc(100vh - 150px)'; });    
   try{ BD.f1map.enhance(root); }catch(e){ console.warn('plan zoom',e); } }
 function planLink(root){ if(!root||root._pvLink) return; root._pvLink=true; const num=t=>String(t||'').trim();
   const rowsFor=n=>[...root.querySelectorAll('.f1-pv-sch tr')].filter(tr=>tr.firstElementChild&&num(tr.firstElementChild.textContent)===n);
@@ -279,7 +294,7 @@ function trustOf(tab,title,lab,txt,res){ const N=TRN||{}, k=null, F=((BD.f1logic
   return [w[0],w[1],gap?'Not published: a gap.':given?given[1]:codes.length?'From the source labels in the text (GOV government record 80; OC operator, BRK broker, PR press release, ENG engineer’s sheet: claims, 50; DIR directory listing 40).':'The lowest of this figure’s inputs in the register.']; }
 const trSpan=t=>t?`<span class="f1-tr" title="Confidence ${t[0]} of 100: ${t[1]}. ${esc(t[2])}">confidence ${t[0]} · ${t[1]}</span>`:'';
  
-const TRFULL=`Confidence, 0–100, under each figure: the lowest of its inputs. ${TRW.map(w=>w[0]+' '+w[1]).join(' · ')}. A figure with no tag is not yet linked to its sources in the tool’s register.`;
+const TRFULL=`Confidence, 0–100, under each figure: never higher than its weakest input. ${TRW.map(w=>w[0]+' '+w[1]).join(' · ')}. A figure with no tag is not yet linked to its sources in the tool’s register.`;
 const TRLEG=`<details class="f1-trl"><summary>What the confidence numbers mean</summary><p>${TRFULL}</p></details>`;
 const TRLINE=`<p class="f1-trl">What the confidence numbers mean: see the Sources page.</p>`;
 const trReady=async()=>{ if(!TRN) TRN=await trLoad(); return TRN; };
@@ -293,7 +308,7 @@ BD.f1trust={tags:trustTags,word:trWord,TRW,ready:trReady,TAB,LEG:`<p class="f1-t
 function boot(){ if(!BD||!BD.S||!BD.select) return setTimeout(boot,200); let skip=false; try{ skip=localStorage.getItem('bd-f1-skip')==='1'; }catch(e){}
   if(skip||/[?&]old\b/.test(location.search)||BD.S.sel) return; landing(); }
  
-async function openLot(tpl,city,id,addr){ const tile=await tileOf(city,id,addr); if(!tile) return false; viewer(tpl); V.own={city,tile,id:String(id),label:addr||id}; V.city=city; V.pick=false; draw(); await loadLot(city); return true; }
-BD.f1={landing,viewer,openLot,TPL,cur:()=>(document.getElementById('f1v')&&V.t)?V.t.id:null};    
+async function openLot(tpl,city,id,addr){ const tile=(LOTS[city]&&LOTS[city].id===String(id)?LOTS[city].tile:null)||await tileOf(city,id,addr); if(!tile) return false;     viewer(tpl,{noLoad:true}); V.own={city,tile,id:String(id),label:addr||id}; V.city=city; V.pick=false; draw(); await loadLot(city); return true; }
+BD.f1={landing,viewer,openLot,TPL,redraw:()=>draw(),cur:()=>(document.getElementById('f1v')&&V.t)?V.t.id:null};    
 boot();
 })();

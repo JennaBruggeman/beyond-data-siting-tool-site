@@ -49,7 +49,18 @@ function init(svg) {
   ctl.addEventListener('click', e => { const b = e.target.closest('button'); if (!b) return; const c = [A[0] + A[2] / 2, A[1] + A[3] / 2];
     if (b.dataset.z === 'in') zoomAt(S, c[0], c[1], 1.8); else if (b.dataset.z === 'out') zoomAt(S, c[0], c[1], 1 / 1.8); else { S.z = 1; S.tx = 0; S.ty = 0; apply(S); } });
   pointers(S); apply(S);
+  streetNames(S);
 }
+ 
+async function streetNames(S) { try {
+  if (!S.F || S.city !== 'van' || typeof BD === 'undefined' || !BD.f1streets || S.svg.querySelector('.f1st-g') || S.svg.hasAttribute('data-map-no-streets') || S.svg.hasAttribute('data-map-pick')) return;    
+  const sel = BD.S && BD.S.sel, id = S.svg.getAttribute('data-map-lot') || (sel && sel.id); if (!id) return;
+  await BD.f1streets.load(); if (!S.svg.isConnected || S.svg.querySelector('.f1st-g')) return;
+  const r = sel && String(sel.id) === String(id) && sel.ring ? sel.ring : null, R = r ? (Array.isArray(r[0]) ? r : r.reduce((a, v, i) => (i % 2 ? a[a.length - 1].push(v) : a.push([v]), a), [])) : [];
+  const vb = S.svg.viewBox.baseVal, u = upp(S), fs = 12 * (isFinite(u) && u > 0 ? u : 1);
+  const html = BD.f1streets.svg(id, S.F.P, { W: vb.width, H: vb.height, fs, collFs: fs, lotPts: R.map(q => S.F.P(q[0], q[1])), max: 6, minRun: 0.5 }); if (!html) return;
+  const g = document.createElementNS('http://www.w3.org/2000/svg', 'g'); g.innerHTML = html; S.body.appendChild(g); apply(S);
+} catch (e) {} }
 const upp = S => { const r = S.svg.getBoundingClientRect(), vb = S.svg.viewBox.baseVal; return r.width > 0 ? vb.width / r.width : 1; };   
 function toSvg(S, cx, cy) { const p = S.svg.createSVGPoint(); p.x = cx; p.y = cy; const m = S.svg.getScreenCTM(); return m ? p.matrixTransform(m.inverse()) : { x: 0, y: 0 }; }
 function clamp(S) { const [ax, ay, aw, ah] = S.A; S.z = Math.max(S.min || 1, Math.min(S.max, S.z));
@@ -57,7 +68,7 @@ function clamp(S) { const [ax, ay, aw, ah] = S.A; S.z = Math.max(S.min || 1, Mat
   S.tx = Math.min(ax - ax * S.z, Math.max(ax + aw - (ax + aw) * S.z, S.tx)); S.ty = Math.min(ay - ay * S.z, Math.max(ay + ah - (ay + ah) * S.z, S.ty)); }
 function zoomAt(S, sx, sy, f) { const z0 = S.z, z1 = Math.max(S.min || 1, Math.min(S.max, z0 * f)); S.tx = sx - (sx - S.tx) * (z1 / z0); S.ty = sy - (sy - S.ty) * (z1 / z0); S.z = z1; apply(S); }
 function apply(S) { clamp(S); S.body.setAttribute('transform', `translate(${S.tx.toFixed(2)} ${S.ty.toFixed(2)}) scale(${S.z.toFixed(4)})`);
-  const k = 1 / S.z, r = TAP * upp(S);
+  const k = 1 / S.z, r0 = TAP * upp(S), r = isFinite(r0) && r0 > 0 ? r0 : 0;    
   for (const m of S.markers) { m.el.setAttribute('transform', `translate(${m.x} ${m.y}) scale(${k}) translate(${-m.x} ${-m.y})`); m.hit.setAttribute('r', r.toFixed(2)); }
   S.svg.querySelectorAll('[data-map-hide-zoomed]').forEach(e => { e.style.display = S.z > 1.02 ? 'none' : ''; });
    

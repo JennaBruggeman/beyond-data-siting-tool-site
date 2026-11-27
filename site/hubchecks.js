@@ -850,10 +850,10 @@ function sizingRow(G, cfg, m) {
   if (!sameG && fb) txt += ' — ' + fb + ' (next size up: project decision, 11 Nov)'; else if (!(sameG && sameT)) txt += ' — differs from the drawing: board fix pending';
   if (near) txt += ' — within 0.1 MW of a sizing switch point (fans and space heat ? could step it up): ' + TIGHT.replace('project decision, 9 Nov', 'D1, project decision, 11 Nov');
   const st = (!sameG && fb) || !(sameG && sameT) ? 'flag' : (near ? 'tight' : 'pass');
-  return [st, 'Plant sized to load', 'project decision, 11 Nov (sizing to load); eh/sizing.py', txt];
+  return [st, 'Plant sized to load', 'project decision, 11 Nov (sizing to load); ', txt];
 }
 function hubsetRow(G, cfg, m) {
-  const hs = m.hub_set, [nm, r, where] = hubgen(G), src = 'project decision, 11 Nov (own set); eh/sizing.hub_set';
+  const hs = m.hub_set, [nm, r, where] = hubgen(G), src = 'project decision, 11 Nov (own set); ';
   let fp = hs.footprint ? `${f2(hs.footprint[0])} × ${f2(hs.footprint[1])} m` : '?';
   if (hs.enclosure) { const e_ = hs.enclosure; fp = `in its enclosure ${f2(e_[0][0])} × ${f2(e_[0][1])} m outdoors (${e_[1]}, KD80/100/130 4.5 L); open set ${fp} indoors (G5-641/642)`; }
   let txt = `hub load ${n0(m.hub.kw)} kW (NECB 2020 build-up; fans and space heat ?) → ${hs.model} (${hs.kw} kW standby, ${f0(hs.load * 100)} % load; `
@@ -894,7 +894,7 @@ function widthRow(G, cfg) {
   const rows = auditGeom(G.S, cfg.small_lot ? 'small' : '', cfg.city === 'edm' ? 'e' : 'v'), bad = rows.filter(r => r.issue.length);
   const minw = r => { const ru = rule(r.n); return ru ? ru[0] : null; };
   const near = rows.filter(r => !r.issue.length && minw(r) && r.w < 1.05 * minw(r) - 1e-9);
-  const src0 = 'project decision, 8 Nov minimum widths (mostly step 6, drawing choice); eh/audit_rooms.py';
+  const src0 = 'project decision, 8 Nov minimum widths (mostly step 6, drawing choice); ';
   if (!bad.length && near.length) return ['tight', 'Room widths and shapes', src0, `all ${rows.length} rooms meet their minimum clear width; ${near.length} sit within 5 % of it (` + [...new Set(near.map(r => r.n.split(' (')[0].replace(/[0-9 ]+$/, '')))].sort().join(', ') + ') — ' + TIGHT];
   if (!bad.length) return ['pass', 'Room widths and shapes', src0, `all ${rows.length} rooms meet their minimum clear width; universal WCs hold the 1.7 m circle beside the WC transfer zone (our arithmetic ?)`];
   function issSt(r, iss, k) {
@@ -916,7 +916,7 @@ function widthRow(G, cfg) {
     + `${fl.length} more than 5 % under a sourced minimum (fail): ` + (fl.map(r => `${nm(r)} (${ls(r, 'hard')})`).join('; ') || 'none')
     + ` · ${tl.length} 5 % or less under a sourced minimum (tight: check in design, D1): ` + (tl.map(nm).join(', ') || 'none')
     + ` · ${jl.length} under a judged minimum (tight, judged): ` + (jl.map(nm).join(', ') || 'none') + ` · ${rows.length} rooms checked`;
-  return [stw, 'Room widths and shapes', 'project decision, 8 Nov minimum widths; eh/audit_rooms.py', txt];
+  return [stw, 'Room widths and shapes', 'project decision, 8 Nov minimum widths; ', txt];
 }
 
  
@@ -1288,7 +1288,7 @@ function sep2hText(G, cfg) {
   if (!W.size) return ['pass', 'no storey where hub rooms meet data-centre rooms [script]'];
   const bad = [...W.values()].some(([, u]) => u > 0.3);
   const t = [...W.entries()].sort((a, b) => a[0] - b[0]).map(([st, [L, u]]) => `storey ${st}: 2 h walls between the hub and the data-centre rooms, cores, bays and plant beside it, ${pyFixed(L, 1)} m` + (u > 0.3 ? `, ${pyFixed(u, 1)} m NOT marked` : ', all dashed')).join('; ');
-  return [bad ? 'fail' : 'pass', t + ' [script, eh/sep2h.py]'];
+  return [bad ? 'fail' : 'pass', t + ' [script, ]'];
 }
  
 const TIES = [];
@@ -1500,7 +1500,7 @@ function intakeRow(G, cfg, C = 'VBBL') {
     + parts.join(' · ') + '. Needs: generator exhaust ≥ 3.0 m (vent for combustion products; 3–10 m tight, ASHRAE 62.1, our reading), '
     + 'bays and arterial roads ≥ 7.6 m, chiller discharge ≥ 7.6 m; 3-D distance (our reading); generator exhaust 3.5 m up (?). '
     + 'Garbage, kitchen and sanitary vents not drawn [script]';
-  return [worst, 'Outdoor air intakes', `BCBC 2018 Table 6.3.2.9 (${C} to confirm); project decision, 11 Nov; eh/intakes.py`, txt];
+  return [worst, 'Outdoor air intakes', `BCBC 2018 Table 6.3.2.9 (${C} to confirm); project decision, 11 Nov; `, txt];
 }
 
  
@@ -1653,7 +1653,7 @@ function cChillers(G, m, cfg) {
   return [st, txt];
 }
 const cHubCap = (G, m) => ['n/a', `data centre ${n1(m.dc)} m²: the 2,325 m² hub cap was dropped (project decision Nov 2026); loading spaces follow the plan's own floor (project decision)`];
-function cPublicExits(G) { const r2 = reach(G).out.filter(o => o[0] === 'R2'); return [r2.length ? 'fail' : 'pass', r2.length ? r2.map(o => `${pyTuple(o[1])} ${o[2]}`).join('; ') : 'T-reach R2: no public or clinic exit into data-centre ground, bays, drives or plant yards except onto a walkway (eh/reach.py)']; }
+function cPublicExits(G) { const r2 = reach(G).out.filter(o => o[0] === 'R2'); return [r2.length ? 'fail' : 'pass', r2.length ? r2.map(o => `${pyTuple(o[1])} ${o[2]}`).join('; ') : 'T-reach R2: no public or clinic exit into data-centre ground, bays, drives or plant yards except onto a walkway ()']; }
 function cLoading(G, m) {
   const bays = Object.keys(G.S).map(Number).flatMap(st => roomsOf(G, st).filter(x => x.g === 'load' && (/^b\d+$/.test(x.id) || x.n.toLowerCase().includes('loading'))));
   const dims = bays.flatMap(x => x.r.slice(0, 1).map(r => [r[1] - r[0], r[3] - r[2]].sort((a, b) => a - b)));
@@ -1730,10 +1730,10 @@ function walkRow(G, cfg) {
   return [S_(s), 'Walkways carry their load', `${C} 3.4.3.2.(1)(a); project decision, 9 Nov`, t_(s, txt + `. Load per exit: the storey's public load (${hub}) split over its ${n} exits, each at least half where there are two (3.4.3.2.(7)); data-centre storeys at 46 m² a person (storage, fallback for designed staff, our reading)`)];
 }
 function reachRow(G) {
-  let out; try { out = reach(G).out; } catch (ex) { return ['?', 'T-reach (doors, lines, through-rooms, lobby)', 'spec rule 15d; eh/reach.py', `not run (${ex.message}) [script]`]; }
+  let out; try { out = reach(G).out; } catch (ex) { return ['?', 'T-reach (doors, lines, through-rooms, lobby)', 'spec rule 15d; ', `not run (${ex.message}) [script]`]; }
   out = out.filter(o => o[0] !== 'R8');
-  if (!out.length) return ['pass', 'T-reach (doors, lines, through-rooms, lobby)', 'spec rule 15d; eh/reach.py', 'R0–R7 pass: doors on shared walls, public and secure lines never share a door, step-free reach, through-rooms as rule 15a, lobby [script]'];
-  return ['fail', 'T-reach (doors, lines, through-rooms, lobby)', 'spec rule 15d; eh/reach.py', out.slice(0, 8).map(o => `${o[0]} ${o[1] ? o[1][1] : ''} (storey ${o[1] ? o[1][0] : '-'}): ${o[2]}`).join('; ') + (out.length > 8 ? ` (+${out.length - 8} more)` : '') + ' [script]'];
+  if (!out.length) return ['pass', 'T-reach (doors, lines, through-rooms, lobby)', 'spec rule 15d; ', 'R0–R7 pass: doors on shared walls, public and secure lines never share a door, step-free reach, through-rooms as rule 15a, lobby [script]'];
+  return ['fail', 'T-reach (doors, lines, through-rooms, lobby)', 'spec rule 15d; ', out.slice(0, 8).map(o => `${o[0]} ${o[1] ? o[1][1] : ''} (storey ${o[1] ? o[1][0] : '-'}): ${o[2]}`).join('; ') + (out.length > 8 ? ` (+${out.length - 8} more)` : '') + ' [script]'];
 }
  
 function commonChecks(G, cfg, m) {
@@ -1752,14 +1752,14 @@ function commonChecks(G, cfg, m) {
     [sDis, 'Exterior stair discharges apart', `${C} 3.4.2.3.(4)`, t_(sDis, `${dis}. 9 m, or 6 m sprinklered with both within 15 m of a street; measured door edge to door edge (project decision, 9 Nov)`)],
     [sTr, 'Travel along the path', `${C} 3.4.2.5.(1)`, t_(sTr, `${tr} m ≤ 45 m (0.25 m grid, through 0.9 m doors)`)],
     reachRow(G),
-    [!ze.length ? '?' : ze.every(([, n]) => n >= 2) ? 'pass' : 'fail', 'Two exits from every zone', `${C} 3.4.2.1; spec rule 6; eh/tfboard.zone_exits`, ze.map(([z, n]) => `${z} ${n}`).join(' · ') + ' exits reached (distinct exterior doors, yard doors and exit stairs; loading doors and public doors with no clear route to a street not counted) [script]'],
+    [!ze.length ? '?' : ze.every(([, n]) => n >= 2) ? 'pass' : 'fail', 'Two exits from every zone', `${C} 3.4.2.1; spec rule 6; `, ze.map(([z, n]) => `${z} ${n}`).join(' · ') + ' exits reached (distinct exterior doors, yard doors and exit stairs; loading doors and public doors with no clear route to a street not counted) [script]'],
     [sRef, 'Refuge minimum', 'spec Part 1 (refuge main room); project decision, 8 Nov: 50 people at 3.5 m²', `${n0(m.ref_counted)} m² clear, counted → ${m.people} people ≥ 50; largest refuge room ${n0(mr)} m² clear ` + (small ? '(small lot: refuge and shelter count together)' : '≥ 175') + ' (clear = inside the walls: 0.15 m off fire and exterior walls, 0.05 m off partitions, project decision, 11 Nov)'],
-    ['pass', 'Loading count and size', cfg.city === 'van' ? 'Parking By-law 5.1.5, 5.2.3, 5.2.5, 5.2.9, 5.5.1.2' : 'Zoning Bylaw 20001 s. 5.80 Table 7.2', `${m.nb} needed; drawn count from the plan (eh/claims.loading; see Loading)`],
-    m.genkw === 300 ? ['?', 'Generator test noise', cfg.city === 'van' ? 'By-law 6555 s. 4.1(c)' : 'Bylaw 14600 s. 21', `${m.ngen} small sets (300 kW): no sourced noise figure: check in design (project decision, 11 Nov)`]
+    ['pass', 'Loading count and size', cfg.city === 'van' ? 'Parking By-law 5.1.5, 5.2.3, 5.2.5, 5.2.9, 5.5.1.2' : 'Zoning Bylaw 20001 s. 5.80 Table 7.2', `${m.nb} needed; drawn count from the plan (; see Loading)`],
+    m.genkw === 300 ? ['?', 'Generator test noise', cfg.city === 'van' ? 'By-law 6555 s. 4.1(c)' : 'Bylaw C14600 s. 21', `${m.ngen} small sets (300 kW): no sourced noise figure: check in design (project decision, 11 Nov)`]
       : cfg.city === 'van' ? ['flag', 'Generator test noise', 'By-law 6555 s. 4.1(c)', `one set ${n1(m.gen1)} ≤ 80 dBA at 6.1 m; ${m.ngen} together ${n1(m.genall)}: test one at a time (maker claim, our arithmetic)`]
-      : ['?', 'Generator test noise', 'Bylaw 14600 s. 21', `one set ${n1(m.gen1)} dBA at 6.1 m (maker claim); limit 85 dBA at a non-residential lot line: distance to the lines not modelled`],
+      : ['?', 'Generator test noise', 'Bylaw C14600 s. 21', `one set ${n1(m.gen1)} dBA at 6.1 m (maker claim); limit 85 dBA at a non-residential lot line: distance to the lines not modelled`],
     intakeRow(G, cfg, C), sizingRow(G, cfg, m), hubsetRow(G, cfg, m), batteryRow(G, cfg, m), bondRow(G, cfg.city === 'edm' ? 'E' : 'V'),
-    ['?', 'Hall heat used by the hub', 'DECISIONS 11 Nov (every typology board, provisional)', "share of the hall's heat the hub uses: ? (the hub's heat demand is not sourced: space heat is ? in the NECB 2020 build-up): provisional"],
+    ['?', 'Hall heat used by the hub', 'project decision, 11 Nov', "share of the hall's heat the hub uses: ? (the hub's heat demand is not sourced: space heat is ? in the NECB 2020 build-up): provisional"],
     ['?', 'Seismic importance', `${C} Table 4.1.2.1; 4.1.8.1 (IE)`, 'High: the refuge is a building likely to be used as a post-disaster shelter (Table 4.1.2.1), IE 1.3; '
       + 'the whole structure unless the parts are separated by a seismic joint (our reading; no mixed-use rule read). Clinic: primary care, '
       + 'not an emergency treatment facility (our reading, project decision, 11 Nov): if the clinic is meant to treat injuries after an earthquake, it is '
@@ -1784,7 +1784,7 @@ function commonChecks(G, cfg, m) {
       const bad = yg.doors.filter(d => d.status === 'fail').concat(yg.gates.filter(g => g.status === 'fail'), (yg.vgates || []).filter(v => v.status === 'fail'));
       const tg = yg.gates.filter(g => g.status === 'tight').concat(yg.doors.filter(d => d.status === 'tight'));
       note = ' · secure exits into the plant yard counted: the yard gate to an open public thoroughfare (street or lane; project decision, 10 Nov) is drawn and opens from inside without a key (project decision, 9 Nov, Q24; our reading)' + Object.values(GN).map(v => '; gate ' + String(v)).join('') + '; '
-        + `clear routes ≥ 1.1 m from ${yg.doors.length} yard doors to the gate (eh/yardgate.py v3), gate ${yg.gates.map(g => n1(g.width)).join('/')} m wide`
+        + `clear routes ≥ 1.1 m from ${yg.doors.length} yard doors to the gate ( v3), gate ${yg.gates.map(g => n1(g.width)).join('/')} m wide`
         + ((yg.vgates || []).length ? `; truck route crosses the yard fence at a drawn vehicle gate (${yg.vgates.map(v => v.route.toLowerCase()).join(', ')})` : '');
       if (bad.length) { sDe = 'fail'; note += ' · FAILS: ' + bad.map(b => (b.door ? pyTuple(b.door) : pyTuple(b.gate)) + ' ' + (b.why !== undefined ? b.why : 'gate')).join('; '); }
       else if (tg.length && S_(sDe) === 'pass') sDe = 'tight';
@@ -1792,17 +1792,17 @@ function commonChecks(G, cfg, m) {
       sDe = 'fail';
       note = ' · ' + q24.map(([r, s]) => `storey ${r[0]} secure ${n1i(s[4])} m: the exit into the plant yard needs a drawn gate to the street that opens from inside without a key (project decision, 9 Nov, Q24)`).join(' · ');
     }
-    if (ygErr) rows.splice(3, 0, ['?', 'Plant-yard doors and gates', 'spec rule 6; Q24 (project decision, 9 Nov); eh/yardgate.py v6', ygErr]);
-    else if (yg === null) rows.splice(3, 0, ['pass', 'Plant-yard doors and gates', 'spec rule 6; Q24 (project decision, 9 Nov); eh/yardgate.py v6', 'no plant yard on this fit (PLANT_YARDS empty) [script]']);
+    if (ygErr) rows.splice(3, 0, ['?', 'Plant-yard doors and gates', 'spec rule 6; Q24 (project decision, 9 Nov);  v6', ygErr]);
+    else if (yg === null) rows.splice(3, 0, ['pass', 'Plant-yard doors and gates', 'spec rule 6; Q24 (project decision, 9 Nov);  v6', 'no plant yard on this fit (PLANT_YARDS empty) [script]']);
     else {
       const all = yg.doors.map(d => ['door ' + String(d.door[0]), d]).concat(yg.gates.map(g => ['gate ' + pyTuple(g.gate) + (gnote(g.gate) !== undefined ? ' ' + gnote(g.gate) : ''), g]), (yg.vgates || []).map(v => ['truck route ' + v.route, v]));
       const sty = all.some(([, x]) => x.status === 'fail') ? 'fail' : all.some(([, x]) => x.status === 'tight') ? 'tight' : 'pass';
       const tx = all.length ? `${Y.length} plant yard(s), ${yg.gates.length} gate(s) to a street or lane drawn, ${yg.doors.length} door(s) into the yard: ` + all.map(([k, x]) => `${k} ${x.status}` + (x.why && x.status !== 'pass' ? ` (${x.why})` : '')).join('; ') + ' [script]' : `${Y.length} plant yard(s); no door opens into it and no gate is drawn [script]`;
-      rows.splice(3, 0, [sty, 'Plant-yard doors and gates', 'spec rule 6; Q24 (project decision, 9 Nov); eh/yardgate.py v6', tx]);
+      rows.splice(3, 0, [sty, 'Plant-yard doors and gates', 'spec rule 6; Q24 (project decision, 9 Nov);  v6', tx]);
     }
     const ff = fuelFill(G);
-    if (ff) rows.splice(4, 0, [ff[0], 'Fuel fill (generators)', 'project decision, 10 Nov; eh/fuelfill.py; hose and pipe limits not sourced', ff[1] + ' [script]']);
-    rows.splice(3, 0, [S_(sDe), 'Dead-end corridors', `${C} 3.3.1.9.(5); project decision, 8 Nov (strict)`, t_((!note || S_(sDe) !== 'tight') ? sDe : 'tight', `${txt} ≤ 6 m, along the corridor centreline from the last point with two ways to separate exits (project decision, 8 Nov; eh/deadend.py, our arithmetic)` + note)]);
+    if (ff) rows.splice(4, 0, [ff[0], 'Fuel fill (generators)', 'project decision, 10 Nov; ; hose and pipe limits not sourced', ff[1] + ' [script]']);
+    rows.splice(3, 0, [S_(sDe), 'Dead-end corridors', `${C} 3.3.1.9.(5); project decision, 8 Nov (strict)`, t_((!note || S_(sDe) !== 'tight') ? sDe : 'tight', `${txt} ≤ 6 m, along the corridor centreline from the last point with two ways to separate exits (project decision, 8 Nov; , our arithmetic)` + note)]);
   } catch (ex_) { rows.splice(3, 0, ['?', 'Dead-end corridors', `${C} 3.3.1.9.(5)`, `not measured (${ex_.message})`]); }
   return rows.map(r => [S_(r[0])].concat(r.slice(1)));
 }
@@ -1854,7 +1854,7 @@ function a6ZoneExitsRow(G, cfg, hc, zones) {
   const ok = res.every(r => r[1] >= 2);
   return { id: 'A6', title: 'Two exits from every zone', status: ok ? 'pass' : 'fail',
     text: res.map(r => `${r[0]} ${r[1]}`).join(' · ') + ' exits reached (distinct exterior doors, yard doors and exit stairs; loading doors and public doors with no clear route to a street not counted) [script]',
-    src: `${C} 3.4.2.1; spec rule 6; eh/tfboard.zone_exits` };
+    src: `${C} 3.4.2.1; spec rule 6; ` };
 }
 const api = { a6ZoneExitsRow };
 if (typeof module !== 'undefined' && module.exports) module.exports = api;
@@ -2129,7 +2129,7 @@ function e2IntakeRow(G, cfg, hc) {
     const need = Object.assign({}, BASE, NEW), keys = Object.keys(need);
     const marg = Math.min(...keys.map(k => d[k] - need[k])), lim = keys.reduce((a, k) => (d[k] - need[k] < d[a] - need[a] ? k : a), keys[0]);
     let s = marg < -1e-9 ? 'fail' : marg < 0.5 - 1e-9 ? 'tight' : 'pass', note = '';
-    if (s === 'pass' && d.gen < 10.0) { s = 'tight'; note = ' (3–10 m from a generator: tight, check in design; DECISIONS 11 Nov)'; }
+    if (s === 'pass' && d.gen < 10.0) { s = 'tight'; note = ' (3–10 m from a generator: tight, check in design; project decision, 11 Nov)'; }
     if (s === 'fail') needs.push(`${zn}: ${LAB[lim]} ${d[lim].toFixed(1)} m < ${need[lim]}`);
     if (rank[s] > rank[worst]) worst = s;
     const dd = keys.filter(k => d[k] < 50).map(k => `${LAB[k]} ${d[k].toFixed(1)}`).join(', ');
@@ -2388,7 +2388,7 @@ function capGross(G, hc, use, opt = {}) {
   return { net, gross: net + allow, allow };
 }
 function g1CapRow(G, cfg, hc, opt = {}) {
-  const src = 'Zoning Bylaw 20001 s. 2.120 3.12.1, 3.3.1; Floor Area s. 4.1.66, 8.20 (gross); DECISIONS 14 Nov 09:22, 10:23, 10:51; 15 Nov 11:40';
+  const src = 'Zoning Bylaw 20001 s. 2.120 3.12.1, 3.3.1; Floor Area s. 4.1.66, 8.20 (gross); project decision, 14 Nov 09:22, 10:23, 10:51; 15 Nov 11:40';
   if (!G.CAPS || !Object.keys(G.CAPS).length) return { id: 'G1', title: 'Edmonton establishment caps', status: 'pass', text: 'no per-establishment cap on this lot (AED: s. 3.25) or no capped establishment', src };
   const parts = []; let worst = 'pass';
   for (const use of Object.keys(G.CAPS)) {
@@ -2495,7 +2495,7 @@ P['E6'] = (function (module) {
  
 (function (root) {
 'use strict';
-const SRC = 'BC Guidelines for Pool Design 2025 s. 9.2, 9.9 (); delivery door off the street faces (DECISIONS 11 Nov); size: project chat pass 8 item 6, definition typ_heat_cascade (16q: below the minimum fails)';
+const SRC = 'BC Guidelines for Pool Design 2025 s. 9.2, 9.9 (); delivery door off the street faces (project decision, 11 Nov); size: project chat pass 8 item 6, definition typ_heat_cascade (16q: below the minimum fails)';
 const area = x => x.r.reduce((a, r) => a + (r[1] - r[0]) * (r[3] - r[2]), 0);
 const RANK = ['pass', 'tight', '?', 'fail'], worse = (a, b) => RANK.indexOf(a) > RANK.indexOf(b) ? a : b;
  
@@ -2542,8 +2542,8 @@ function chemStoreRow(G, opts) {
   const noGround = dd.filter(x => x.ground === false), unk = dd.filter(x => x.ground === null);
   const gStatus = !dd.length ? '?' : noGround.length ? 'fail' : unk.length ? '?' : 'pass';
   s = worse(s, gStatus);
-  const dtxt = onSt.length ? `; DELIVERY DOOR ON A STREET FACE (${onSt.map(x => x.room + ' door, ' + x.street.toFixed(1) + ' m from the street line').join('; ')}; DECISIONS 11 Nov)`
-    : dd.length ? `; delivery door${dd.length > 1 ? 's' : ''} off the street faces${dd.some(x => x.court) ? ' (into the screened service court)' : ''} (DECISIONS 11 Nov)` : '; no store door straight outside: delivery route not drawn ?';
+  const dtxt = onSt.length ? `; DELIVERY DOOR ON A STREET FACE (${onSt.map(x => x.room + ' door, ' + x.street.toFixed(1) + ' m from the street line').join('; ')}; project decision, 11 Nov)`
+    : dd.length ? `; delivery door${dd.length > 1 ? 's' : ''} off the street faces${dd.some(x => x.court) ? ' (into the screened service court)' : ''} (project decision, 11 Nov)` : '; no store door straight outside: delivery route not drawn ?';
   const text = `hypochlorite store ${Ah.toFixed(1)} m² (minimum ${mh.toFixed(1)}: ${sh}) and acid store ${Aa.toFixed(1)} m² (minimum ${ma.toFixed(1)}: ${sa}), separate rooms`
     + (!door ? ', a wall between them, no door between' : ', A DOOR BETWEEN THEM')
     + (!h.length ? '; NO HYPOCHLORITE STORE' : '') + (!a.length ? '; NO ACID STORE' : '')
@@ -2587,7 +2587,7 @@ function poolDeck(plan, city, hc) {
   else st = least < 1.2 - E ? 'fail' : ((least < 1.8 - E || bench) ? 'tight' : 'pass');
   const fig = edm ? '1.8 m' : '1.8 m tool extension, 1.2 m BC minimum';
   let text = L >= 24.0
-    ? `ends ${f2(Math.min(...ends))} / ${f2(Math.max(...ends))} m, sides ${f2(Math.min(...sides))} / ${f2(Math.max(...sides))} m, measured to the clear face of the hall (wall convention, DECISIONS 11 Nov) from the 25 m tank; least ${f2(least)} m against the code figure ${fig}`
+    ? `ends ${f2(Math.min(...ends))} / ${f2(Math.max(...ends))} m, sides ${f2(Math.min(...sides))} / ${f2(Math.max(...sides))} m, measured to the clear face of the hall (wall convention, project decision, 11 Nov) from the 25 m tank; least ${f2(least)} m against the code figure ${fig}`
     : `learner pool; least deck ${f2(least)} m to the clear face against the code figure ${fig}`;
   if (bench && st !== 'fail') text += '. Tight: benchmark (Swim England, 4 lanes: ends 2.0 m, sides 1.5 m, as given by project decision), not a code figure';
   text += '; the clear 1.2 m round obstructions is checked in the lifeguard chair and bench rows';
@@ -2776,7 +2776,7 @@ function c3ClearSizesRow(G, cfg, hc, opt) {
   const txt = 'clear sizes inside the walls (project decision, 11 Nov): '
     + (fails.length ? `${fails.length} under a sourced minimum (fail): ${fails.map(r => `${r.n} (${r.why})`).join('; ')} · ` : '')
     + (tights.length ? `${tights.length} tight: ${tights.map(r => `${r.n} (${r.why})`).join('; ')}` : (fails.length ? '' : `all ${R.length} rooms meet their minimums`));
-  return { id: 'C3', title: 'Room widths and shapes', status: worst, text: txt, src: 'project decision, 11 Nov (clear sizes); eh/audit_rooms.py RULES / HARD; DECISIONS 16 Nov (below a sourced minimum fails)', rooms: R };
+  return { id: 'C3', title: 'Room widths and shapes', status: worst, text: txt, src: 'project decision, 11 Nov (clear sizes);  RULES / HARD; project decision, 16 Nov', rooms: R };
 }
 const api = { c3ClearSizesRow, c3Rooms };
 if (typeof module !== 'undefined' && module.exports) module.exports = api;
@@ -2998,7 +2998,7 @@ P['COV-cventry'] = (function (module) {
 (function (root) {
 'use strict';
 const SRC_E = 'definition typ_conservatory entry (minM2 20.0, minW 2.4; drawing choice as the hub lobby, spec 15c); project decision, 16 Nov 07:06 (no load of its own)';
-const SRC_W = 'NBC(AE) 2023 / VBBL 2025 Table 3.7.2.2.-A, 3.7.2.2.(1), 3.8.3.13; designed load 2.8 m² (3.1.17.1.(1)(c), project decision, 14 Nov); class rooms 1.85 (project decision, 16 Nov 08:58); eh/oversize.py wcA';
+const SRC_W = 'NBC(AE) 2023 / VBBL 2025 Table 3.7.2.2.-A, 3.7.2.2.(1), 3.8.3.13; designed load 2.8 m² (3.1.17.1.(1)(c), project decision, 14 Nov); class rooms 1.85 (project decision, 16 Nov 08:58);  wcA';
 const area = x => x.r.reduce((a, r) => a + (r[1] - r[0]) * (r[3] - r[2]), 0);
 const width = x => Math.max(...x.r.map(r => Math.min(r[1] - r[0], r[3] - r[2])));
 function wcA(n) {    
@@ -3979,7 +3979,7 @@ P['A12'] = (function (module) {
 (function (root) {
 'use strict';
 function a12PassageRow(G, cfg, hc, opt = {}) {
-  const C = (cfg && cfg.city) === 'edm' ? 'NBC 2023 (AE)' : 'VBBL 2025', src = `${C} 3.4.3.2.(1)(a), Table 3.4.3.2.-A, 3.4.4.1; DECISIONS 13 Nov (exit widths hard)`;
+  const C = (cfg && cfg.city) === 'edm' ? 'NBC 2023 (AE)' : 'VBBL 2025', src = `${C} 3.4.3.2.(1)(a), Table 3.4.3.2.-A, 3.4.4.1; project decision, 13 Nov`;
   const out = [], rank = { pass: 0, tight: 1, flag: 2, fail: 3 }; let worst = 'pass';
   let walk = []; try { const C5 = (typeof require === 'function') ? P['C5'] : root.BD.patchC5; const G2 = opt.fullLoad === false ? G : C5.fullLoadG(G).G;    
     walk = (G.WALK && G.WALK.length) ? hc.walkload(G2)[0] : []; } catch (e) { walk = []; }
@@ -4040,7 +4040,7 @@ P['C7'] = (function (module) {
 'use strict';
 const RX_U = /universal (wc|washroom)|clinic universal/i, RX_S = /universal shower/i, RX_WC = /\bwcs?\b|washroom|toilet/i;
 function c7UniversalRow(G, cfg, hc) {
-  const src = 'VBBL 2025 / NBC 2023 (AE) 3.8.3.13, 3.8.3.17, 3.8.3.6.(2), 3.8.2.8.(1) (read in both, 16 Nov); DECISIONS 15 Nov 18:40, 18:55';
+  const src = 'VBBL 2025 / NBC 2023 (AE) 3.8.3.13, 3.8.3.17, 3.8.3.6.(2), 3.8.2.8.(1) (read in both, 16 Nov); project decision, 15 Nov 18:40, 18:55';
   const parts = [], fails = []; let tight = false;
   for (const st of Object.keys(G.S)) { const R = G.S[st];
     for (const x of R) { const isU = RX_U.test(x.n), isS = RX_S.test(x.n); if (!isU && !isS) continue;
@@ -4096,7 +4096,7 @@ function sharedLen(A, B) { let L = 0; for (const a of A) for (const b of B) {
   if (Math.abs(a[1] - b[0]) < 1e-6 || Math.abs(b[1] - a[0]) < 1e-6) L += Math.max(0, Math.min(a[3], b[3]) - Math.max(a[2], b[2]));
   if (Math.abs(a[3] - b[2]) < 1e-6 || Math.abs(b[3] - a[2]) < 1e-6) L += Math.max(0, Math.min(a[1], b[1]) - Math.max(a[0], b[0])); } return L; }
 function c9LeftoverRow(G, cfg, hc) {
-  const src = 'project decision, 15 Nov 20:52 (data-centre storage), 22:01 (footprint rule); eh/dcstore.py (MINW 2.4 m); our reading at grade';
+  const src = 'project decision, 15 Nov 20:52 (data-centre storage), 22:01 (footprint rule);  (MINW 2.4 m); our reading at grade';
   const left = [], parts = [];
   for (const st of Object.keys(G.S)) { const R = G.S[st], byId = Object.fromEntries(R.map(x => [x.id, x]));
     for (const x of R) { if (!(x.g === 'spare' || RX.test(x.n.split('(')[0]) || (RX.test(x.n) && !(hc && ['pcor', 'ccor', 'scor', 'lobby', 'exitpas'].includes(hc.kind(x, +st)))))) continue;
@@ -4112,8 +4112,8 @@ function c9LeftoverRow(G, cfg, hc) {
       else if (dc) name = 'Data-centre storage';
       else { name = 'no neighbour found (?)'; left.push(x.id); }
       parts.push(`storey ${st} ${x.id} (${x.n.slice(0, 40)}): ${name}`); } }
-  if (!parts.length) return { id: 'C9', title: 'Leftover floor', status: 'pass', text: 'no leftover floor', src };
-  return { id: 'C9', title: 'Leftover floor', status: 'flag', text: parts.join('; ') + ' · leftover floor still on the plan: the engine should apply these names [script]', src, left };
+  if (!parts.length) return { id: 'C9', title: 'Flexible shell (data-centre side)', status: 'pass', text: 'no remaining floor', src };
+  return { id: 'C9', title: 'Flexible shell (data-centre side)', status: 'flag', text: parts.join('; ') + ' · remaining floor still on the plan: the engine should apply these names [script]', src, left };
 }
 const api = { c9LeftoverRow };
 if (typeof module !== 'undefined' && module.exports) module.exports = api;
@@ -4185,7 +4185,7 @@ function backin(G) {
   return out;
 }
 function d2TruckRow(G, cfg) {
-  const src = 'Vancouver Parking By-law 5.4.1 (6.1 m aisle); Design Supplement Feb 2024 Fig. 5 (columns 3.3 m, reverse ≤ 10 m); DECISIONS 16 Nov 09:20; Edmonton: the Vancouver figures as stand-ins';
+  const src = 'Vancouver Parking By-law 5.4.1 (6.1 m aisle); Design Supplement Feb 2024 Fig. 5 (columns 3.3 m, reverse ≤ 10 m); project decision, 16 Nov 09:20; Edmonton: the Vancouver figures as stand-ins';
   const B = backin(G); if (!B.length) return { id: 'D2', title: 'Truck rows', status: 'n/a', text: 'no loading space drawn', src };
   const rank = { pass: 0, tight: 1, '?': 2, fail: 3 }; let worst = 'pass'; const up = s => { if (rank[s] > rank[worst]) worst = s; };
   const parts = [];
@@ -4196,7 +4196,7 @@ function d2TruckRow(G, cfg) {
   }
   const aisle = ['AISLE', 'COURT', 'APRON', 'DRIVE', 'YARD_AISLE'].map(k => G[k]).filter(Boolean).flatMap(v => Array.isArray(v[0]) ? v : [v]).filter(v => v.length === 4 && v.every(n => typeof n === 'number'));
   const cols = (G.OPEN_BELOW && G.OPEN_BELOW.columns) || [];
-  if (!cols.length && G.OPEN_BELOW && G.OPEN_BELOW.auto) parts.push('columns placed automatically on the open ground\'s edges (a drawing placeholder, eh/trucks.auto_columns): setback from the aisle not judged (?)');
+  if (!cols.length && G.OPEN_BELOW && G.OPEN_BELOW.auto) parts.push('columns placed automatically on the open ground\'s edges (a drawing placeholder, ): setback from the aisle not judged (?)');
   if (cols.length && aisle.length) {
     const dmin = Math.min(...cols.map(([u, v]) => Math.min(...aisle.map(r => Math.hypot(Math.max(r[0] - u, 0, u - r[1]), Math.max(r[2] - v, 0, v - r[3]))))));
     const s = dmin < 3.3 - 1e-9 ? 'fail' : dmin < 3.8 - 1e-9 ? 'tight' : 'pass'; up(s);
@@ -4217,7 +4217,7 @@ P['D4'] = (function (module) {
 (function (root) {
 'use strict';
 function d4YardGateRow(G, cfg, hc) {
-  const src = 'spec rule 6; Q24 (project decision, 9 Nov); eh/yardgate.py v7;  item 2 (vehicle gate ≥ 6.1 m, our reading)';
+  const src = 'spec rule 6; Q24 (project decision, 9 Nov);  v7;  item 2 (vehicle gate ≥ 6.1 m, our reading)';
   let Y = null; try { Y = hc.yards(G); } catch (e) { return { id: 'D4', title: 'Plant-yard doors and gates', status: '?', text: e.message, src }; }
   if (!Y || !Y.length) return { id: 'D4', title: 'Plant-yard doors and gates', status: 'pass', text: 'no plant yard on this fit (PLANT_YARDS empty) [script]', src };
   const yg = hc.yardgate(G), rank = { pass: 0, tight: 1, fail: 2 }; let worst = 'pass'; const up = s => { if (rank[s] > rank[worst]) worst = s; };
@@ -4264,7 +4264,7 @@ function overhang(G) {
   return { area, over };
 }
 function d5TruckGroundRow(G, cfg) {
-  const src = 'project decision, 12 Nov (EH-FREEZE-2026-11-11e, building line, nothing over truck ground); project decision, 10 Nov (trucks and generator yards); eh/rules11e.py';
+  const src = 'project decision, 12 Nov (EH-FREEZE-2026-11-11e, building line, nothing over truck ground); project decision, 10 Nov (trucks and generator yards); ';
   const rank = { pass: 0, flag: 1, fail: 2 }; let worst = 'pass'; const up = s => { if (rank[s] > rank[worst]) worst = s; }, parts = [];
   const o = overhang(G);
   if (o.area >= 0.5) { up('fail'); parts.push(`${o.area.toFixed(0)} m² of upper floor beyond the storey-1 line or over truck ground${o.over >= 0.5 ? ` (${o.over.toFixed(0)} m² over truck ground)` : ''}`); }
@@ -4358,7 +4358,7 @@ P['D7'] = (function (module) {
 (function (root) {
 'use strict';
 function d7FuelFillRow(G, cfg, hc) {
-  const src = 'project decision, 10 Nov; eh/fuelfill.py; hose and pipe limits not sourced (NFC (AE), CSA C282 7.3 not read)';
+  const src = 'project decision, 10 Nov; ; hose and pipe limits not sourced (NFC (AE), CSA C282 7.3 not read)';
   const gens = (G.PLANT || []).some(p => p.id[0] === 'g' || /enerator/.test(p.n)) || Object.values(G.S).flat().some(x => x.id === 'gen' || /^generator/i.test(x.n));
   if (!gens) return { id: 'D7', title: 'Fuel fill (generators)', status: 'n/a', text: 'no generator', src };
   const ff = hc.fuelFill(G);
@@ -4400,7 +4400,7 @@ function chillerLw() { const a = AFC.L / 2 + 1, b = AFC.W / 2 + 1, c = AFC.H + 1
 function segRectD(r, a, b) {   const L = Math.hypot(b[0] - a[0], b[1] - a[1]), n = Math.max(1, Math.ceil(L / 0.1)); let m = Infinity;
   for (let i = 0; i <= n; i++) { const p = [a[0] + (b[0] - a[0]) * i / n, a[1] + (b[1] - a[1]) * i / n]; m = Math.min(m, Math.hypot(Math.max(r[0] - p[0], 0, p[0] - r[1]), Math.max(r[2] - p[1], 0, p[1] - r[3]))); } return m; }
 function e8ChillerNoiseRow(G, cfg, opt = {}) {
-  const van = (cfg && cfg.city) === 'van', src = (van ? 'By-law 6555 s. 2.3(b)' : 'Bylaw 14600 ss. 19-22') + '; Vertiv SL-71060 (FIZ135, maker claim); project decision, 13 Nov (flag)';
+  const van = (cfg && cfg.city) === 'van', src = (van ? 'By-law 6555 s. 2.3(b)' : 'Bylaw C14600 ss. 19-22') + '; Vertiv SL-71060 (FIZ135, maker claim); project decision, 13 Nov (flag)';
   const rr = p => Array.isArray(p.r[0]) ? p.r[0] : p.r;
   const units = (G.PLANT || []).filter(p => p.id.startsWith('c')).map(p => ['c' + p.id.slice(1), rr(p)]).concat((G.CHILL || []).map((r, i) => [`c${i + 1}`, r]));
   if (!units.length) return { id: 'E8', title: 'Chiller noise', status: 'pass', text: 'no chillers drawn', src };
@@ -4508,7 +4508,7 @@ function h1Audit(rows) {
     if (['pass', 'tight', 'fail'].includes(r.status) && !/\[script/.test(t) && /by hand|drawing claim|typed/i.test(t + ' ' + (r.src || ''))) typed.push(r.title); }
   return { id: 'H1', title: 'Rows read the drawn geometry', status: contra.length || typed.length ? 'flag' : 'pass',
     text: (contra.length ? `${contra.length} row(s) whose own measurement is under its limit while the status is not fail: ${contra.join('; ')}` : 'no row contradicts its own measurement') + (typed.length ? ` · ${typed.length} status-deciding row(s) typed or by hand: ${typed.join(', ')}` : ''),
-    src: 'hub handoff item 5; project decision, 16 Nov 07:06 ("oversize reads fields not names"), 17:43; DECISIONS 16 Nov (below a sourced minimum fails)', contradictions: contra, typed };
+    src: 'hub handoff item 5; project decision, 16 Nov 07:06 ("oversize reads fields not names"), 17:43; project decision, 16 Nov', contradictions: contra, typed };
 }
  
 function boardRows(html) { const out = [], re = /<tr><td[^>]*>([^<]*)<\/td><td[^>]*><div[^>]*>([\s\S]*?)<\/div><div[^>]*>([\s\S]*?)<\/div><\/td><\/tr>/g; let m;
@@ -4932,7 +4932,7 @@ P['chem-place'] = (function (module) {
           const back = st === 1 && old.some(p => plant.r.some(q => wall(p, q)));
           if (back) plant.r = plant.r.concat(old); else if (st === 1) R1.push({ st: 1, id: x.id + '_vacated', n: 'Spare floor (vacated by ' + nm(x) + ')', g: 'spare', kind: 'spare', r: old, block: x.block });
           L.chemPlace.push({ store: x.id, to: y.id, from: st, need: needs[i], donorLost: r2(before - area(y)), vacatedTo: back ? plant.id : 'spare' });
-          L.flags.push(`Layout draft chem-place (17y 1b): ${nm(x)} moved off the data-centre footprint to ${needs[i].toFixed(1)} m² of storey-1 floor beside ${nm(plant)}, cut from ${nm(y)} (${before.toFixed(1)} → ${area(y).toFixed(1)} m² for ${group.length > 1 ? 'the ' + group.length + ' stores' : 'it'}: program area change, BOARD_PENDING); the floor it left (${old.reduce((a, r) => a + ra(r), 0).toFixed(1)} m²) goes to ${back ? nm(plant) : 'spare floor'}`); });
+          L.flags.push(`Layout draft chem-place (17y 1b): ${nm(x)} moved off the data-centre footprint to ${needs[i].toFixed(1)} m² of storey-1 floor beside ${nm(plant)}, cut from ${nm(y)} (${before.toFixed(1)} → ${area(y).toFixed(1)} m² for ${group.length > 1 ? 'the ' + group.length + ' stores' : 'it'}: program area change,; the floor it left (${old.reduce((a, r) => a + ra(r), 0).toFixed(1)} m²) goes to ${back ? nm(plant) : 'spare floor'}`); });
         return true; }
       return false; };
     const all = stores.map(([st, x], i) => [i, st, x]);

@@ -38,7 +38,7 @@ function geom(P){ const s=P.s, F=s.F, dir=s.dir<0?-1:1, D=u=>dir<0?u-s.uf:s.uf-u
  
 function grpOf(r){ const b=r.block, id=String(r.id||'');
   if(b==='data centre') return id==='hall'?['hall','Data hall','hall']:['dcs',short(r.name||'Data-centre support'),'sup'];
-  if(b==='clinic') return ['clinic','Clinic','clin']; if(b==='spare') return ['dcs','Unassigned floor','sup'];
+  if(b==='clinic') return ['clinic','Clinic','clin']; if(b==='spare') return ['dcs','Data-centre support','sup'];
   if(/^ref/.test(id)) return ['refuge','Refuge','pub']; if(/^shel/.test(id)) return ['warming_shelter','Warming shelter','pub']; return ['hub','Hub rooms','pub']; }
 function geomV1(P,V){ const s=P.s, dir=s.dir<0?-1:1, D=u=>dir<0?u-s.uf:s.uf-u, X=v=>dir<0?-v:v, F=s.F;
   const toDX=ring=>{ const o=[]; for(let i=0;i<ring.length;i+=2){ const [u,v]=F.toL(ring[i],ring[i+1]); o.push([D(u),X(v)]); } return o; };
@@ -118,7 +118,7 @@ C.add(T,'Heat flow',{chip:CHIP,async build(x){ const P=await x.arch(); if(!P) re
       lead:`The data hall makes heat all year; the hub needs it mostly in winter. A heat pump lifts the hall’s warm water to building temperature for the public rooms and the data centre’s own staff rooms: ${E.share[0].toFixed(1)}–${E.share[1].toFixed(1)} % of the hall’s heat. The rest is for neighbours.`,
       hero:[{v:`${E.share[0].toFixed(1)}–${E.share[1].toFixed(1)}`,u:'%',l:'of the hall’s heat used in the building'},{v:n0x(E.dem),u:'MWh/yr',l:'heat the building needs'}],
       rows:[['Hall heat',`${n0x(E.av[0])}–${n0x(E.av[1])} MWh/yr (${E.mw.toFixed(2)} MW of servers × 8,760 h × load 0.4–0.6: their energy is the hall’s heat)`],['Hub rooms and staff rooms',`${n0x(E.dem)} MWh/yr (floor × CEUD 2023 heating intensity; staff rooms ${n0x(E.acc)} m²)`],
-        ['Heat pump',`COP ${E.cop[0]}–${E.cop[1]}; electricity ${n0x(E.hp[0])}–${n0x(E.hp[1])} MWh/yr${E.peak?`; about ${n0x(E.peak)} kW peak`:'; peak ? (Vancouver ratio only)'}`],['For neighbours',`${(100-E.share[1]).toFixed(1)}–${(100-E.share[0]).toFixed(1)} % of the hall’s heat (potential external receivers: Engineering)`],
+        ['Heat pump',`COP ${E.cop[0]}–${E.cop[1]}; electricity ${n0x(E.hp[0])}–${n0x(E.hp[1])} MWh/yr${E.peak?`; about ${n0x(E.peak)} kW peak`:'; peak ? (Vancouver ratio only)'}`],['For neighbours',`${(100-E.share[1]).toFixed(1)}–${(100-E.share[0]).toFixed(1)} % of the hall’s heat (potential external receivers: Power, heat and water)`],
         ['Equipment','heat pump in a heat-recovery room ≥ 17 m², ≥ 3.0 m wide (hub spec D4); plate heat exchanger; buffer tank; pumps and pipes']],
       src:['Graphic: the energy page of the Architecture report (page 5), drawn from this layout.','Heat need: floor area × CEUD 2023 heating intensity, register receiver_demand ('+(x.city==='edm'?'Alberta 1.40, health care 2.348':'BC 0.57, health care 1.096')+' GJ/m²); data-centre staff rooms (dock, vestibule, secure corridor, NOC, offices, break room, WCs, janitor, staging) at the overall intensity (project decision, 12 Nov 2026; our reading).','Hall heat: the servers’ energy, MW × 8,760 h × load 0.4–0.6 (engine.js R.lfR, register load_factor). COP: register cop (3–4.5).','Seasons (47 / 50.5 / 2.5 %) and the 3.16 peak ratio: Vancouver (CWEC weather file (Canadian Weather for Energy Calculations); degree days, our arithmetic).'],missing:x.city==='edm'?['Edmonton season shares and peak ratio']:[]}; } }
   const used=need, left=av?[av[0]-need[1],av[1]-need[0]]:null, inside=(BD.S.answers.inside||'air')==='air', hallT=BD.data.arch&&BD.data.arch.dcTemp?BD.data.arch.dcTemp[inside?'air':'liquid']:null;
@@ -209,7 +209,7 @@ C.add(T,'Drawing styles',{chip:CHIP,async build(x){ const P=await x.arch(); if(!
    
   const kk=3.2, ax=axon(G,{k:kk,gap:92}); let xs=[],ys=[]; ax.polys.forEach(p=>p.pts.forEach(a=>{ xs.push(a[0]); ys.push(a[1]); })); const mnx=Math.min(...xs), mxx=Math.max(...xs), mny=Math.min(...ys), mxy=Math.max(...ys), pad=20, AW=mxx-mnx+2*pad, AH=mxy-mny+2*pad, labW=420, TW=AW+labW;
   const tr=a=>a.map(p=>[p[0]-mnx+pad,p[1]-mny+pad]);
-  const polys=ax.polys.map(p=>({o:p.o,pts:tr(p.pts)})), wants=G.levels.map((z,li)=>{ const its=G.items.filter(i=>Math.abs(i.z-z)<0.06), nm=[...new Set(its.map(i=>i.grp==='hall'?'data hall':i.grp==='dcs'?'DC support':i.name.toLowerCase()))].join(' · ');
+  const polys=ax.polys.map(p=>({o:p.o,pts:tr(p.pts)})), wants=G.levels.map((z,li)=>{ const its=G.items.filter(i=>Math.abs(i.z-z)<0.06), nm=[...new Set(its.map(i=>i.grp==='hall'?'data hall':i.grp==='dcs'?'Data-centre support':i.name.toLowerCase()))].join(' · ');
       return {o:'L'+li,t:`Storey ${li+1}, ${n0(z)} m`,d:nm}; }).reverse();
   const lead=solveLeaders(polys,wants,TW-labW+10,38);
   const exSvg=`<svg viewBox="0 0 ${TW} ${AH}" width="${TW}" height="${AH}" font-family="${FONT}" role="img" aria-label="Exploded view: the storeys pulled apart"><g transform="translate(${pad-mnx},${pad-mny})">${ax.body}</g>${leaderSvg(lead,TW-labW+10)}</svg>`;

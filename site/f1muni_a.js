@@ -27,7 +27,7 @@ const shareLine=(city,cn)=>{ const c=(cn||{})[city]; if(!c||c.rezoning==null) re
   if(c.dc) out.push(`${fN(c.dc)} are Direct Control, decided site by site`);
   return out.join('; ')+'; the rest need a rezoning.'; };
 const CNT_SRC='Lots per class: tool/data/approval_counts.json (checks/tests/approval_counts.py, 8 Nov 2026): the property records in the tool’s tiles (City open data), each counted once (strata units count one each); permitted and conditional = the lots in those zones (checks/lot_types_2026-11-07.csv) classed by today’s zone row; rezoning = every other record with a zone; Direct Control counted apart (?); records with no zone not counted (Vancouver 362, Edmonton 11).';
-const CLS_SRC='Classes: tool/data/zones.json (Vancouver: “Bulk Data Storage” conditional in I-2, I-2B, I-3 sub-area A, FC-2, I-1C; Edmonton: Major Industrial permitted in IH s. 2.140, 2.1 and EETC s. 3.52, 2.1; IM only where existing on 1 Jan 2024, s. 2.130, 2.3, so new = rezoning; register edm_dc_major). Direct Control: Bylaw 20001 DC1, DC2 site provisions are not in the bylaw copy (?).';
+const CLS_SRC='Classes: tool/data/zones.json (Vancouver: “Bulk Data Storage” conditional in I-2, I-2B, I-3 sub-area A, FC-2 (not in the library: no layout fits, data centres not permitted at grade) and I-1C (only where a layout fits by matching); Edmonton: Major Industrial permitted in IH s. 2.140, 2.1 and EETC s. 3.52, 2.1; IM only where existing on 1 Jan 2024, s. 2.130, 2.3, so new = rezoning; register edm_dc_major). Direct Control: Bylaw 20001 DC1, DC2 site provisions are not in the bylaw copy (?).';
 C.add(T,'Your city',{async build(x){
   const W=470, H=520, out=[], id='mua1'+Math.random().toString(36).slice(2,6), cn=await counts();
   for(const city of ['van','edm']){ const m=await meta(city), st=await BD.streets(city), ext=m.ext, bb=[ext[0],ext[1],ext[2],ext[3]], f=C.frame(bb,W,H,8), by={};
@@ -118,7 +118,7 @@ if(!document.getElementById('f1c-mua')){ const st=document.createElement('style'
 .f1c-mua-off{background:#fff;border:1px dashed var(--f-rule);display:flex;align-items:center;justify-content:center;text-align:center;color:var(--f-mute);font-size:12.5px;padding:20px}
 .f1c-mua-print{margin-top:14px;font-size:12.5px;padding:7px 14px;background:#fff;border:1px solid var(--f-ink);color:var(--f-ink);border-radius:2px}
 .f1c-mua-print:hover{background:var(--f-ink);color:#fff}
-@media print{body *{visibility:hidden!important}.f1c-mua-sheet:not(.f1c-mua-off),.f1c-mua-sheet:not(.f1c-mua-off) *{visibility:visible!important}.f1c-mua-sheet:not(.f1c-mua-off){position:absolute;left:0;top:0;width:190mm;height:auto;font-size:9px;border:0}}
+@media print{body:has(.f1c-mua-sheet:not(.f1c-mua-off)) *{visibility:hidden!important}.f1c-mua-sheet:not(.f1c-mua-off),.f1c-mua-sheet:not(.f1c-mua-off) *{visibility:visible!important}.f1c-mua-sheet:not(.f1c-mua-off){position:absolute;left:0;top:0;width:190mm;height:auto;font-size:9px;border:0}}
 `; document.head.appendChild(st); }
 
  
@@ -135,11 +135,11 @@ const SRC_M='checks/research_arch_v1/municipal.md', SRC_R='checks/research_arch_
 const PROC={
  van:{
   decides:'Director of Planning, or the Development Permit Board',
-  notice:'The Director or Board “may notify” owners and tenants it deems necessary (ZDB s. 4.3.8). Not required.', appeal:'Board of Variance', appealWin:'30 days', appealCl:'By-law 10200 s. 3.2', appealWho:'only the property owner (or an agent) seeking to develop or use the property, per the City’s Board of Variance page; the Vancouver Charter s. 573(1)(a) says “any person aggrieved”: not settled ?',
+  notice:'The Director or Board “may notify” owners and tenants it deems necessary (ZDB s. 4.3.12); in most cases the City notifies nearby properties and neighbourhood groups (City development permit page, step 3).', appeal:'Board of Variance', appealWin:'30 days', appealCl:'By-law 10200 s. 3.2', appealWho:'only the property owner (or an agent) seeking to develop or use the property, per the City’s Board of Variance page; the Vancouver Charter s. 573(1)(a) says “any person aggrieved”: not settled ?',
   steps:[
    {n:'Pre-application',w:'You and City planners',t:'Before applying. Order is our reading of the sources.',c:'Zoning and Development By-law s. 4'},
-   {n:'Development permit application',w:'Director of Planning',t:'Refers it to the Development Permit Board if public response warrants it.',c:'ZDB s. 4.3.7(h)'},
-   {n:'Notice to neighbours',w:'Director or Board',t:'May notify the owners and tenants it deems necessary.',c:'ZDB s. 4.3.8'},
+   {n:'Development permit application',w:'Director of Planning',t:'Refers it to the Development Permit Board if public response warrants it.',c:'ZDB s. 4.3.11(h)'},
+   {n:'Notice to neighbours',w:'Director or Board',t:'May notify the owners and tenants it deems necessary; in most cases the City notifies nearby properties.',c:'ZDB s. 4.3.12; City development permit page'},
    {n:'Decision',w:'Director of Planning or Development Permit Board',t:'Grants it with or without conditions, or refuses.',c:'ZDB s. 4.3.1'},
    {n:'Appeal',w:'Board of Variance',t:'30 days from the decision.',c:'By-law 10200 s. 3.2'},
    {n:'Building permit',w:'City of Vancouver',t:'Applied for once the development permit is issued.',c:'City of Vancouver development permit page'}],
@@ -151,19 +151,35 @@ const PROC={
    {n:'Then the development permit',w:'As on the permit path',t:'After the rezoning, the same development permit steps as a permitted or discretionary use.',c:'Vancouver Charter; City rezoning FAQ'}]},
  edm:{
   decides:'Development Planner',
-  notice:'Mailed within 7 days of approval to owners within 60 m of the site, the community league and the BIA (s. 7.160). Not on a site sign by default in industrial zones.', appeal:'Subdivision and Development Appeal Board (SDAB)', appealWin:'21 days', appealCl:'Bylaw 20001 s. 7.170', appealWho:'the applicant, within 21 days of the decision; “any person affected”, within 21 days of the notice (s. 7.170 1–2)',
+  notice:'Published on the City’s website within 7 days of approval (s. 7.160 1.2); mailed to owners within 60 m, the community league and the BIA only if a rule was varied (s. 7.160 1.3). In industrial zones a site sign is up to the planner.', appeal:'Subdivision and Development Appeal Board (SDAB)', appealWin:'21 days', appealCl:'Bylaw 20001 s. 7.170', appealWho:'the applicant, within 21 days of the decision; “any person affected”, within 21 days of the notice (s. 7.170 1–2)',
   steps:[
    {n:'Pre-application',w:'You and City planners',t:'Before applying. Order is our reading of the sources.',c:'Zoning Bylaw 20001 ss. 7.100–7.170'},
-   {n:'Development permit application',w:'Development Planner',t:'A data centre is Major Industrial (City guidance, applied to every size): a permitted use in IH and EETC; elsewhere a rezoning comes first.',c:'Bylaw 20001 ss. 2.140 2.1, 3.52 2.1; edm_dc_major'},
-   {n:'Decision',w:'Development Planner',t:'May approve with or without conditions, or refuse even if the rules are met.',c:'s. 7.100 1.1.9, 1.1.10'},
-   {n:'Notice',w:'City of Edmonton',t:'Mailed within 7 days of approval to owners within 60 m, the community league and the BIA.',c:'s. 7.160 1.2–1.4'},
-   {n:'Appeal',w:'SDAB',t:'21 days from the decision; “any person affected” 21 days after notice.',c:'s. 7.170 1–2'},
+   {n:'Development permit application',w:'Development Planner',t:'A data centre is Major Industrial (City guidance, applied to every size): a permitted use in IH and EETC; elsewhere a rezoning comes first.',c:'Bylaw 20001 ss. 2.140 2.1, 3.52 2.1; City of Edmonton guidance on data centres as Major Industrial'},
+   {n:'Decision',w:'Development Planner',t:'Must approve it if it meets the bylaw; must refuse it if not, unless a rule is varied (then it becomes discretionary).',c:'s. 7.100 1.1.6–1.1.8'},
+   {n:'Notice',w:'City of Edmonton',t:'Published on the City’s website within 7 days of approval; mailed to owners within 60 m, the community league and the BIA only if a rule was varied.',c:'s. 7.160 1.2, 1.3'},
+   {n:'Appeal',w:'Subdivision and Development Appeal Board (SDAB)',t:'21 days. For a permitted use, a neighbour can appeal only if a rule was relaxed, varied or misinterpreted. Where the site holds an Alberta Utilities Commission approval, the appeal goes to the Land and Property Rights Tribunal.',c:'s. 7.170 1–2; MGA ss. 685(2.1), 685(3), 686(1)'},
    {n:'Building permit',w:'City of Edmonton',t:'After the development permit and its appeal period.',c:'Zoning Bylaw 20001 ss. 7.100–7.170'}],
   rezone:[
    {n:'Pre-application',w:'You and the City',t:'Only if the rezoning is to a Direct Control zone: 21 days of pre-application notice first.',c:'City of Edmonton rezoning page'},
    {n:'Public hearing',w:'City Council',t:'Council makes the final decision on rezonings and plan amendments at a public hearing.',c:'City of Edmonton rezoning page'},
    {n:'Regional referral',w:'EMRB',t:'A rezoning is not referred. A plan amendment is, if it converts over 32 ha of a major employment area outside Downtown.',c:'REF 4.3(d)'},
    {n:'Then the development permit',w:'As on the permit path',t:'After the rezoning, the same development permit steps as a permitted or discretionary use.',c:'City of Edmonton rezoning page'}]}};
+ 
+const SAY={van:{short:'Comment on Shape Your City while the application is open. The Director of Planning decides. Only the owner can appeal (Board of Variance, 30 days).',
+  lines:[['Find it','Active development permit applications are listed by address on the City’s Shape Your City “Development” page.','City of Vancouver, “Find a development application or permit” (read 23 Nov 2026); shapeyourcity.ca/development'],
+   ['Notice','In most cases the City notifies nearby properties and neighbourhood groups. The applicant may have to post a sign. The by-law leaves notice to the City.','City of Vancouver, “Development permit”, step 3; ZDB s. 4.3.12'],
+   ['Comment','Comment while the application is under review, through its Shape Your City comment form when one is open. The decision-maker considers the comments.','City of Vancouver, “Development permit”, step 3; Shape Your City “Development”'],
+   ['Who decides','The Director of Planning decides. Large or contested applications go to the Development Permit Board, whose meetings are public; anyone who signs up may speak for up to 3 minutes.','City of Vancouver, “Development Permit Board”; ZDB s. 4.3.11(h)'],
+   ['Appeal','Only the owner can appeal, to the Board of Variance, within 30 days of the decision. Neighbours can’t file an appeal, but they can ask to speak at the hearing.','City of Vancouver, “Appeal decisions to the Board of Variance”; Board of Variance page']],
+  link:'https://shapeyourcity.ca/development'},
+ edm:{short:'No comment step before the decision for a permitted use. Approved permits go online within 7 days. You can appeal to the SDAB within 21 days, but only if a rule was varied or misread.',
+  lines:[['Find it','The City keeps a register of applications open to anyone who asks; every approved permit goes on a public City web page within 7 days.','Zoning Bylaw 20001 s. 7.100 1.1.2; s. 7.160 1.2'],
+   ['No comment step','For a permitted use the bylaw sets no public comment step before the decision. The Development Planner must approve the permit if it meets the bylaw.','s. 7.100 1.1.6'],
+   ['Notice','Neighbours get mail only if a rule was varied: owners within 60 m, the community league and the business association, within 7 days of approval.','s. 7.100 1.1.8; s. 7.160 1.3, 1.4, 2.1'],
+   ['Who decides','The Development Planner.','s. 7.100'],
+   ['Appeal','Appeal to the Subdivision and Development Appeal Board within 21 days after notice of the decision. For a permitted use, a neighbour can appeal only if a rule was relaxed, varied or misinterpreted. Where the site holds an Alberta Utilities Commission approval (generators of 1 MW or more), the appeal goes to the Land and Property Rights Tribunal.','s. 7.170 2; Municipal Government Act ss. 685(2.1), 685(3), 686(1)(b)']],
+  link:null},
+ rezone:'Council decides the rezoning. Residents can write to Council or speak at the public hearing where one is held.'};
 const PATHS=[
  {id:'permitted',name:'Permitted',k:'As of right',what:'The zone lists a data centre as a permitted use. The use itself needs no decision.',who:'No decision on the use; a development permit is still needed.'},
  {id:'conditional',name:'Conditional or discretionary',k:'The City decides',what:'The zone lists it with conditions. Vancouver calls this a conditional use; Edmonton, a discretionary use.',who:null},
@@ -171,6 +187,7 @@ const PATHS=[
  
 const pathSentence=(x,city)=>{ const p=pathOf(x); return p==='rezoning'?'Here a data centre needs a rezoning: City Council decides, after a public hearing.':p==='permitted'?(city==='edm'?'Here a data centre is a permitted use: it still needs a development permit, issued where the zone’s rules are met.':'Here a data centre is permitted outright: it still needs a development permit.'):city==='van'?'Here a data centre is a conditional use: the Director of Planning decides, after a development permit application.':'Here a data centre is a discretionary use: the Development Planner decides, after a development permit application.'; };
 const pathOf=x=>{ const w=x.status.word; return /rezoning/.test(w)?'rezoning':/permitted/.test(w)?'permitted':/conditional|discretionary/.test(w)?'conditional':'rezoning'; };
+BD.f1PROC={PROC,PATHS,SAY,pathOf,pathSentence:(x,c)=>pathSentence(x,c)};    
 const zonesOf=city=>(city==='van'?BD.data.raw.zones.ZV:BD.data.raw.zones.ZE)||{};
 const zoneCount=city=>{ const R=zonesOf(city), c={permitted:0,conditional:0,rezoning:0};
    
@@ -235,7 +252,7 @@ C.add(T,'Approval process',{async build(x){
   const list=a=>`<div class="f1c-mua-steps">${a.map((s,i)=>`<div class="f1c-mua-step"><div class="n">${i+1}</div><h4>${esc(s.n)}</h4><div class="w">${esc(s.w)}</div><p>${esc(s.t)}</p><span class="c">${esc(s.c)}</span></div>`).join('')}</div>`;
   const draw=`<div style="width:100%"><div style="font-size:12px;color:var(--f-mute);margin-bottom:6px">${esc(cn)} · ${esc(x.zone)} · ${esc(x.status.word)} · ${path==='rezoning'?'rezoning path':'development permit path'}</div>${list(steps)}
    <p class="f1c-note" style="margin-top:26px;max-width:760px">No timeline is shown: the sources give no single sourced duration for the whole process. The order of steps is our reading of the sources; who decides and the notice and appeal rules are the clauses named.</p></div>`;
-  return {draw,lead:path==='rezoning'?`${cn}: Council decides after a public hearing.`:city==='van'?'The Director of Planning decides, or the Development Permit Board if public response warrants it. Neighbours may be notified.':'The Development Planner decides. Neighbours are notified by mail after approval, and anyone affected can appeal.',
+  return {draw,lead:path==='rezoning'?`${cn}: Council decides after a public hearing.`:city==='van'?'The Director of Planning decides, or the Development Permit Board if public response warrants it. Neighbours may be notified.':'The Development Planner decides: a permitted use that meets the bylaw must be approved. Approved permits go online within 7 days; a neighbour can appeal only if a rule was varied or misread.',
     
    hero:[{v:String(steps.filter(st=>!/^(?:Only if|A rezoning is not referred)/.test(st.t)).length),l:steps.some(st=>/^(?:Only if|A rezoning is not referred)/.test(st.t))?'steps on this lot’s path, plus some that apply only in some cases':'steps on this lot’s path'},{v:path==='rezoning'?'Council':city==='van'?'Director':'Planner',l:'decides'},{v:P.appealWin,l:path==='rezoning'?'appeal window, for the development permit that follows':'appeal window'}],
    rows:path==='rezoning'?[['Decides the rezoning','Council, after a public hearing'],['Then, the development permit',P.decides],['Notice (development permit)',P.notice],['Appeal (development permit)',`${P.appeal}, ${P.appealWin} (${P.appealCl})`],['Who may appeal',P.appealWho],['Time to decision',C.q('no sourced figure; not shown')]]
@@ -251,8 +268,8 @@ const RPAGES=[['Can a data centre go here?',['Is a data centre allowed?','Indust
 const NPG=RPAGES.length+2, NWORD=['','one','two','three','four','five','six','seven','eight','nine','ten'][NPG]||String(NPG);
  
  
-BD.F1DISCLAIMER='Beyond Data is a thesis research tool. Its plans, heat figures and costs are feasibility estimates built from public data and stated assumptions. They are not construction drawings, engineering designs, cost quotes or approvals, and no site owner, building or operator shown here has agreed to anything. Code and zoning checks screen each plan against the rules listed on its board; they are not a code review. Items marked ‘resolved in design development’ are open by design.';
-const FOOT=`<div style="position:absolute;left:56px;right:56px;bottom:18px;font-size:12px;color:#8A8984;border-top:1px solid #ECECEC;padding-top:5px">Feasibility estimates from public data, not a design, a quote or an approval. Full disclaimer on page 1.</div>`;
+BD.F1DISCLAIMER='Beyond Data is a thesis research tool. Its plans, heat figures and costs are feasibility estimates built from public data and stated assumptions. They are not construction drawings, engineering designs, cost quotes or approvals, and no site owner, building or operator shown here has agreed to anything. Code and zoning checks screen each plan against the rules listed with it; they are not a code review. Items marked ‘resolved in design development’ are open by design.';
+const FOOT=`<div style="position:absolute;left:56px;right:56px;bottom:18px;font-size:12px;color:#8A8984;border-top:1px solid #ECECEC;padding-top:5px">A feasibility study from public data: not a design, a quote or an approval.</div>`;
  
 BD.F1LICENCE='Contains information licensed under the Open Government Licence – Canada (Public Safety Canada, Canada Structures), the Open Government Licence – Vancouver and the Open Government Licence – City of Edmonton.';
  
@@ -260,6 +277,11 @@ BD.f1proc=PROC; BD.f1zoneClass=(city,key)=>CLS[clsOf(city,key)];
 BD.F1FOOT=FOOT; BD.F1COVER=()=>`<p style="position:absolute;left:56px;right:56px;bottom:28px;font-size:12px;line-height:1.5;color:#6B6A66;border-top:1px solid #DAD9D5;padding-top:8px">${esc(BD.F1DISCLAIMER)}</p>`;
  
 BD.f1reportPage=({n,total,title,head,body,cover})=>(body=String(body||'').replace(/ data-map(-[a-z]+)?(="[^"]*")?/g,'').replace(/ data-mk\b/g,''),`<div class="f1r-pg"><div class="cap">Page ${n} · ${esc(cover?'Title':title)}</div><div class="f1r-box"><div class="f1r-sheet" style="position:relative"><div class="hd"><span>${esc(head)}</span><span>${n} / ${total}</span></div>${cover?body:`<h1>${esc(title)}</h1>${body}`}${cover?BD.F1COVER():FOOT}</div></div></div>`);
+ 
+if(!window.__bdPrintFit){ window.__bdPrintFit=1; const PAGE=900, FOOTH=44;    
+  addEventListener('beforeprint',()=>document.querySelectorAll('#f1v .f1r-sheet').forEach(sh=>{ const w=sh.querySelector(':scope > .f1r-fit'); if(!w) return; const z=w.style.zoom; w.style.zoom='1';
+    const H=w.scrollHeight+FOOTH; w.style.zoom=z; const n=Math.ceil(H/PAGE), k=n>1?(n-1)*PAGE/H*0.97:1; if(n>1&&k>=0.8){ sh.dataset.pfit='1'; sh.style.setProperty('--pz',k.toFixed(3)); } }));
+  addEventListener('afterprint',()=>document.querySelectorAll('#f1v .f1r-sheet[data-pfit]').forEach(sh=>{ delete sh.dataset.pfit; sh.style.removeProperty('--pz'); })); }
 BD.f1cardPages=async function({tpl,x,groups,label,cover}){
   const SRC=[], sid=t=>{ const p=C.pub(t); let k=SRC.indexOf(p); if(k<0){ SRC.push(p); k=SRC.length-1; } return k+1; }, NPG=groups.length+2;
   const runCard=async t=>{ const sp=C.get(tpl,t); if(!sp) return null; try{ return await sp.build(x); }catch(e){ console.warn(label+' report',t,e); return null; } };
@@ -268,7 +290,7 @@ BD.f1cardPages=async function({tpl,x,groups,label,cover}){
   let n=2, LINEd=false; if(BD.f1trust) await BD.f1trust.ready(); const TC=BD.f1trust&&BD.f1trust.cell;    
   for(const [title,cards] of groups){ let body=''; for(const t of cards){ const r=await runCard(t); if(!r) continue; const refs=(r.src||[]).map(sid);
       body+=`<div class="lb">${esc(t)}</div>${r.lead?`<p class="ld">${C.pub(r.lead)}${refs.length?` <span style="color:#6B6A66">[${refs.join(', ')}]</span>`:''}</p>`:''}`+
-        `<div class="f1r-dr">${r.draw||''}</div>`+((r.rows||[]).length?`<table class="f1c-res-t">${r.rows.map(q=>`<tr><th>${esc(q[0])}</th><td>${q[1]&&typeof q[1]==='object'?`<b style="color:#CC746C">?</b> ${esc(q[1].why||'')}`:q[1]}${TC?TC(tpl,t,q[0],q[1]&&typeof q[1]==='object'?'?':q[1],r):''}</td></tr>`).join('')}</table>`:'')+
+        `<div class="f1r-dr f1r-whole">${r.draw||''}</div>`+((r.rows||[]).length?`<table class="f1c-res-t">${r.rows.map(q=>`<tr><th>${esc(q[0])}</th><td>${q[1]&&typeof q[1]==='object'?`<b style="color:#CC746C">?</b> ${esc(q[1].why||'')}`:q[1]}${TC?TC(tpl,t,q[0],q[1]&&typeof q[1]==='object'?'?':q[1],r):''}</td></tr>`).join('')}</table>`:'')+
         (r.more||[]).filter(m=>m&&m[1]&&!(r.draw||'').includes(m[1])).map(m=>`<div class="f1r-more"><div class="lb">${esc(m[0])}</div>${m[1]}</div>`).join(''); }
     if(!LINEd&&/class="f1-tr"/.test(body)&&BD.f1trust&&BD.f1trust.LINE){ body=BD.f1trust.LINE+body; LINEd=true; }    
     pages.push(pg(n++,title,body||'<p class="ld">Not available for this lot.</p>')); }
@@ -279,7 +301,7 @@ C.add(T,'Report',{async build(x){
   const city=x.city, sel=x.sel, m=await meta(city), sts=await BD.streets(city);
   let mp=''; if(sel.ring){ const b=C.bbox(sel.ring), cx=(b[0]+b[2])/2, cy=(b[1]+b[3])/2, R=420; mp=mapSvg(m,sts,sel,city,[cx-R,cy-R,cx+R,cy+R],300,300,null).svg; }
   const R=await BD.f1cardPages({tpl:T,x,groups:RPAGES,label:'Municipal',cover:N=>`<div style="margin-top:120px"><div class="lb">Municipal report</div><h1 style="font-size:40px;font-weight:300">${esc(x.addr)}</h1><p class="ld">${esc(CITYN[city])} · zone ${esc(x.zone)} · ${esc(C.n0(sel.lotArea))} m². ${esc(pathSentence(x,city))}</p></div>
-    <div style="margin-top:40px">${mp}</div><p class="ld" style="margin-top:40px">Rules, not a design. [n] = source, page ${N}. “?” = no source read.</p>`});
+    <div style="margin-top:40px">${mp}</div><p class="ld" style="margin-top:40px">Rules, not a design. [n] = source, page ${N}.</p>`});
   return {draw:`<div class="f1r-pages">${R.pages.join('')}</div><button class="f1c-mua-print" type="button" onclick="window.print()">Print the report</button>`,
    lead:`The Municipal report: ${NWORD} letter pages drawn from this lot by the cards before it. Print, or save as PDF.`,
    hero:[{v:String(R.NPG),l:'pages'},{v:String(R.SRC.length),l:'sources'}],

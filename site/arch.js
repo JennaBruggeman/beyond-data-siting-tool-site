@@ -12,10 +12,14 @@ const mid=a=>a?(a[0]+a[1])/2:null;
 const mwR=a=>!a||!(a[1]>0)?'?':a[0].toFixed(1)+'–'+a[1].toFixed(1)+' MW'; 
 
  
-A.ready=Promise.all([fetch('arch_programs.json').then(r=>r.json()),fetch('opps.json').then(r=>r.ok?r.json():{}).catch(()=>({}))]).then(([P,O])=>{
-  CAT.list=P.programs.filter(p=>!p.hidden);    P.programs.forEach(p=>CAT.byId[p.id]=p); CAT.src=O.sources||{}; CAT.kind=O.source_kinds||{}; CAT.meta=P.meta; }).catch(e=>console.warn('arch data',e));
-function chips(ids){ if(!ids||!ids.length) return '<span class="asrc q" title="no source">?</span>';
-  return ids.map(i=>`<span class="asrc" tabindex="0" title="${esc((CAT.kind[i]?CAT.kind[i].toUpperCase()+': ':'')+(CAT.src[i]||'(source text not in this build)'))}">${esc(i)}</span>`).join(''); }
+ 
+A.ready=fetch('arch_programs.json').then(r=>r.json()).then(P=>{
+  CAT.list=P.programs.filter(p=>!p.hidden);    P.programs.forEach(p=>CAT.byId[p.id]=p); CAT.meta=P.meta; }).catch(e=>console.warn('arch data',e));
+let SRCP=null; const srcTitle=i=>(CAT.kind[i]?CAT.kind[i].toUpperCase()+': ':'')+(CAT.src[i]||'(source text not in this build)');
+function loadSrc(){ if(SRCP) return SRCP; SRCP=fetch('opps.json').then(r=>r.ok?r.json():{}).catch(()=>({})).then(O=>{ CAT.src=O.sources||{}; CAT.kind=O.source_kinds||{};
+    if(typeof document!=='undefined') document.querySelectorAll('.asrc[data-src]').forEach(el=>{ el.title=srcTitle(el.dataset.src); }); }); return SRCP; }
+function chips(ids){ loadSrc(); if(!ids||!ids.length) return '<span class="asrc q" title="no source">?</span>';
+  return ids.map(i=>`<span class="asrc" tabindex="0" data-src="${esc(i)}" title="${esc(SRCP&&Object.keys(CAT.src).length?srcTitle(i):'(source text loading)')}">${esc(i)}</span>`).join(''); }
 const GROUP=[['care','Care and refuge'],['wet','Water'],['grow','Growing and drying'],['public','Public and heated'],['energy','Energy'],['system','Systems (feed the budgets; not drawn as blocks)']];
 
  
@@ -95,7 +99,7 @@ function placeOnce(){ const s=site(); if(!s) return null; const {F,G,dir,v0,v1,W
   if(s.M.plant&&s.M.plant.yard){ const y=BD.geo.clip(s.M.ring,s.M.plant.yard); if(y&&y.length>=6){ const e=ext(y); occ.push([e[0],e[1],e[2],e[3],0,1e9,true]); } }
   if(s.M.loading){ const e=ext(s.M.loading); occ.push([e[0],e[1],e[2],e[3],0,1e9,true,kL]); }
   if(s.M.loadInside) out.flags.push({t:`Loading: ${s.M.loadInside.n} bay${s.M.loadInside.n>1?'s':''} inside the building (${n0(s.M.loadInside.m2)} m² of ground storey; Architecture default, as the test fits draw it). Ratios takes this floor out of the ground; Arrange draws it on the ground storey at the rear end of the building (drawing choice)${out.hall.base>0?'; not drawn here, because the refuge takes the ground floor under the hall':''}.`,src:['arch_ratios'],sev:'note'});
-  const bu0=um[0], bu1=um[1], bw=v1-v0, bl=bu1-bu0, cs=2, nU=Math.max(1,Math.floor(bl/cs)), nV=Math.max(1,Math.floor(bw/cs));
+  const bu0=um[0], bu1=um[1], bw=v1-v0, bl=bu1-bu0, cs=Math.max(2,Math.ceil(Math.sqrt(bl*bw/40000)/2)*2)  , nU=Math.max(1,Math.floor(bl/cs)), nV=Math.max(1,Math.floor(bw/cs));
   
    
   const lotR=s.M.yardOff||s.M.ring  , inLot=(u,v)=>{ const w=F.toW(u,v); return inside(w,lotR); };
@@ -110,7 +114,7 @@ function placeOnce(){ const s=site(); if(!s) return null; const {F,G,dir,v0,v1,W
   masses.sort((a,b)=>prio(a)-prio(b));
   if(under&&refuge&&refuge.m2){ const fp=Math.min(refuge.m2,(hu1-hu0)*(hv1-hv0)), d=Math.min(hu1-hu0,fp/Math.max(1,hv1-hv0)); const ua=dir<0?hu0:hu1-d, ub=dir<0?hu0+d:hu1;
     out.boxes.push({id:'refuge',p:CAT.byId.refuge,q:refuge,ring:G.rectW(F,ua,ub,hv0,hv1),base:0,h:ftf.ground,storeys:1,sh:ftf.ground,front:Math.abs((dir<0?ua:ub)-uf)<0.6,underHall:true,u:[ua,ub],v:[hv0,hv1]}); }
-  out.notDrawn=[]; const Hmax=s.H||Infinity, capF=s.fsr&&s.lot?s.lot*s.fsr[1]:null, code=zoneCode(); let floorUsed=s.hallM2+out.boxes.reduce((t,b)=>t+(b.q.m2||0),0), nonInd=out.boxes.reduce((t,b)=>t+(industrialUse(b.q,code)?0:(b.q.m2||0)),0);
+  out.notDrawn=[]; const Hmax=s.H||Infinity, capF=s.fsr&&s.lot?s.lot*s.fsr[1]:null, code=zoneCode(); if(s.city==='edm'&&under&&refuge&&refuge.m2){ const z=CAT.byId.refuge&&CAT.byId.refuge.zoning&&CAT.byId.refuge.zoning[s.city]; if(z&&zoneMatch(s.city==='van'?z.districts:z.zones,code)==='no') (out.rezoned=out.rezoned||[]).push('refuge'), out.flags.push({t:`${CAT.byId.refuge.name.split(' (')[0]}: not permitted in ${code||'this zone'}${useTxt(z.use)?' ('+useTxt(z.use)+')':''}; drawn as if rezoned. A rezoning would be a separate council decision.`,src:z.src,sev:'bad',id:'refuge'}); }   let floorUsed=s.hallM2+out.boxes.reduce((t,b)=>t+(b.q.m2||0),0), nonInd=out.boxes.reduce((t,b)=>t+(industrialUse(b.q,code)?0:(b.q.m2||0)),0);
    
   const RT=ratioNow(); out.ratio=RT; let progUsed=out.boxes.reduce((t,b)=>t+(b.q.m2||0),0), gUsed=(hu1-hu0)*(hv1-hv0);
   if(RT&&RT.b&&RT.r){ const cp=dcCapPct(RT.b,RT.r,null); if(RT.r.dc>cp.geo&&cp.G&&cp.G.pg.items.length) out.flags.push({t:`Data centre: its share (${RT.r.dc}%) leaves too little ground for the picked programs beside the hall. ${groundLine(RT.b,RT,cp).replace(/<[^>]+>/g,'')} Back in Ratios it takes at most ${cp.geo}%.`,src:['arch_ratios'],sev:'bad'}); }  
@@ -119,11 +123,13 @@ function placeOnce(){ const s=site(); if(!s) return null; const {F,G,dir,v0,v1,W
   const SPN=2.0  , hF=dir<0?hu0:hu1, BANDS=!!(A.bands&&RT&&!under&&Math.abs(hv0-v0)<0.05&&Math.abs(hv1-v1)<0.05&&Math.abs(hF-uf)>=SPN+6), bandQ=[];
   for(const x of masses){ const {q,p}=x, nm=p.name.split(' (')[0];
     if(q.m2==null){ out.flags.push({t:`${nm}: no sourced typical size; type one to place it.`,src:p.size&&p.size.src,sev:'q'}); continue; }
-    if(q.id==='refuge'&&!q.opt){ out.flags.push({t:'Refuge: choose a placement (own building, side by side, or under the hall). There is no default (project decision, 1 Nov 2026).',src:[],sev:'q'}); out.notDrawn.push(q.id); continue; }
+    if(q.id==='refuge'&&!q.opt){ out.flags.push({t:'Refuge: choose a placement (own building, side by side, or under the hall). There is no default.',src:[],sev:'q'}); out.notDrawn.push(q.id); continue; }
     { const z=p.zoning&&p.zoning[s.city]; if(z&&z.cap_m2&&s.city==='edm'&&code==='BE'&&q.m2>z.cap_m2){ out.flags.push({t:`${nm}: ${n0(q.m2)} m² is over the ${n0(z.cap_m2)} m² this use may have in BE; not drawn. ${minOf(p)!=null&&minOf(p)>z.cap_m2?'Its sourced minimum ('+n0(minOf(p))+' m²) is over the cap, so it cannot go on a BE lot.':'Make it '+n0(z.cap_m2)+' m² or less.'}`,src:z.src,sev:'bad',id:q.id}); out.notDrawn.push(q.id); continue; } }
     if(s.city==='van'&&/^I-[23]/.test(code)&&!industrialUse(q,code)&&nonInd+q.m2>s.lot*1.0+0.5){ out.flags.push({t:`${nm}: ${n0(q.m2)} m² would pass the 1.00 floor-space ratio ${code} allows for non-industrial uses combined (${n0(s.lot)} m² on this lot, ${n0(Math.max(0,s.lot-nonInd))} m² left); not drawn.`,src:[/I-2/.test(code)?'van_zdb_i2':'van_zdb_i3'],sev:'bad',id:q.id}); out.notDrawn.push(q.id); continue; }
     if(s.city==='van'&&/^I-2/.test(code)&&q.id==='clinic'){ const lim=Math.max(AD.i2Office.m2,AD.i2Office.share*(floorUsed+q.m2));   if(q.m2>lim+0.5){ out.flags.push({t:`${nm}: in I-2, general and health care office together may have the greater of 235 m² or 33.3% of all floor area (${n0(lim)} m² here); ${n0(q.m2)} m² is over it; not drawn.`,src:['van_zdb_i2'],sev:'bad',id:q.id}); out.notDrawn.push(q.id); continue; } }
-    { const z=p.zoning&&p.zoning[s.city]; if(z&&zoneMatch(s.city==='van'?z.districts:z.zones,code)==='no'){ out.flags.push({t:`${nm}: not permitted in ${code||'this zone'}${z.use?' ('+z.use+')':''}; not drawn. A rezoning would be a separate council decision.`,src:z.src,sev:'bad',id:q.id}); out.notDrawn.push(q.id); continue; } }
+    { const z=p.zoning&&p.zoning[s.city]; if(z&&zoneMatch(s.city==='van'?z.districts:z.zones,code)==='no'){   if(s.city==='edm'){ (out.rezoned=out.rezoned||[]).push(q.id); out.flags.push({t:`${nm}: not permitted in ${code||'this zone'}${useTxt(z.use)?' ('+useTxt(z.use)+')':''}; drawn as if rezoned. A rezoning would be a separate council decision.`,src:z.src,sev:'bad',id:q.id}); } else { out.flags.push({t:`${nm}: not permitted in ${code||'this zone'}${useTxt(z.use)?' ('+useTxt(z.use)+')':''}; not drawn. A rezoning would be a separate council decision.`,src:z.src,sev:'bad',id:q.id}); out.notDrawn.push(q.id); continue; } }
+       
+      else if(z&&s.city==='edm'&&code&&zoneMatch(z.zones,code)==='?'&&/\b(BE|IM|IH|MU|EETC)\b/.test(z.zones||'')) (out.rezoned=out.rezoned||[]).push(q.id), out.flags.push({t:`${nm}: not permitted in ${code}${useTxt(z.use)?' ('+useTxt(z.use)+')':''}; drawn as if rezoned. A rezoning would be a separate council decision.`,src:z.src,sev:'bad',id:q.id}); }
     if(RT&&progUsed+q.m2>RT.progM2+0.5){ out.flags.push({t:`${nm}: ${n0(q.m2)} m² would pass the programs' share of the floor (${n0(RT.progM2)} m², ${n0(Math.max(0,RT.progM2-progUsed))} m² left); not drawn. Edit ratios to give programs more.`,src:['arch_ratios'],sev:'bad',id:q.id}); out.notDrawn.push(q.id); continue; }
     if(capF!=null&&floorUsed+q.m2>capF+0.5){ out.flags.push({t:`${nm}: ${n0(q.m2)} m² would pass the floor-space ratio (${n0(capF)} m² on this lot, ${n0(Math.max(0,capF-floorUsed))} m² left); not drawn.`,src:s.city==='van'?['van_zdb_i2','van_zdb_i3']:['edm_bl20001'],sev:'bad',id:q.id}); out.notDrawn.push(q.id); continue; }
     const grade=p.place&&p.place.grade, mustSt=s.city==='van'&&p.place&&p.place.street_entrance&&!(q.id==='refuge'&&q.opt==='side_by_side'&&false), atG=grade==='at grade'||mustSt, notG=grade==='not at grade'&&notAtGradeHere(p), roof=q.place==='roof';
@@ -164,11 +170,11 @@ function placeOnce(){ const s=site(); if(!s) return null; const {F,G,dir,v0,v1,W
         else add(`minimum size or sides: no free area of its size with sides of at least ${sides} is left beside the hall, the plant, the plant yard and loading`,sideSrc); }
       out.flags.push({t:`${nm}: not drawn. Stopped by ${R.join('; ')}.`,src,sev:'bad',id:q.id,stop:R}); out.notDrawn.push(q.id); continue; }
      
-    if(st>st0) out.flags.push({t:`${nm}: ${n0(q.m2)} m² on ${st} storeys of about ${n0(q.m2/st)} m² each${mustSt?' (it does not fit on one floor along the street front, where it needs its own entrance)':' (it does not fit on one floor here)'}, with two stairs and a lift (plan layer; their floor comes out of the program's, net floor in the plan).${q.id==='clinic'?' A clinic may sit on upper floors (project decision, 4 Nov 2026).':' Whether this program can be split across floors is a design question.'}`,src:q.id==='clinic'?['arch_ratios']:[],sev:q.id==='clinic'?'note':'q',id:q.id});
+    if(st>st0) out.flags.push({t:`${nm}: ${n0(q.m2)} m² on ${st} storeys of about ${n0(q.m2/st)} m² each${mustSt?' (it does not fit on one floor along the street front, where it needs its own entrance)':' (it does not fit on one floor here)'}, with two stairs and a lift (plan layer; their floor comes out of the program's, net floor in the plan).${q.id==='clinic'?' A clinic may sit on upper floors (4 Nov 2026).':' Whether this program can be split across floors is a design question.'}`,src:q.id==='clinic'?['arch_ratios']:[],sev:q.id==='clinic'?'note':'q',id:q.id});
     if(unaligned&&st>1) out.flags.push({t:`${nm}: its upper floors are drawn ${n0(SM.above*10)/10} m apart (the ${code} minimum), not at the data centre's ${n0(unaligned*10)/10} m storeys, because ${n0(st)} storeys at that height pass the ${n0(Hmax)} m limit; floors that do not line up share no door (drawing choice ?).`,src:['arch_hb_vanI3'],sev:'q',id:q.id});
     const {base,i,j,dc,wc}=best, hh=hOf(base,st), spread=st>st0, uA=dir<0?bu0+i*cs:bu1-(i+dc)*cs, uB=uA+dc*cs, vA=v0+j*cs, vB=vA+Math.min(wc*cs,q.m2/st/(dc*cs)), gap=gc*cs; 
     floorUsed+=q.m2; progUsed+=q.m2; if(base===0) gUsed+=q.m2/st; if(!industrialUse(q,code)) nonInd+=q.m2; occ.push([uA,uB,vA,vB,base,base+hh,false]); if(own) occ.push([uA-gap,uB+gap,vA-gap,vB+gap,0,1e9,true]);
-    out.boxes.push({id:q.id,p,q,ring:G.rectW(F,uA,uB,vA,vB),base,h:hh,storeys:st,sh:hh/st,shSrc:SM?['arch_hb_vanI3']:own0?(p.size.src||[]):null,front:base===0&&Math.abs((dir<0?uA:uB)-uf)<cs+0.01,top:base>=hallTop-0.01,roof,u:[uA,uB],v:[vA,vB],gap,own,spread}); }
+    out.boxes.push({id:q.id,asIfRezoned:(out.rezoned||[]).includes(q.id)||undefined,p,q,ring:G.rectW(F,uA,uB,vA,vB),base,h:hh,storeys:st,sh:hh/st,shSrc:SM?['arch_hb_vanI3']:own0?(p.size.src||[]):null,front:base===0&&Math.abs((dir<0?uA:uB)-uf)<cs+0.01,top:base>=hallTop-0.01,roof,u:[uA,uB],v:[vA,vB],gap,own,spread}); }
    
   out.band=null; if(BANDS){ const lo=dir<0, inL=r=>inLot(r[0]+0.05,r[2]+0.05)&&inLot(r[1]-0.05,r[2]+0.05)&&inLot(r[0]+0.05,r[3]-0.05)&&inLot(r[1]-0.05,r[3]-0.05);
     const sp=lo?[hF-SPN,hF]:[hF,hF+SPN]; let uF=uf; { const back=lo?sp[0]:sp[1]; for(let k=0;k<200;k++){ const r=lo?[uF,back,hv0,hv1]:[back,uF,hv0,hv1]; if(inL(r)) break; uF+=lo?0.05:-0.05; } }  
@@ -247,7 +253,7 @@ function placeOnce(){ const s=site(); if(!s) return null; const {F,G,dir,v0,v1,W
   if(s.H&&top>s.H+0.01) out.flags.push({t:`Check: something is drawn to ${n0(top)} m, over this zone's ${n0(s.H)} m limit. This should not happen; please report it.`,src:s.city==='van'?['van_zdb_i2','van_zdb_i3']:['edm_bl20001'],sev:'bad'});
   out.boxes.forEach(b=>{ const sh=b.sh||ftf.ground; b.level=Math.floor(b.base/ftf.ground+0.01); b.levels=[...new Set(Array.from({length:b.storeys||1},(_,k)=>Math.floor((b.base+k*sh)/ftf.ground+0.01)))]; }); 
   out.levels=[...new Set(out.boxes.flatMap(b=>b.levels))].sort((a,b)=>a-b);
-  out.hallDepth=hu1-hu0; out.hallTop=hallTop; return out; }
+  out.hallDepth=hu1-hu0; out.hallTop=hallTop; if(out.rezoned) for(const b of out.boxes) if(out.rezoned.includes(b.id)) b.asIfRezoned=true;     return out; }
 function notAtGradeHere(p){   const z=zoneCode(); return /I-3|FC-2/.test(z)&&BD.S.sel&&BD.S.sel.city==='van'; }
 
  
@@ -276,6 +282,8 @@ function secureRing(P){ const s=P.s, M=s.M;
   return rs.filter(r=>r&&r.length>=6); } 
 function secArea(P){   const r=P.s.M.ring, sec=P.secRing||[]; let a=1e9,b=1e9,c=-1e9,d=-1e9; for(let i=0;i<r.length;i+=2){ a=Math.min(a,r[i]); b=Math.min(b,r[i+1]); c=Math.max(c,r[i]); d=Math.max(d,r[i+1]); }
   let n=0, m=0; for(let x=a+0.5;x<c;x+=1) for(let y=b+0.5;y<d;y+=1){ if(!inside([x,y],r)) continue; n++; if(insideAny([x,y],sec)) m++; } return n?[m,n]:[0,0]; }
+ 
+function useTxt(u){ return String(u||'').replace(/\s*\([^()]*(?:\.md\b|register)[^()]*\)/gi,'').trim(); }
 function zoneMatch(str,code){  
   if(!str||!code) return '?'; const re=new RegExp('(^|[^A-Z0-9-])'+code.replace(/[-]/g,'\\-')+'(?![A-Z0-9])'); const segs=String(str).toUpperCase().split(/[;(]/);
   const seg=segs.find(x=>re.test(x)); if(/^\s*NONE\s*$/i.test(str)) return 'rezoning'; if(!seg){ return /\bONLY\b/i.test(str)?'no':'?'; } if(/\bONLY\b/.test(seg)&&seg.replace(re,'').trim().length>4) return 'only'; if(/NOT PERMITTED|\bNP\b/.test(seg)) return 'no'; if(/NOT LISTED/.test(seg)) return 'rezoning'; return 'yes'; }
@@ -307,12 +315,12 @@ function rules(P){ const s=P.s, M=s.M, city=s.city, code=zoneCode(), out=[...P.f
   for(const b of P.boxes){ const p=b.p, nm=p.name.split(' (')[0], q=b.q;
     if(p.place&&p.place.public&&insideAny(cen(b.ring),sec)){
       if(b.underHall&&A.secure!=='lot') out.push({t:`${nm} sits under the hall: outside the line at grade, with a 2 h floor between (a design choice).`,src:['arch_nbc3131'],sev:'note',id:b.id});
-      else if(b.top&&A.secure!=='lot') out.push({t:`${nm} sits above the hall roof: treated as outside the line, reached by its own stair (a design choice; project decision default 2 Nov 2026).`,src:[],sev:'note',id:b.id});
+      else if(b.top&&A.secure!=='lot') out.push({t:`${nm} sits above the hall roof: treated as outside the line, reached by its own stair (a design choice, a default).`,src:[],sev:'note',id:b.id});
       else { out.push({t:`${nm} is public but inside the secure line.`,src:p.place.src,sev:'bad',id:b.id}); b.bad=true; } }
     const z=p.zoning&&p.zoning[city]; if(z){ const zs=city==='van'?z.districts:z.zones, m=zoneMatch(zs,code);
       const st=m==='no'?'not permitted':m==='rezoning'?'rezoning':z.status||'?', only=m==='only'?' (only part of the use is listed here: '+((zs.toUpperCase().split(/[;(]/).find(x=>x.includes(code))||'').trim())+')':'';
       if(m==='?'&&st!=='?') out.push({t:`${nm}: ${st} in ${city==='van'?'Vancouver':'Edmonton'}${zs?' ('+zs+')':''}; whether that covers ${code||'this zone'} is not confirmed (?).`,src:z.src,sev:'q',id:b.id});
-      else if(st!=='permitted') { const sev=st==='conditional'?'note':st==='?'?'q':'bad'; out.push({t:`${nm} in ${code||'this zone'}: ${st==='?'?'zoning not confirmed (?)':st}${z.use?' ('+z.use+')':''}${only}.`,src:z.src,sev,id:b.id}); if(sev==='bad') b.bad=true; }
+      else if(st!=='permitted') { const sev=st==='conditional'?'note':st==='?'?'q':'bad'; out.push({t:`${nm} in ${code||'this zone'}: ${st==='?'?'zoning not confirmed (?)':st}${useTxt(z.use)?' ('+useTxt(z.use)+')':''}${only}.`,src:z.src,sev,id:b.id}); if(sev==='bad') b.bad=true; }
       if(z.cap_m2&&city==='edm'&&code==='BE'&&q.m2>z.cap_m2){ out.push({t:`${nm}: ${n0(q.m2)} m² is over the ${n0(z.cap_m2)} m² cap for this use in BE.`,src:z.src,sev:'bad',id:b.id}); b.bad=true; } }
     const C=q.id==='warming_shelter'&&q.opt==='overnight'; if(C&&city==='van') out.push({t:`Overnight shelter in Vancouver: no listed use found for overnight stays in this district (?).`,src:z?z.src:[],sev:'q',id:b.id});
     if(!b.own){ if(C) out.push({t:`Overnight shelter is residential (C): it uses the one residential suite an F-2 building may hold; a second residential use would need its own building. Fire separation from F-2 for C ? here.`,src:['arch_nbc3131'],sev:'note',id:b.id});
@@ -452,10 +460,10 @@ function splitLine(RT){ if(!RT) return `<p class="sub asplit">Ratios not set for
  
  
 function groundLine(b,c,cap){ const G=cap.G, k=b.dataFl, it=G.it, pg=G.pg, s=it?it.s:0, need=c.dcM2/k/(1-s), st=`${k} hall storey${k>1?'s':''}${b.dataFl<b.floors?' over a ground storey kept for other uses':''} under the ${n0(b.M.H)} m height limit`;
-  const ps=pg.why==='under'?'programs go on the ground storey under the hall':pg.why==='over'?`programs can sit over the hall (its top ${n0(pg.top)} m)`:pg.why==='typology'?`${n0(pg.m2)} m² held back for ${pg.typ.chosen?'the chosen typology':'programs: no programs or typology chosen, so the smallest library typology'} (${esc(pg.typ.name)}; a default, project decision to confirm)`:pg.why==='none'?'no ground held for programs':
+  const ps=pg.why==='under'?'programs go on the ground storey under the hall':pg.why==='over'?`programs can sit over the hall (its top ${n0(pg.top)} m)`:pg.why==='typology'?`${n0(pg.m2)} m² held back for ${pg.typ.chosen?'the chosen typology':'programs: no programs or typology chosen, so the smallest library typology'} (${esc(pg.typ.name)}; a default)`:pg.why==='none'?'no ground held for programs':
     `programs ${n0(pg.m2)} m² (${pg.items.map(x=>esc(x.name.split(' (')[0])+' '+n0(x.g)+(x.min?' at its minimum':' as set')).join('; ')})`;
   const items=it?[`footprint after ${it.dock>0?'':'loading and '}the plant yard ${n0(it.G0)} m²`].concat(it.intr>0.5?[`yard units over it ${n0(it.intr)}`]:[]).concat(it.tx.n?[`${it.tx.n} transformer pads, ${it.tx.cl} m from the building, ${n0(it.tx.m2)}`]:[]).concat(it.dock>0?[`${it.dockN} loading bay${it.dockN>1?'s':''} inside ${n0(it.dock)}`]:[]).concat(it.drive.m2>0?[`a ${it.drive.w} m drive to the rear yard ${n0(it.drive.m2)} (no other street reaches it)`]:[]).concat([ps]):[ps];
-  if(pg.under){ const gs=Math.max(0,G.ground-pg.under.m2); return `Hall needs ${n0(c.dcM2/k)} m² a storey (${st}); ${n0(G.ground)} m² available. Its support rooms (${n0(s*100)} % of the data centre, ${n0(c.dcM2*s/(1-s))} m²) take the ground storey first: ${n0(gs)} m² there after ${pg.under.why==='typology'?`${n0(pg.under.m2)} m² held back for programs (no programs or typology chosen: the smallest library typology, ${esc(pg.under.typ.name)}; a default, project decision to confirm)`:`the programs' ${n0(pg.under.m2)} m²`}. Ground: ${items.slice(0,-1).join(' − ')}.`; }
+  if(pg.under){ const gs=Math.max(0,G.ground-pg.under.m2); return `Hall needs ${n0(c.dcM2/k)} m² a storey (${st}); ${n0(G.ground)} m² available. Its support rooms (${n0(s*100)} % of the data centre, ${n0(c.dcM2*s/(1-s))} m²) take the ground storey first: ${n0(gs)} m² there after ${pg.under.why==='typology'?`${n0(pg.under.m2)} m² held back for programs (no programs or typology chosen: the smallest library typology, ${esc(pg.under.typ.name)}; a default)`:`the programs' ${n0(pg.under.m2)} m²`}. Ground: ${items.slice(0,-1).join(' − ')}.`; }
   return `Hall and its support rooms need ${n0(need)} m² of ground per storey (${st}; support ${n0(s*100)} % of the data centre); ${n0(G.ground)} m² available. Ground: ${items.join(' − ')}.`; }
  
 const MIXTXT='Needs rezoning: no Edmonton zone allows a data centre with public uses. A data centre is Major Industrial, permitted only in IH and EETC, which list no Community, Health or Emergency Service use; BE allows those uses but not Major Industrial (Zoning Bylaw 20001 ss. 2.120, 2.140, 3.52; City guidance, register edm_dc_major). Shown as if rezoned: a flagged option, not a prediction.';
@@ -542,7 +550,7 @@ async function viewArrange(){ await ready(); BD.S.view2='tab'; const sd=$('#side
   const presets=[['suggest','Suggested'],['lot','Lot line'],['wall','Building wall'],['hall','Hall wall']];
   sd.innerHTML=`${tabsHTML('aarr')}<h2>Arrange</h2><p class="lead">The tool places each program by its rules; you resize, lock, delete and choose options. Nothing is scored.</p>${splitLine(P.ratio)}${hallLine(P)}${budHTML(B)}${A.msg?`<div class="aflag bad">${esc(A.msg)}</div>`:''}
    <div class="abar ctl" style="display:flex;gap:6px;flex-wrap:wrap;align-items:center;font-size:12px">Secure line ${presets.map(([k,l])=>`<button data-sec="${k}" aria-pressed="${A.secure===k}">${l}</button>`).join('')} ${chips(['arch_sec_gcpsg015AppC'])}</div>
-   <p class="sub" style="font-size:11.5px">Suggested: the tightest line that keeps the hall, its plant and loading inside. A design choice, not a rule (project decision, 1 Nov 2026).</p>
+   <p class="sub" style="font-size:11.5px">Suggested: the tightest line that keeps the hall, its plant and loading inside. A design choice, not a rule.</p>
    ${A.picks.length?A.picks.map(rowHTML).join(''):'<p class="sub">No programs yet. Go back to add some.</p>'}
    <h3 style="font-size:13px;margin-top:14px">Rules ${RL.filter(r=>r.sev==='bad').length?`<span class="k">${RL.filter(r=>r.sev==='bad').length}</span> flagged`:''}</h3>
    ${RL.length?RL.map(r=>`<div class="aflag ${r.sev}">${esc(r.t)} ${chips(r.src)}</div>`).join(''):'<p class="sub">No rule flags.</p>'}

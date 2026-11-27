@@ -34,8 +34,8 @@ const LIMITS=[
  ['Size',`Real data centres sit in the ${K('lower half')} of the range; small downtown buildings can exceed it. ${K('Only 11 buildings')} worldwide publish both IT load and floor area.`],
  ['Grid',`${K('No utility publishes substation headroom.')} Known: no new downtown Vancouver feeder positions from fiscal 2027 until the West End substation (construction from November 2026, in service as early as 2032), with temporary measures in between; east of the peninsula, Murrin is to be replaced by a new East Vancouver substation (construction from 2027 at the earliest, about four years); Alberta's 1,200 MW interim limit, fully allocated. Otherwise "needs the utility's answer".`],
  ['Heat',`Receivers are ${K('candidates by type, not customers')}. Demand, current heating and willingness are unknown: heat available is not heat used.`],
- ['Edmonton',`Heights from the City's 3D buildings (about 95%), the rest estimated from floor area. ${K('District energy areas approximate (Blatchford from property records, Downtown from the City map), not traced from their bylaws; floodplain not yet checked.')} Lots licensed lot outlines (not published) via Edmonton Public Schools GIS, to 1 Sep 2025, academic use.`],
- ['People',`Census 2021 spread evenly within each area, so ${K('estimates near boundaries')}. Sound is ${K('screening only')}, no walls or barriers. The watched edge needs a site visit.`],
+ ['Edmonton',`Heights from the City's 3D buildings (about 95%), the rest estimated from floor area. ${K('District energy areas approximate (Blatchford from property records, Downtown from the City map), not traced from their bylaws; floodplain not yet checked.')} Lots: licensed lot data, to 1 Sep 2025, academic use.`],
+ ['People',`Census 2021 spread evenly within each area, so ${K('estimates near boundaries')}. Sound is ${K('screening only')}, no walls or barriers. The watched edge needs checking on the ground.`],
  ['Claims',`Operator figures are ${K('labelled as claims')}; industry surveys as surveys.`],
  ['Security',`${K('Generic equipment only')}; nothing that would help defeat a facility's security.`],
 ];
@@ -49,7 +49,7 @@ const DATA=[
  ['Edmonton zoning','Zoning Bylaw 20001 geographic data','12 Oct 2026'],
  ['Edmonton building outlines','City of Edmonton rooflines','14 Oct 2026'],
  ['Edmonton heights','City of Edmonton 3D buildings (383,329 parts)','downloaded Oct 2026'],
- ['Edmonton lot outlines','Alberta title mapping (licensed lot outlines (not published)) via Edmonton Public Schools GIS','1 Sep 2025'],
+ ['Edmonton lot outlines','Licensed lot data, academic use (local build only)','1 Sep 2025'],
  ['Receivers','Statistics Canada ODSRF v2 (2026), ODHF (2020), ODEF v2.1 (2022); Vancouver non-market housing','see each'],
  ['Grid carbon','National Inventory Report 2026 (2024 data)','2024'],
  ['Precedent catalogue','130 sites, gathered 15 Oct 2026','15 Oct 2026'],
@@ -69,7 +69,7 @@ const CHANGES=[
 function aboutView(){
   $('#side').innerHTML=`<button class="x" id="back">← Back</button><div class="kind">About this tool</div><h2>What this tool can't tell you</h2>
   <p>${LIMITS_LEAD}</p><dl class="lim">${LIMITS.map(([l,t])=>`<dt>${l}</dt><dd>${t}</dd>`).join('')}</dl>
-  <h3>Data and their dates</h3><div class="tt"><table><thead><tr><th>Layer</th><th>Source</th><th>As of</th></tr></thead><tbody>${DATA.filter(r=>!(window.BD_PUBLIC&&/licensed lot outlines/.test(r[1]))).map(r=>`<tr>${r.map(c=>`<td>${esc(c)}</td>`).join('')}</tr>`).join('')}</tbody></table></div>
+  <h3>Data and their dates</h3><div class="tt"><table><thead><tr><th>Layer</th><th>Source</th><th>As of</th></tr></thead><tbody>${DATA.filter(r=>!(window.BD_PUBLIC&&/Licensed lot data/.test(r[1]))).map(r=>`<tr>${r.map(c=>`<td>${esc(c)}</td>`).join('')}</tr>`).join('')}</tbody></table></div>
   <h3>Versions</h3><div class="tt"><table><tbody>${CHANGES.map(r=>`<tr><td>v${esc(r[0])}</td><td>${esc(r[1])}</td><td>${esc(r[2])}</td></tr>`).join('')}</tbody></table></div>
   <h3>Evidence badges</h3><p class="sub">Each source line carries a badge: <span class="evb ev-record">public record</span> <span class="evb ev-peer">research or government lab</span> <span class="evb ev-survey">industry survey</span> <span class="evb ev-claim">operator or maker claim</span> <span class="evb ev-physics">physics</span> <span class="evb ev-transfer">transferred from elsewhere</span> <span class="evb ev-assume">assumption or gap</span></p>
   <div class="draftnote">Version ${VERSION.n}, ${VERSION.date}.</div>`;
@@ -185,7 +185,7 @@ function citiesView(){
    ['Solar yield, roof','892–1,007 kWh per kWp a year','944–1,244 kWh per kWp a year','NRCan municipal values (flat to latitude tilt)','record'],
    ['Solar yield, south wall','716 kWh per kWp a year','989 kWh per kWp a year','NRCan municipal values (vertical)','record'],
    ['Rain','about 1,160 mm a year','about 420 mm a year','ECCC Normals 1991–2020','record'],
-   ['Night noise limit next to homes','45–55 dBA by zone (By-law 6555)','50 dBA (Bylaw 14600)','city by-laws','record'],
+   ['Night noise limit next to homes','45–55 dBA by zone (By-law 6555)','50 dBA (Bylaw C14600)','city by-laws','record'],
    ['Getting power','2026 Call: must curtail ≥10% of load on 24 h notice, ≥144 h a year; no new downtown feeder positions from fiscal 2027 to about 2032, temporary measures in between','AESO interim limit of 1,200 MW for new large loads, fully allocated; data centres ≥75 MW may tether to their own new generation or storage, and are cut first in mandatory load shedding','BC Hydro 2026 RFA; Alta Reg 117/2026; AESO 2025, 2026','record'],
    ['Where heat could go','NEU: compulsory connection inside its area; heat sent back credited at 50%','Blatchford: compulsory connection inside its service area (Bylaw C17943 s. 6); service area approximate in the tool (property-record hull, not Schedule A)','By-law 9552; Bylaw C17943','record'],
    ['Electricity price','BC Hydro large general service 6.79 ¢/kWh + $13.83/kW a month (Electric Tariff RS 1600–1611, in effect from 1 April 2026)','Alberta pool averaged $43.68/MWh in 2025, plus wires charges','BC Hydro 2026; AESO 2025','record'],
@@ -216,7 +216,7 @@ async function siteReport(){
 <style>body{font-family:'IBM Plex Sans','Open Sans',Arial,sans-serif;font-weight:300;color:#1F2022;max-width:760px;margin:32px auto;padding:0 20px;line-height:1.45}h1{font-weight:300;margin:0}h2{font-size:12px;letter-spacing:.12em;text-transform:uppercase;color:#777;margin-top:26px}.acc{color:#CC746C}table{border-collapse:collapse;width:100%;font-size:13px}td{border-top:1px solid #ddd;padding:6px 8px;vertical-align:top}td:first-child{color:#666;width:38%}.small{font-size:11px;color:#777}</style></head><body>
 <div class="small">BEYOND DATA · SITE REPORT · ${date} · tool version ${VERSION.n}</div><h1>${esc(a[0]||'Site')}</h1><div class="acc">${f.city==='van'?'Vancouver':'Edmonton'}</div>
 <h2>In numbers</h2><table>${rows.map(([k,v])=>`<tr><td>${k}</td><td>${v}</td></tr>`).join('')}</table>
-<h2>Sources</h2><p class="small">Zone schedules (Vancouver Zoning and Development By-law; Edmonton Zoning Bylaw 20001). Hall share: Burlington plan set. Hall area per MW: five built Canadian halls (operator claims). PUE: LBNL 2023, Uptime 2025. Load factor: Fan et al. 2007. Capture: LBNL 2014, NREL. COP: DEA 2026; Fjernvarme Fyn 2020 (observed). Homes: NRCan CEUD 2023. Grid carbon: NIR 2026. Receivers: Statistics Canada ODSRF, ODHF, ODEF; City of Vancouver non-market housing.${f.city==='edm'&&sel.ring?' Lot outline: Alberta title mapping (licensed lot outlines (not published)) via Edmonton Public Schools GIS, current to 1 Sep 2025; academic use.':''}</p>
+<h2>Sources</h2><p class="small">Zone schedules (Vancouver Zoning and Development By-law; Edmonton Zoning Bylaw 20001). Hall share: Burlington plan set. Hall area per MW: five built Canadian halls (operator claims). PUE: LBNL 2023, Uptime 2025. Load factor: Fan et al. 2007. Capture: LBNL 2014, NREL. COP: DEA 2026; Fjernvarme Fyn 2020 (observed). Homes: NRCan CEUD 2023. Grid carbon: NIR 2026. Receivers: Statistics Canada ODSRF, ODHF, ODEF; City of Vancouver non-market housing.${f.city==='edm'&&sel.ring?' Lot outline: licensed lot data, current to 1 Sep 2025; academic use.':''}</p>
 <h2>Read with</h2><p class="small">Ranges, not designs. Operator figures are claims. Heat available is not heat used: receivers' demand, current heating and willingness are not known. </p></body></html>`;
   const dl=BD.dl; if(!dl) return alertBox('Downloads are not available in this view.');
   try{ await dl.save({filename:`site-report-${(a[0]||'site').replace(/[^A-Za-z0-9]+/g,'-').toLowerCase()}.html`,data:new Blob([html],{type:'text/html'})}); }catch(err){ alertBox('The report was not saved'+(err&&err.code?` (${err.code})`:'')+'.'); }
@@ -228,7 +228,7 @@ BD.siteReport=siteReport;
 function feedbackView(){
   const sel=BD.S.sel, where=sel&&sel.a?`${sel.a[0]} (${BD.S.city})`:'';
   $('#side').innerHTML=`<button class="x" id="back">← Back</button><div class="kind">Feedback</div><h2>What did you notice?</h2>
-  <p class="draft">For the user sessions. Your note is stored with the tool so project decision can read every response together. Leave out anything personal.</p>
+  <p class="draft">For the user sessions. Your note is stored with the tool and read together with every other response. Leave out anything personal.</p>
   <label class="sub">Your name or role (optional)<input id="fbWho" class="fbin"></label>
   <label class="sub">Site or page${where?'':' (optional)'}<input id="fbWhere" class="fbin" value="${esc(where)}"></label>
   <label class="sub">What was clear, what was confusing, what was missing?<textarea id="fbText" rows="6" class="fbin"></textarea></label>

@@ -6,7 +6,7 @@ const IMG='f1/l2/';
 const ROLES=[
  ['resident','Resident','What is this building next to me?'],
  ['municipal','Municipal','Does it fit the rules?'],
- ['engineering','Engineering','Where can its heat go?'],
+ ['engineering','Power, heat and water','Where can its heat go?'],
  ['architecture','Architecture','What is the building?']];
  
 const TYP=[
@@ -49,10 +49,10 @@ function html(){ return `<div class="f1l2">
   <p class="f1l2-note">Small massings are illustrative; the library shows each typology’s tested plans.</p></div></section>
  <section class="f1l2-sec" id="f1l2-ex" hidden><div class="f1l2-in"><h2>Example lots</h2><p class="f1l2-sub" data-l2exsub></p><div class="f1l2-exs" data-l2exs></div></div></section>
  <section class="f1l2-find" id="f1l2-find" data-l2find hidden><div class="f1l2-in"><h2 data-l2findh></h2><p data-l2findp></p><div class="r"><button class="f1l2-btn inv" data-go="lib">Open the library</button><span class="m" data-l2findm></span></div></div></section>
- <section class="f1l2-sec f1l2-howsec" id="f1l2-how"><div class="f1l2-in f1l2-how2"><div><h2>How it works</h2><p class="f1l2-sub">One logic runs under all four roles. Every number in it links to its source and its check status.</p><a href="#" class="f1l2-a" data-go="logic">Open the logic diagram</a></div><div class="f1l2-howw">${howSvg()}</div></div></section>
+ <section class="f1l2-sec f1l2-howsec" id="f1l2-how"><div class="f1l2-in f1l2-how2"><div><h2>How it works</h2><p class="f1l2-sub">One logic runs under all four roles. Every number in it links to its source and its check status.</p><a href="#" class="f1l2-a" data-go="logic">Open the source breakdown</a>${BD.f1decides&&BD.f1decides.on()?` <a href="#" class="f1l2-a" data-go="decides" style="margin-left:18px">How each lot is laid out</a>`:''}</div><div class="f1l2-howw">${howSvg()}</div></div></section>
  <footer class="f1l2-foot"><div class="f1l2-in"><div><p>Beyond Data, ARCH 540, UBC School of Architecture and Landscape Architecture, 2026</p>
    <p>Data: City of Vancouver open data. Edmonton results are derived from licensed lot data (outlines simplified). Maker and operator figures are labelled as claims.</p>
-   <details class="f1l2-lic"><summary>Sources and licences</summary><p>Contains information licensed under the Open Government Licence – Canada (Public Safety Canada, Canada Structures), the Open Government Licence – Vancouver and the Open Government Licence – City of Edmonton. Every figure in the tool names its own source; open the logic diagram to follow one back.</p></details></div>
+   <details class="f1l2-lic"><summary>Sources and licences</summary><p>Contains information licensed under the Open Government Licence – Canada (Public Safety Canada, Canada Structures), the Open Government Licence – Vancouver and the Open Government Licence – City of Edmonton. Every figure in the tool names its own source; open the source breakdown to follow one back. <a class="f1l2-a" href="sources.html">The full list of sources and licences</a></p></details></div>
   <a href="#" class="f1l2-a" data-go="old">The earlier tool (archive)</a></div></footer></div>`; }
 
  
@@ -62,7 +62,7 @@ const DT=s=>{ const m=/^(\d{4})-(\d{2})-(\d{2})/.exec(s||''); if(!m) return ''; 
 const lotPic=()=>`<div class="f1l2-lotpic"><svg viewBox="0 0 120 88" aria-hidden="true"><defs><pattern id="f1l2-h" width="6" height="6" patternUnits="userSpaceOnUse" patternTransform="rotate(45)"><line x1="0" y1="0" x2="0" y2="6" stroke="var(--bd-ghost)" stroke-width="0.6"/></pattern></defs><rect x="14" y="10" width="92" height="62" rx="8" fill="url(#f1l2-h)" stroke="var(--bd-ink)" stroke-width="2"/><line x1="8" y1="82" x2="112" y2="82" stroke="var(--bd-ink)" stroke-width="3"/></svg><span class="st">street</span></div>`;
 async function after(L){
   L.querySelectorAll('a[href^="#f1l2-"]').forEach(a=>a.addEventListener('click',e=>{ e.preventDefault(); const s=L.querySelector(a.getAttribute('href')); if(s&&!s.hidden) s.scrollIntoView({behavior:'smooth'}); }));
-  L.querySelectorAll('[data-l2typ]').forEach(b=>b.addEventListener('click',()=>{ if(BD.f1lib&&BD.f1lib.typology) BD.f1lib.typology(b.dataset.l2typ); else if(BD.f1lib) BD.f1lib.open(); }));
+  L.querySelectorAll('[data-l2typ]').forEach(b=>b.addEventListener('click',()=>{ if(BD.f1lib&&BD.f1lib.typology) (BD.f1lib.intro||BD.f1lib.typology)(b.dataset.l2typ); else if(BD.f1lib) BD.f1lib.open(); }));
   const C=await coverage(); if(!L.isConnected) return; if(!C){ L.querySelectorAll('[data-l2ex],[data-l2findnav]').forEach(a=>a.remove()); return; }    
   const v=C.van||{}, when=[C.round,DT(C.date)].filter(Boolean).join(', '), eng='';    
    

@@ -86,7 +86,7 @@ function welcome(){ let w=$('#welcome'); if(w) w.remove(); w=document.createElem
   w.querySelectorAll('.ex').forEach(b=>b.onclick=()=>{ w.remove(); runExample(+b.dataset.i); });
   setTimeout(()=>$('#wEx')&&$('#wEx').focus(),50); }
 BD.welcome=welcome;
-function arcs(){ const cv=document.createElement('canvas'); cv.className='wbg'; cv.setAttribute('aria-hidden','true'); requestAnimationFrame(()=>{ try{ BD.welcomeCity(cv); cv.classList.add('on'); }catch(e){ console.warn(e); } }); let t; window.addEventListener('resize',()=>{ clearTimeout(t); t=setTimeout(()=>{ if(cv.isConnected) BD.welcomeCity(cv); },200); }); return cv; }
+function arcs(){ const cv=document.createElement('canvas'); cv.className='wbg'; cv.setAttribute('aria-hidden','true'); const paintCity=()=>{ if(!cv.isConnected) return; const w=cv.closest('#welcome'); if(document.getElementById('f1')||document.getElementById('f1v')||(w&&w.hasAttribute('inert'))) return setTimeout(paintCity,1500); try{ BD.welcomeCity(cv); cv.classList.add('on'); }catch(e){ console.warn(e); } }; setTimeout(paintCity,(window.BD&&BD.F1FLAGS)?2500:0);     let t; window.addEventListener('resize',()=>{ clearTimeout(t); t=setTimeout(()=>{ if(cv.isConnected&&cv.classList.contains('on')&&!document.getElementById('f1')&&!document.getElementById('f1v')) BD.welcomeCity(cv); },200); });     return cv; }
 async function runExample(i){ const x=EXAMPLES[i]; reset(); F.exPending=true; Object.assign(BD.S.answers,x.ans,{mw:null});
   try{ if(BD.S.city!==x.sel.city) await BD.setCity(x.sel.city,true); await BD.select(Object.assign({quiet:true},x.sel));
     

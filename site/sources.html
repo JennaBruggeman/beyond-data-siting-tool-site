@@ -1,18 +1,132 @@
-<!doctype html><html lang="en-CA"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Sources and licences</title><style>
-@font-face{font-family:'IBM Plex Sans';src:url(fonts/IBMPlexSans-Regular-Latin1.woff2) format('woff2');font-weight:400}
-:root{--ink:#222;--mute:#666;--line:#ddd;--red:#CC746C;--bg:#fff}
-body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.5 'IBM Plex Sans',system-ui,sans-serif}
-main{max-width:900px;margin:0 auto;padding:24px 16px 64px} h1{font-weight:400;font-size:28px;margin:8px 0 4px} h2{font-weight:500;font-size:18px;margin:28px 0 8px}
-p,li{max-width:72ch} .mute{color:var(--mute)} .k{color:var(--red)} a{color:inherit} nav a{margin-right:16px}
-table{border-collapse:collapse;width:100%;font-size:14px} th,td{text-align:left;vertical-align:top;padding:6px 8px;border-bottom:1px solid var(--line)} th{font-weight:500}
-figure{margin:16px 0 32px} figure img{max-width:100%;height:auto;border:1px solid var(--line)} figcaption{color:var(--mute);font-size:13px}
-.fig{display:flex;gap:24px;flex-wrap:wrap;margin:6px 0} .fig div{min-width:120px} .fig b{display:block;font-size:22px;font-weight:400}
-</style></head><body><main><nav class="mute"><a href="index.html">The tool</a><a href="sources.html">Sources and licences</a></nav><h1>Sources and licences</h1><p class="mute">The public web version of Beyond Data uses open data only. Each source keeps its licence; the attribution each licence asks for is given with it.</p><h2>Open data</h2><table><thead><tr><th>Publisher</th><th>Data</th><th>Licence and attribution</th></tr></thead><tbody><tr><td>City of Vancouver Open Data</td><td>Property parcel polygons<br>Property tax report 2026 (zoning, values)<br>Building footprints 2009<br>LiDAR 2022 (buildings and ground, processed into tiles)<br>Public streets and lanes<br>Designated floodplain<br>Public trees<br>Non-market housing<br>Libraries and community centres<br>Operating permits – water systems<br>Energy benchmarking (buildings that disclosed their reports)</td><td>Contains information licensed under the Open Government Licence – Vancouver.</td></tr><tr><td>City of Edmonton Open Data</td><td>Property Information (Current Calendar Year), dkk9-cj3x<br>Property Assessment Data (Current Calendar Year), q7d6-ambg<br>Land Parcels_Assessment Parcels (Point), dm3i-bp8w (lot area at each parcel point)<br>Zoning Bylaw geographical data<br>Road Network<br>Rooflines and 3D buildings<br>Trees, eecg-fc54<br>Public Libraries, jn25-zspi<br>Recreation Facilities, nz3t-vyg3<br>Community League Halls, kaps-rk7z</td><td>City of Edmonton. Contains information licensed under the Open Government Licence – City of Edmonton.</td></tr><tr><td>Statistics Canada</td><td>Census of Population 2021 (98-401-X2021006) and dissemination area boundaries (92-160-X)<br>Open Database of Educational Facilities v2.1<br>Open Database of Healthcare Facilities<br>Open Database of Sport and Recreation Facilities v2</td><td>Source: Statistics Canada. Reproduced and distributed on an “as is” basis with the permission of Statistics Canada (Statistics Canada Open Licence).</td></tr><tr><td>Natural Resources Canada</td><td>CanVec 50K: hydro (shorelines) and transformer stations<br>Photovoltaic potential and solar resource maps of Canada<br>Electric Charging and Alternative Fuelling Stations Locator</td><td>Contains information licensed under the Open Government Licence – Canada.</td></tr><tr><td>Environment and Climate Change Canada</td><td>Canadian Weather Year for Energy Calculation (CWEC), Vancouver and Edmonton: sun statistics derived from it</td><td>Contains information licensed under the Open Government Licence – Canada.</td></tr><tr><td>Government of Alberta</td><td>Alberta Flood Mapping, flood hazard layer<br>Continuing Care Accommodation Standards compliance reporting (care homes)</td><td>Contains information licensed under the Open Government Licence – Alberta.</td></tr><tr><td>Government of British Columbia</td><td>Residential Care Facilities<br>Locations of Post-Secondary Institutions</td><td>Contains information licensed under the Open Government Licence – British Columbia.</td></tr><tr><td>Public Safety Canada</td><td>Canada Structures (12 September 2025; doi:10.82126/z1bc-zd72): building outlines and heights for the 3-D context. Its footprints come from the Open Database of Buildings, OpenStreetMap (© OpenStreetMap contributors) and Microsoft Building Footprints</td><td>Contains information licensed under the Open Government Licence – Canada.</td></tr></tbody></table><h2>What the public version leaves out</h2><ul>
-<li><b>Edmonton lot outlines.</b> The City of Edmonton does not publish them as open data: “As of November 1st, 2021, the City will no longer provide datasets with land parcel boundary polygon geometry” (City of Edmonton Open Data, Vacant Land – Industrial, <a href="https://data.edmonton.ca/d/stt5-pzaa">stt5-pzaa</a>). The full version uses licensed title mapping for academic work. Here, Edmonton lots are the City’s parcel points; cards that need a lot outline say so, and the seven Edmonton test fits are shown as images.</li>
-<li><b>A licensed assessment list.</b> The full version also counts commercial and apartment buildings from a licensed property assessment list as heat receivers; none of those records is published here.</li>
-<li><b>Code and standard texts</b> that are licensed are not reproduced; the tool cites them by clause.</li>
-<li><b>The Edmonton test-fit drawings.</b> Their plans show lot lines; the public version gives Edmonton results only (simplified outlines). They are in the full version.</li></ul>
-<h2>Figures from other sources</h2><p>Operator and industry figures (data-centre sizes, equipment) are labelled as claims where they appear. District-energy service areas are traced from City and utility maps and labelled as approximate.</p>
-<h2>This project</h2><p>Code: MIT licence. Text, drawings and data made for the project: Creative Commons Attribution 4.0 (<a href="https://creativecommons.org/licenses/by/4.0/">CC BY 4.0</a>); credit “Beyond Data, Jenna Bruggeman (UBC M.Arch), CC BY 4.0”. © 2026 Jenna Bruggeman. Third-party data keeps its own licence and credit, as listed on this page.</p>
-<h2>Fonts and libraries</h2><p>IBM Plex Sans (SIL Open Font Licence 1.1). three.js (MIT licence).</p></main></body></html>
+<!doctype html>
+<html lang="en-CA">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Beyond Data · Sources</title>
+<meta name="description" content="Every source the Beyond Data siting tool uses, with its licence.">
+<style>
+ 
+@font-face{font-family:"IBM Plex Sans";font-weight:300;font-display:swap;src:url(fonts/IBMPlexSans-Light-Latin1.woff2) format("woff2")}
+@font-face{font-family:"IBM Plex Sans";font-weight:400;font-display:swap;src:url(fonts/IBMPlexSans-Regular-Latin1.woff2) format("woff2")}
+@font-face{font-family:"IBM Plex Sans";font-weight:600;font-display:swap;src:url(fonts/IBMPlexSans-SemiBold-Latin1.woff2) format("woff2")}
+:root{--ink:#1E2A47;--ink2:#4A5672;--mute:#6B7590;--rule:#D9DDE5;--soft:#F4F5F8;--navy:#3D5185;--amber:#8A3B00}
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{margin:0;background:#fff;color:var(--ink);font:400 16px/1.55 "IBM Plex Sans",system-ui,sans-serif}
+a{color:var(--navy);text-underline-offset:2px}
+a:focus-visible,button:focus-visible,summary:focus-visible,input:focus-visible{outline:2px solid var(--navy);outline-offset:2px}
+.wrap{max-width:980px;margin:0 auto;padding:0 24px}
+header.top{border-bottom:1px solid var(--rule)}
+header.top .wrap{display:flex;justify-content:space-between;align-items:baseline;gap:16px;padding-top:18px;padding-bottom:18px}
+.brand{font-weight:600;color:var(--ink);text-decoration:none}
+.back{font-size:15px}
+h1{font-size:44px;line-height:1.08;font-weight:600;margin:48px 0 12px;letter-spacing:-.01em}
+.lede{font-size:18px;color:var(--ink2);max-width:44em;margin:0 0 28px}
+.terms{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:0;border-top:1px solid var(--rule);border-bottom:1px solid var(--rule);margin:0 0 36px}
+.terms div{padding:16px 20px 16px 0}
+.terms div+div{padding-left:20px;border-left:1px solid var(--rule)}
+.terms dt{font-size:13px;color:var(--mute);margin:0 0 4px}
+.terms dd{margin:0;font-size:15px}
+.find{position:sticky;top:0;z-index:2;background:#fff;padding:14px 0 12px;border-bottom:1px solid var(--rule)}
+.find label{display:block;font-size:13px;color:var(--mute);margin:0 0 6px}
+.find .row{display:flex;gap:10px;align-items:center}
+.find input{flex:1;min-width:0;font:inherit;font-size:16px;color:var(--ink);padding:10px 12px;border:1px solid #B8BFCC;border-radius:4px;background:#fff}
+.find input::-webkit-search-cancel-button{-webkit-appearance:none;display:none}
+.find button{font:inherit;font-size:14px;color:var(--navy);background:none;border:0;padding:8px 4px;cursor:pointer}
+.find button[hidden]{display:none}
+.count{font-size:14px;color:var(--ink2);margin:8px 0 0;min-height:1.4em}
+details.g{border-bottom:1px solid var(--rule)}
+details.g>summary{list-style:none;cursor:pointer;display:flex;justify-content:space-between;align-items:baseline;gap:16px;padding:18px 0}
+details.g>summary::-webkit-details-marker{display:none}
+details.g>summary h2{margin:0;font-size:20px;font-weight:600;display:flex;align-items:baseline;gap:12px}
+details.g>summary h2::before{content:"";flex:none;width:8px;height:8px;border-right:1.5px solid var(--ink2);border-bottom:1.5px solid var(--ink2);transform:rotate(-45deg) translate(-1px,-1px);transition:transform .15s ease}
+details.g[open]>summary h2::before{transform:rotate(45deg) translate(-2px,-2px)}
+details.g>summary .n{font-size:15px;color:var(--mute);white-space:nowrap;font-variant-numeric:tabular-nums}
+details.g[data-hit="0"]{display:none}
+ol.list{list-style:none;margin:0 0 20px;padding:0}
+ol.list li{padding:14px 0;border-top:1px solid #ECEEF2}
+ol.list li[hidden]{display:none}
+.cit{margin:0;max-width:52em}
+.meta{margin:6px 0 0;font-size:14px;color:var(--ink2);display:flex;flex-wrap:wrap;gap:4px 14px}
+.meta .lic{color:var(--mute)}
+.meta .lic.open{color:var(--ink2)}
+.tag{display:inline-block;font-size:12px;font-weight:600;letter-spacing:.02em;color:var(--amber);border:1px solid #E8C9AE;border-radius:3px;padding:0 6px;margin-right:6px;vertical-align:1px}
+mark{background:#FDE5D0;color:inherit;padding:0 1px}
+.more{font:inherit;font-size:14px;color:var(--navy);background:none;border:1px solid var(--rule);border-radius:4px;padding:8px 14px;margin:0 0 20px;cursor:pointer}
+footer{margin:56px 0 0;border-top:1px solid var(--rule)}
+footer .wrap{padding-top:20px;padding-bottom:40px;font-size:14px;color:var(--ink2)}
+.err{padding:20px 0;color:var(--ink2)}
+@media (max-width:700px){
+  .wrap{padding:0 16px}
+  h1{font-size:32px;margin-top:32px}
+  .lede{font-size:16px}
+  .terms{grid-template-columns:1fr}
+  .terms div,.terms div+div{padding:12px 0;border-left:0}
+  .terms div+div{border-top:1px solid var(--rule)}
+  details.g>summary h2{font-size:18px}
+}
+@media (prefers-reduced-motion:reduce){details.g>summary h2::before{transition:none}}
+</style>
+</head>
+<body>
+<header class="top"><div class="wrap"><a class="brand" href="index.html">Beyond Data</a><a class="back" href="index.html">Back to the tool</a></div></header>
+<main class="wrap">
+  <h1>Sources</h1>
+  <p class="lede" id="lede">Every source the tool uses: codes and by-laws, open data, research and the claims of operators and makers, each with its licence.</p>
+  <dl class="terms" id="terms"></dl>
+  <div class="find" role="search">
+    <label for="q">Search citations and publishers</label>
+    <div class="row"><input id="q" type="search" autocomplete="off" spellcheck="false" placeholder="e.g. Vancouver Building By-law, ASHRAE, Statistics Canada"><button type="button" id="clear" hidden>Clear</button></div>
+    <p class="count" id="count" aria-live="polite"></p>
+  </div>
+  <div id="groups"><p class="err">Loading the sources…</p></div>
+</main>
+<footer><div class="wrap" id="foot">Beyond Data, ARCH 540, UBC School of Architecture and Landscape Architecture, 2026.</div></footer>
+<script>
+(function(){
+'use strict';
+const PAGE=60;    
+const esc=s=>String(s==null?'':s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const fmt=n=>Number(n).toLocaleString('en-CA');
+const KIND={'OPERATOR CLAIM':'Operator claim','INDUSTRY CLAIM':'Industry claim','MAKER CLAIM':'Maker claim'};
+const OPEN=l=>/open|licence –|database licence/i.test(l||'')&&!/cited only/i.test(l||'');
+const safeURL=u=>/^https?:\/\//i.test(u||'')?u:null;
+const $=id=>document.getElementById(id);
+let D=null, state={q:'',shown:{}};
+
+function hl(text,q){ const t=esc(text); if(!q) return t; const i=String(text).toLowerCase().indexOf(q); if(i<0) return t;
+  return esc(String(text).slice(0,i))+'<mark>'+esc(String(text).slice(i,i+q.length))+'</mark>'+esc(String(text).slice(i+q.length)); }
+
+function row(s,q){ const url=safeURL(s.link); const k=KIND[s.kind];
+  const meta=[s.year&&!String(s.citation||'').includes(String(s.year))?`<span>${esc(s.year)}</span>`:'',s.publisher?(url?`<a href="${esc(url)}" target="_blank" rel="noopener noreferrer">${hl(s.publisher,q)}</a>`:`<span>${hl(s.publisher,q)}</span>`):(url?`<a href="${esc(url)}" target="_blank" rel="noopener noreferrer">Link</a>`:''),
+    `<span class="lic${OPEN(s.licence)?' open':''}">${esc(s.licence||'Licence not recorded')}</span>`].filter(Boolean).join('');
+  return `<li><p class="cit">${k?`<span class="tag">${esc(k)}</span>`:''}${hl(s.citation,q)}</p><p class="meta">${meta}</p></li>`; }
+
+function match(s,q){ return !q||String(s.citation||'').toLowerCase().includes(q)||String(s.publisher||'').toLowerCase().includes(q); }
+
+function draw(){ const q=state.q, out=[]; let total=0;
+  for(const g of D.groups){ const all=D.sources.filter(s=>s.group===g.group), hit=all.filter(s=>match(s,q)); total+=hit.length;
+    const lim=state.shown[g.group]||PAGE, vis=hit.slice(0,lim);
+    const id='g'+D.groups.indexOf(g);
+    out.push(`<details class="g" id="${id}" data-hit="${hit.length}"${q&&hit.length?' open':''}${!q&&state.open&&state.open[g.group]?' open':''}><summary><h2>${esc(g.group)}</h2><span class="n">${q?`${fmt(hit.length)} of ${fmt(all.length)}`:fmt(all.length)}</span></summary><ol class="list">${vis.map(s=>row(s,q)).join('')}</ol>${hit.length>lim?`<button type="button" class="more" data-g="${esc(g.group)}">Show ${fmt(Math.min(PAGE,hit.length-lim))} more of ${fmt(hit.length-lim)}</button>`:''}</details>`); }
+  $('groups').innerHTML=out.join('');
+  $('count').textContent=q?(total?`${fmt(total)} of ${fmt(D.sources.length)} sources match “${state.raw}”.`:`No source matches “${state.raw}”.`):`${fmt(D.sources.length)} sources in ${D.groups.length} groups.`;
+  $('clear').hidden=!q; }
+
+function init(d){ D=d; state.open={};
+  const L=d.licences||{};
+  $('terms').innerHTML=`<div><dt>Credit</dt><dd>${esc(d.credit||'')}</dd></div><div><dt>Text and drawings</dt><dd>${esc(L.content||'')}</dd></div><div><dt>Code</dt><dd>${esc(L.code||'')}</dd></div>`;
+  $('foot').innerHTML=`Beyond Data, ARCH 540, UBC School of Architecture and Landscape Architecture, 2026. List built ${esc(d.built||'')}. Each source keeps the licence shown beside it; “cited only” means the publisher keeps all rights and the tool quotes or summarizes it.`;
+  draw(); }
+
+let t=null; $('q').addEventListener('input',e=>{ clearTimeout(t); t=setTimeout(()=>{ state.raw=e.target.value.trim(); state.q=state.raw.toLowerCase(); state.shown={}; draw(); },120); });
+$('clear').addEventListener('click',()=>{ $('q').value=''; state.q=''; state.raw=''; state.shown={}; draw(); $('q').focus(); });
+$('groups').addEventListener('click',e=>{ const b=e.target.closest('.more'); if(!b) return; const g=b.dataset.g; state.shown[g]=(state.shown[g]||PAGE)+PAGE; state.open[g]=true; const y=window.scrollY; draw(); const el=[...document.querySelectorAll('details.g')].find(x=>x.querySelector('h2').textContent===g); if(el) el.open=true; window.scrollTo(0,y); });
+$('groups').addEventListener('toggle',e=>{ const d=e.target; if(d.matches&&d.matches('details.g')&&!state.q) state.open[d.querySelector('h2').textContent]=d.open; },true);
+
+fetch('data/sources_public.json').then(r=>{ if(!r.ok) throw new Error(r.status); return r.json(); }).then(init).catch(()=>{ $('groups').innerHTML='<p class="err">The source list could not be loaded. Try reloading the page.</p>'; $('count').textContent=''; });
+})();
+</script>
+</body>
+</html>

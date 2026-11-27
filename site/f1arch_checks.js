@@ -19,7 +19,7 @@ const FONT='font-family="IBM Plex Sans,system-ui,sans-serif"', NS='f1c-checks-';
 .${NS}pg{width:122px;display:flex;flex-direction:column;gap:6px}
 .${NS}pg .sheet{aspect-ratio:612/792;border:1px solid ${K.rule};background:#fff;padding:9px 9px 7px;display:flex;flex-direction:column;gap:6px;overflow:hidden}
 .${NS}pg.todo .sheet{border-style:dashed}
-.${NS}pg .hd{font-size:8px;color:${K.faint}}.${NS}pg .ti{font-size:12px;font-weight:400;color:${K.ink};line-height:1.2}
+.${NS}pg .hd{font-size:8px;color:var(--bd-ink-3)}.${NS}pg .ti{font-size:12px;font-weight:400;color:${K.ink};line-height:1.2}
 .${NS}pg .wh{font-size:10px;color:${K.ink2};line-height:1.35}
 .${NS}pg .no{font-size:11.5px;color:${K.mute};display:flex;justify-content:space-between}.${NS}pg .no b{font-weight:400;color:${K.red}}
 .${NS}pg .ln{height:3px;background:${K.hair};border-radius:1px}
@@ -105,9 +105,11 @@ BD.f1archBasis=basisOf;
 BD.f1archEstimate=async x=>{ const P=await x.arch(); if(!P||!hubOn(P)) return null; const PL=planOf(P), H=PL&&PL.hub; if(!H||H.doesntFit) return null; const b=basisOf(H); return b.k==='checked'?null:Object.assign({names:[]},H.estimate||{},{basis:b}); };
 BD.f1archNoFit=async x=>{ const P=await x.arch(); if(!P) return null;
   if(!hubOn(P)&&(!BD.arch||!BD.arch.typology||BD.arch.typology==='emergency_hub')){    
-    const M=P.s&&P.s.M, Z=(M&&M.Z)||{}, why=['The tool’s placement step puts no Emergency hub on this lot: no ground floor is left for its refuge and public rooms.'].concat(Z.notAllowed?[`Zone ${Z.zone||'?'} does not allow a data centre (a rezoning would be needed).`]:[]);
+    const M=P.s&&P.s.M, Z=(M&&M.Z)||{}, FL=(P.flags||[]).filter(q=>q&&q.t), ND=new Set(P.notDrawn||[]), clean=t=>BD.f1cards&&BD.f1cards.pubFull?BD.f1cards.pubFull(String(t)):String(t);    
+    const own=FL.filter(q=>q.id&&ND.has(q.id)).concat(FL.filter(q=>q.sev==='bad'&&!q.id&&/rezon/i.test(q.t))).map(q=>clean(q.t));
+    const why=own.length?own:['The tool’s placement step did not draw the Emergency hub’s public rooms on this lot.'].concat(Z.notAllowed?[`Zone ${Z.zone||'?'} does not allow a data centre (a rezoning would be needed).`]:[]);
     return {draw:`<div style="max-width:620px;margin:40px auto;text-align:left"><p class="f1v-empty" style="text-align:left">The Emergency hub isn’t laid out on this lot.</p><ol class="f1c-nofit">${why.map(t=>`<li>${esc(t)}</li>`).join('')}</ol></div>`,
-      lead:'The Emergency hub isn’t laid out on this lot. '+why.join(' '),rows:why.map(t=>['Why',esc(t)]),src:['The tool’s placement step (the Ratios and Arrange cards) and the zone row.'],missing:[]}; }
+      lead:'Why the Emergency hub isn’t drawn here, in the placement step’s own words.',rows:[],src:['The tool’s placement step (the Ratios and Arrange cards) and the zone row.'],missing:[]}; }
   if(!hubOn(P)) return null; const PL=planOf(P); return PL&&PL.hub&&PL.hub.doesntFit?noFitCard(P):null; };
 function noFitCard(P){ const w=noFitWhy(P);
   const list=w.lim.length?`<ol class="f1c-nofit">${w.lim.map(t=>`<li>${esc(t)}</li>`).join('')}</ol>`:`<p class="f1v-empty">The size search gave no reason (?).</p>`;
@@ -212,7 +214,7 @@ C.add(T,'Rooms',{chip:CHIP,async build(x){
   const HB=PL.hub, TL=tLine(HB);
   if(HB&&HB.rooms){ const lob=pl.stor[0].rooms.find(o=>o.id==='lob'), ppl=Math.floor(pl.stor[0].rooms.filter(o=>/^ref/.test(o.id)).reduce((t,o)=>t+o.m2,0)/3.5);
     const hubRows=[['Variant',`${HB.variant.main}${(HB.variant.flags||[]).length?', '+HB.variant.flags.join(', '):''}${HB.variant.sideDrive?', side drive':''}${HB.variant.lotType&&HB.variant.lotType!=='?'?' (lot type: '+HB.variant.lotType.replace('_','-')+')':''}${HB.variant.notBuilt.length?' · not built yet: '+HB.variant.notBuilt.join(', '):''}`],['Fallback ladder',`step ${HB.ladder.step}: ${HB.ladder.what}${HB.ladder.limiting.length?' · limiting: '+HB.ladder.limiting[HB.ladder.limiting.length-1].replace(/^step \d+ \([^)]*\): /,''):''}`],
-      ['Hall and MW',`${n0(HB.hall)} m² ÷ 630 m²/MW = ${HB.MW.toFixed(2)} MW · data centre ${n0(HB.dcArea)} m² (cap 2,325). 630 m²/MW is the test fits’ figure, inside the air-cooled range of 560–640 (decisions log, 11 Nov 2026); Engineering sizes at the conservative 637`],['Refuge people',`${ppl} at 3.5 m² (minimum 50)`],['Clinic',HB.clin?`${n0(HB.clin)} m²`:'none'],
+      ['Hall and MW',`${n0(HB.hall)} m² ÷ 630 m²/MW = ${HB.MW.toFixed(2)} MW · data centre ${n0(HB.dcArea)} m² (cap 2,325). 630 m²/MW is the test fits’ figure, inside the air-cooled range of 560–640 (decisions log, 11 Nov 2026); the Power, heat and water cards size at the conservative 637`],['Refuge people',`${ppl} at 3.5 m² (minimum 50)`],['Clinic',HB.clin?`${n0(HB.clin)} m²`:'none'],
       ['T-reach (rule 15d)',TL.reach],['Dead ends (VBBL 3.3.1.9.(5), 6 m)',TL.dead],['T-width (room widths)',TL.width],['Shared lobby',lob?`${n0(lob.m2)} m² (drawing choice; ≥ 20 m², spec 15c)`:C.q()]];
     if(HB.caps) hubRows.push(['Use caps (Edmonton, gross floor area)',HB.caps.rows.map(r=>`${esc(r.name)} as ${esc(r.use)}: ${n0(r.gross)} m² gross${r.cap!=null?` / ${n0(r.cap)} m² cap${r.over?' · over: set in the rezoning (flag)':''}`:' · no cap'}`).join('<br>')+(HB.caps.lobbyTo?`<br>Shared lobby counted with ${esc((HB.caps.rows.find(r=>r.id===HB.caps.lobbyTo)||{}).name||HB.caps.lobbyTo)}`:'')+`<br><span style="color:${K.mute}">${esc(HB.caps.src)}</span>`]);    
     const cn=pl.counts, mins=pl.stor.flatMap(st=>st.rooms.filter(o=>o.parts[0]&&o.parts[0].min).map(o=>{ const m=o.parts[0].min; return `<tr><td>${esc(storeyLabel(st.z))} · ${esc(o.name)}</td><td>${n0(o.m2)} m² · min ${m.m2!=null?n0(m.m2)+' m²':'?'}${m.w!=null?', '+m.w+' m wide':''} · step ${m.step}${m.rank?' · rank '+m.rank:''}</td></tr>`; })).join('');
@@ -481,7 +483,7 @@ C.add(T,'Report',{chip:CHIP,async build(x){
   return {draw,lead:'The report keeps the pages the tool already builds and adds a plans page and a code-checks page. Every figure keeps its source.',
     hero:[{v:String(built.length),l:'pages the tool builds today'},{v:String(nb),l:'pages not built yet',red:nb>0}],
     rows:[['Pages in the preview',String(pages.length)],['Export','Print or save as PDF (window.print)'],['Licensed data','none on these pages'],['Plans and checks pages',C.q('not built into the report yet')]],
-    more:pages.map(p=>[p.t+(p.built?'':' (not built yet)'),`<p>${esc(p.w)}</p>`]),
-    src:['Built pages: the report plan for the Architecture template in tool/templates.json (reports.arch), drawn by tool/report3.js.','Plans page: the plan layer (tool/plan.js). Code-checks page: BD.archTest.rules(P) counts for this layout. Neither is built into the report yet.','Export: the browser’s print dialog. The report’s own PDF (tool/report3.js, jsPDF) is not wired to these cards.'],
+    more:pages.filter(p=>p.built).map(p=>[p.t,`<p>${esc(p.w)}</p>`]),
+    src:['Built pages: the report plan for the Architecture template in tool/templates.json (reports.arch), drawn by tool/report3.js.','Plans page: the layout layer (tool/plan.js). Code-checks page: BD.archTest.rules(P) counts for this layout. Neither is built into the report yet.','Export: the browser’s print dialog. The report’s own PDF (tool/report3.js, jsPDF) is not wired to these cards.'],
     missing:['plans page in the report','code-checks page in the report','section or 3-D drawing page for the report','PDF export from these cards (print only)']}; }});
 })();

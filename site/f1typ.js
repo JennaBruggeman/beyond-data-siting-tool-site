@@ -42,7 +42,7 @@ function capRow(c){ let v='';
 function pageHtml(id){ const t=T.list.find(x=>x.id===id), P=T.pages[id]; if(!t||!P) return libHtml();
   return `<div class="f1t-wrap"><button class="f1t-back" data-lib>← All typologies</button>
   <section class="f1t-top"><div><h1>${esc(t.name)}</h1><p class="f1t-st">${chip(t.status)} ${esc(t.statusNote)}</p><p class="f1t-lead">${esc(t.lead)}</p>
-    <div class="f1t-acts"><button class="f1-btn" data-try>Try it on a lot →</button><button class="f1-link" data-logic>Logic diagram →</button><button class="f1-link" data-spec="${esc(t.id)}">Read the spec →</button></div></div>${models(t)}</section>
+    <div class="f1t-acts"><button class="f1-btn" data-try>Try it on a lot →</button><button class="f1-link" data-logic>Source breakdown →</button><button class="f1-link" data-spec="${esc(t.id)}">Read the spec →</button></div></div>${models(t)}</section>
   <section><div class="f1t-h"><h2>Capacities</h2><span>ranges, each with its source</span></div><table class="f1t-cap"><tbody>${P.capacities.map(capRow).join('')}</tbody></table></section>
   <section><div class="f1t-h"><h2>Variants</h2><span>each opens its schematic floor plans on its test lot</span></div><div class="f1t-vars">${P.variants.map(v=>`<article class="f1t-var"><h3>${esc(v.name)}</h3><p>${esc(v.trigger)}</p>
     <dl><dt>test lot</dt><dd>${esc(v.lot)}</dd><dt>data centre</dt><dd>${n2(v.mw)} MW</dd><dt>status</dt><dd>${esc(v.status)}</dd></dl>

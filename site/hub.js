@@ -57,6 +57,7 @@ const RULES = {
   sizeFreeRows: ['Truck reverse at most 10 m (SU-9)'],    
   deadline: null,    
   sizeFree: ['P1', 'E6', 'F6', 'CHEM-DC'],        
+  hardMs: 12000,    
   dcPerimeter: true,    
    
   patchesOn: true,
@@ -93,7 +94,7 @@ const RULES = {
   turnFront: true, serviceB: true,    
   mwFloor: { mw: 0.3, why: 'MW floor (project decision, 13 Nov 2026, ): a layout under 0.3 MW reads doesn’t fit, the first missed minimum named; the hub’s own small-lot boards (E10004 0.31, V1360 0.41) stay' },
   pu: { vesW: 2.2, pS: 1.45, pw: 1.4, dOff: 3.0, lobbyMin: 2.4, dSv: 2.6, dockMin: 2.4, gapF: 2.4, dead3: 5.0, ch: { l: 12.14, w: 2.36, side: 1.5, end: 2.1, endGap: 4.2, gap: 3.0 },
-    why: 'layout (b), small lot (13 Nov 2026, as the 1360 Frances St reference board, EH-FREEZE-2026-11-11j addition): staff vestibule 2.2 m wide (portal 1.8 m, arch_acc_gcpsg015RZ; rest drawing choice); stair S2 exit passage 1.45 m and the other exit passages 1.4 m (1.1 m clear inside 0.15 m walls, VBBL 3.3.1.9; the board 1.4–2.0 m); staff office 3.0 m deep behind the public corridor; lobby at least 2.4 m wide (the room-width table: dock or lobby 2.4 m; the board draws 2.4 m), at least 20 m²; washroom and service strip 2.6 m deep (the universal WC 1.7 × 3.2 m clear and the shower 1.5 × 1.8 m clear fit it), along the rear, then the far side (stopping 2.4 m short of the refuge’s exit passage, so the refuge reaches it at full counted width), then the near side; a run’s leftover under 2.4 m joins its last room; dock at least 2.4 m behind the vestibule where there are no loading spaces; chillers 12.14 × 2.36 m (vertivAFC), side by side 3.0 m apart (as the board), clear zones 1.5 m sides, 2.1 m ends, 4.2 m between ends (Vertiv SL-70790 4.2.4, our reading); all other sizes drawing choices' },
+    why: 'layout (b), small lot (13 Nov 2026, as the 1360 Frances St reference board, EH-FREEZE-2026-11-11j addition): staff vestibule 2.2 m wide (portal 1.8 m, arch_acc_gcpsg015RZ; rest drawing choice); stair S2 exit passage 1.45 m and the other exit passages 1.4 m (1.1 m clear inside 0.15 m walls, VBBL 3.3.1.9; the board 1.4–2.0 m); staff office 3.0 m deep behind the public corridor; lobby at least 2.4 m wide (the room-width table: dock or lobby 2.4 m; the board draws 2.4 m), at least 20 m²; washroom and service strip 2.6 m deep (the universal WC 1.7 × 3.2 m clear and the shower 1.5 × 1.8 m clear fit it), along the rear, then the far side (stopping 2.4 m short of the refuge’s exit passage, so the refuge reaches it at full counted width), then the near side; a run’s remaining under 2.4 m joins its last room; dock at least 2.4 m behind the vestibule where there are no loading spaces; chillers 12.14 × 2.36 m (vertivAFC), side by side 3.0 m apart (as the board), clear zones 1.5 m sides, 2.1 m ends, 4.2 m between ends (Vertiv SL-70790 4.2.4, our reading); all other sizes drawing choices' },
   lineOn: true,    
   narrow: { wMax: 20, dS: 3.0, dO: 3.5, dA: 5.2, pl: 1.5, why: 'narrow lots (F2b, 10 Nov 2026, as the 1330 Glen Dr and 8238 Fraser St hand fits): where the stacked rows do not fit across a lot under 20 m wide, the hub bands run back from the street: refuge and shelter strip | public corridor | 3.0 m service strip, the lobby across the corridor and service strip at the street; overflow rooms in a 3.5 m pocket of the refuge strip on the corridor; the data-centre entrance row and the bays at the rear (with a side drive: a 5.2 m row only as wide as the bays, stair S2 and lift E2 turned across, the dock and vestibule behind them, the plant yard behind the refuge, as the 1330 hand fit; with no drive: across the lot, stair S2 along the exit passage); the hall only over the hub, the rear two storeys with chillers on their roof (all drawing choices); the refuge held at the spec size, the rest of its strip open ground, not built (project decision, 10 Nov)' },
   base: { why: 'base surface: the corner grades joined by triangles; both triangulations computed (fans from neighbouring corners: on a four-corner lot the two diagonals) and the lower surface used under the building (Z&D s. 2 joins the corner grades; project decision, 8 Nov, our reading)' },
@@ -233,6 +234,7 @@ function siteOf(P) { const s = P.s, M = s.M, F = M.F, L = (X, Y) => F.toL(X, Y).
 }
 
  
+const HARD_STOP = { stop: 'time limit' }, hardCheck = () => { if (RULES.hardDeadline && Date.now() > RULES.hardDeadline) throw HARD_STOP; };
 function layout(S0) {
   const S = S0, city = S.city, van = city === 'van', zone = S.zone || '', flags = [], notes = [];
   const I2 = /^I-2/.test(zone), I3 = /^I-3/.test(zone), stackedZone = van && (I2 || I3);
@@ -259,7 +261,7 @@ function layout(S0) {
   const dir = S.dir, uf = S.uf, uOf = a => uf - dir * a;
    
   const vMin = Math.min(...vs), vMax = Math.max(...vs);
-  function span(a) { const u = uOf(a); let best = null, cur = null;
+  function span(a) { hardCheck(); const u = uOf(a); let best = null, cur = null;
     for (let v = vMin; v <= vMax + 1e-9; v += 0.05) { const ok = inBld(u, v) && !inDrive(u, v); if (ok) { if (!cur) cur = [v, v]; cur[1] = v; } else if (cur) { if (!best || cur[1] - cur[0] > best[1] - best[0]) best = cur; cur = null; } }
     if (cur && (!best || cur[1] - cur[0] > best[1] - best[0])) best = cur; return best; }
   let a0 = 0; { const ref = span(3); for (let a = 0; a < 3; a += 0.05) { const sp = span(a); if (sp && ref && sp[1] - sp[0] >= ref[1] - ref[0] - 0.06) { a0 = r2(a); break; } } }
@@ -418,7 +420,7 @@ function layout(S0) {
     out.wing = { depth: wd, typology: S.wingTyp.id };
     if (S.wingTyp && out.rooms) { const w1 = (out.rooms[1] || []).find(x => x.id === 'wcw'), m1 = (out.rooms[1] || []).find(x => x.id === 'wcm'), wl = wingOf(S.wingTyp, out.ladder ? { drop: [] } : {}, S.city === 'van');
       flags.push(`Washrooms by occupant load ( item 7): ${w1 ? `${w1.n} and ${m1 ? m1.n : 'WC men'} (VBBL Table 3.7.2.2.-A)` : 'none drawn'} beside the universal WC; load counted from ${Object.entries(wl.rate).map(([k, v]) => `${k.replace(/_/g, ' ')} at ${v} m² a person`).join(', ') || 'no room'}${wl.noRate.length ? `; not counted, no m² a person in the definition: ${wl.noRate.map(k => k.replace(/_/g, ' ')).join(', ')} (?)` : ''}`); }
-    flags.push(`Wing ( item 6; eh/AWING_RULES_2026-11-14.md): ${S.wingTyp.name} in a one-storey wing ${wd} m deep on the street, open to the sky (${W1.map(x => `${x.n.split(' (')[0].toLowerCase()} ${Math.round(sum(x.r.map(ra)))} m²`).join(', ')}${lob ? ', the shared lobby' : ''}); storeys 2 and 3 stop at the wing line; the wing's depth follows its program (Code's proposed rule, project decision to confirm); no hub set, no clinic`); }
+    flags.push(`Wing ( item 6; ): ${S.wingTyp.name} in a one-storey wing ${wd} m deep on the street, open to the sky (${W1.map(x => `${x.n.split(' (')[0].toLowerCase()} ${Math.round(sum(x.r.map(ra)))} m²`).join(', ')}${lob ? ', the shared lobby' : ''}); storeys 2 and 3 stop at the wing line; the wing's depth follows its program (Code's proposed rule, project decision to confirm); no hub set, no clinic`); }
   if (out && out.learner) flags.push(`Smaller program: the learner pool (${learnerOf(S.typDef).name}), because the 25 m pool hall does not fit the width (${out.learner.why}); kept only at 0.3 MW or more ( item 3)`);
    
   if (out && !van && out.rooms && !out.shared && out.grade !== false) { const gr = Math.round(grossOf(out.rooms, () => true)), need = gr < 2500 ? 0 : gr <= 7500 ? 1 : 2, single = Object.keys(out.rooms).length === 1;
@@ -937,7 +939,7 @@ function bigRoomStacked(C) {
     R1.push(rid(1, big.id, big, 'proom', 'pub', [[0, aP, 0, hW]], { big: true, wet: true }));
     R1.push(rid(1, 'lob', RD(F.lobby.id), 'lobby', 'circ', [[0, lobD, bW0, bC1], [0, SW, bC1, r2(W - SL)]]));
     let a = lobD; wet.forEach((o, i) => { const w = i === wet.length - 1 && r2(aP - a - wetW[i]) < LEFTOVER ? r2(aP - a) : wetW[i]; R1.push(rid(1, o.id, o.x, 'proom', 'pub', [[r2(a), r2(a + w), bW0, bW1]], { wet: !!o.x.wet })); a = r2(a + w); });
-    if (aP - a > 0.01) R1.push(room(1, 'fspw', 'Unassigned program floor (no use yet; the band’s leftover length)', 'spare', 'spare', [[a, aP, bW0, bW1]], { block: 'pool' }));
+    if (aP - a > 0.01) R1.push(room(1, 'fspw', 'Unassigned program floor (no use yet; the band’s remaining length)', 'spare', 'spare', [[a, aP, bW0, bW1]], { block: 'pool' }));
     R1.push(room(1, 'cor', 'Public corridor', 'circ', 'pcor', [[lobD, r2(aE - 2.6), bW1, bC1]], { block: 'pool', corridor: true }));
     R1.push(room(1, 's1', 'Stair S1 (data centre)', 'sup', 'score', [S1r], { block: 'data centre', core: true, stair: true }));
     a = SW; const stripEnd = r2(aE - 2.6);
@@ -949,7 +951,7 @@ function bigRoomStacked(C) {
         R1.push(room(1, o.id, `Stair ${o.id.toUpperCase()} (program)`, 'circ', 'pcore', [[r[0], r[1], r[2], r2(W - cw)]], { block: 'pool', core: true, stair: true }));
         R1.push(room(1, o.id + 'v', `Stair ${o.id.toUpperCase()}'s exit vestibule to the side (2 h)`, 'circ', 'exitpas', [[r[0], r[1], r2(W - cw), r[3]]], { block: 'pool', vest: o.id })); }
       else if (o.core === 'lift') R1.push(room(1, 'e1', 'Lift E1 (public)', 'circ', 'pcore', [r], { block: 'pool', core: true, lift: true }));
-      else if (o.spare) R1.push(room(1, 'fsps', 'Unassigned program floor (no use yet; the band’s leftover length)', 'spare', 'spare', [r], { block: 'pool' }));
+      else if (o.spare) R1.push(room(1, 'fsps', 'Unassigned program floor (no use yet; the band’s remaining length)', 'spare', 'spare', [r], { block: 'pool' }));
       else R1.push(rid(1, o.id, o.x, 'proom', 'pub', [r])); a = r2(a + sw[i]); });
     R1.push(room(1, 'pasf', 'Exit passage from the public corridor to the side', 'circ', 'exitpas', [[stripEnd, aE, bW1, W]], { block: 'pool' }));
      
@@ -1162,7 +1164,7 @@ function bigRoomBeside(C, Wset, tries) {
   const wet = F.wetBand.rooms.filter(hasP).map(id => ({ id, x: RD(id) })), wetW = wet.map(o => Math.max(o.x.minW || 0, up1(m2Of(o.x) / wB)));
   if (sum(wetW) > hL + 1e-6) return { fail: `the wet band behind the ${big.name.toLowerCase()} needs ${r2(sum(wetW))} m along it; ${hL} m` };
   b = bH0; wet.forEach((o, i) => { const w = i === wet.length - 1 && r2(bH1 - b - wetW[i]) < LEFTOVER ? r2(bH1 - b) : wetW[i]; R.push(rid(o.id, o.x, 'proom', 'pub', [[hW, aW1, r2(b), r2(b + w)]], { wet: true })); b = r2(b + w); });
-  if (bH1 - b > 0.01) R.push(room(1, 'fspw', 'Unassigned program floor (no use yet; the band’s leftover length)', 'spare', 'spare', [[hW, aW1, b, bH1]], { block: 'pool' }));
+  if (bH1 - b > 0.01) R.push(room(1, 'fspw', 'Unassigned program floor (no use yet; the band’s remaining length)', 'spare', 'spare', [[hW, aW1, b, bH1]], { block: 'pool' }));
    
   R.push(room(1, 'cor', 'Public corridor', 'circ', 'pcor', [[aW1, aC1, 0, bH1]], { block: 'pool', corridor: true }));
    
@@ -1175,7 +1177,7 @@ function bigRoomBeside(C, Wset, tries) {
   if (sum(ws) > Wst + 1e-6) return { fail: `the program's strip needs ${r2(sum(ws))} m across at ${dSt} m deep; ${Wst} m` };
   const aB = r2(aC1 + dSt), left = r2(Wst - sum(ws)); b = 0;
   stripX.forEach((x, i) => { const w = i === stripX.length - 1 && left < LEFTOVER ? r2(ws[i] + left) : ws[i]; R.push(rid(x.id, x, 'proom', x.block === 'gym' ? 'gym' : (x.wet ? 'plant' : 'pub'), [[aC1, aB, r2(b), r2(b + w)]], { wet: !!x.wet })); b = r2(b + w); });
-  if (left >= LEFTOVER) R.push(room(1, 'fsps', 'Unassigned program floor (no use yet; the band’s leftover length)', 'spare', 'spare', [[aC1, aB, b, Wst]], { block: 'pool' }));
+  if (left >= LEFTOVER) R.push(room(1, 'fsps', 'Unassigned program floor (no use yet; the band’s remaining length)', 'spare', 'spare', [[aC1, aB, b, Wst]], { block: 'pool' }));
   if (W - Wst > 0.5) R.push(room(1, 'fsp2', 'Unassigned program floor (no use yet)', 'spare', 'spare', [[0, aB, Wst, W]], { block: 'pool' }));
   else if (Wst > Wst0 + 0.5) R.push(room(1, 'fsp2', 'Unassigned program floor (no use yet)', 'spare', 'spare', [[0, aC1, Wst0, W]], { block: 'pool' }));
   if (GS) C.noRoof = R.filter(x => x.id === GS.gh.id).flatMap(x => x.r);    
@@ -1354,7 +1356,7 @@ function closeSpare(L, def, van, fillId) { if (!L.rooms || L._closeSpare) return
   if (RULES.fillOff) { const nb = []; for (const st of Object.keys(L.rooms).map(Number)) { const R = L.rooms[st];
       for (const x of R.filter(y => y.kind === 'spare' && !y.dcSide && y.block !== 'data centre' && (y.block !== 'spare' || (L.kind === 'stacked' && L.aB != null && y.id !== 'sparehub' && y.r.every(r => r[1] <= L.aB + 0.01))))) {
         R.splice(R.indexOf(x), 1); x.r.forEach(r => { if (ra(r) >= 0.5) nb.push({ st, m2: r2(ra(r)), r: r.map(r2), open: st === 1 && !Object.keys(L.rooms).some(k => +k > st && L.rooms[k].some(y => y.r.some(q => Math.min(r[1], q[1]) - Math.max(r[0], q[0]) > 0.05 && Math.min(r[3], q[3]) - Math.max(r[2], q[2]) > 0.05))) }); }); } }
-    L.unbuilt = nb; (L.flags || (L.flags = [])).push(`TEST ( item 1(a)): the leftover program floor is not built: ${Math.round(sum(nb.map(o => o.m2)))} m² (${Math.round(sum(nb.filter(o => o.open).map(o => o.m2)))} m² at grade with nothing above becomes open court)`); return; }
+    L.unbuilt = nb; (L.flags || (L.flags = [])).push(`TEST ( item 1(a)): the remaining program floor is not built: ${Math.round(sum(nb.map(o => o.m2)))} m² (${Math.round(sum(nb.filter(o => o.open).map(o => o.m2)))} m² at grade with nothing above becomes open court)`); return; }
   const mn = FR.minArea || 0, mx = FR.maxM2 || 1e9; let k = 0, made = 0, a = 0, joined = 0, dry = 0, wetUnder = 0;
    
   const all = () => Object.values(L.rooms).flat(), areaOf_ = id => sum(all().filter(y => (y.prog || y.id) === id || y.id === id).map(y => sum(y.r.map(ra))));
@@ -1389,7 +1391,7 @@ function closeSpare(L, def, van, fillId) { if (!L.rooms || L._closeSpare) return
   if (over.length) { over.forEach(([st, rr]) => L.rooms[st].push(room(st, `fspr_r${st}_${Math.round(rr[0] * 10)}_${Math.round(rr[2] * 10)}`, FR.maxRatio ? `Unassigned program floor (the ${String(FR.estOf).replace(/_/g, ' ')} is at its ratio)` : 'Unassigned program floor (the establishment is at its cap)', 'spare', 'spare', [rr], { block: 'spare', ratioStop: true })));
     (L.flags || (L.flags = [])).push(FR.maxRatio ? `Fill stopped at the ratio ( item 1(b)): the ${String(FR.estOf).replace(/_/g, ' ')} at most ${Math.round(FR.maxRatio.v * 100)} % of the ${String(FR.maxRatio.of).replace(/_/g, ' ')} (${FR.maxRatio.src || 'the definition'}); no next item or general room in the list, so ${Math.round(sum(over.map(o => ra(o[1]))))} m² is left unassigned (?)`
       : `Fill stopped at the cap ( item 2): ${capStop ? capStop.name : 'the establishment'} gets fill only up to its ${capStop ? capStop.cap : 500} m² Edmonton cap; no uncapped item takes the rest, so ${Math.round(sum(over.map(o => ra(o[1]))))} m² under storeys is left unassigned (?)`); }
-  if (L.unbuilt && L.unbuilt.length) (L.flags || (L.flags = [])).push(`Footprint to the program ( item 2, project decision, 15 Nov 21:54): ${Math.round(sum(L.unbuilt.map(o => o.m2)))} m² of leftover floor at grade with nothing above is not built; it stays open ground`);
+  if (L.unbuilt && L.unbuilt.length) (L.flags || (L.flags = [])).push(`Footprint to the program ( item 2, project decision, 15 Nov 21:54): ${Math.round(sum(L.unbuilt.map(o => o.m2)))} m² of remaining floor at grade with nothing above is not built; it stays open ground`);
   if (made || joined) (L.flags || (L.flags = [])).push(`Spare floor closed (project decision, 15 Nov 14:59; repeat rule 15f items 5-6): ${made} ${FR.name.split(' (')[0].toLowerCase()} room(s), ${Math.round(a)} m² (at up to ${FR.maxM2 || '?'} m² each, the last taking the remainder)${joined ? `; ${Math.round(joined)} m² under ${mn} m² joined the room beside it` : ''}${dry ? `; ${dry} under the hall as ${String(FR.dryAlt).replace(/_/g, ' ')} (rule 8)` : ''}${wetUnder ? `; ${wetUnder} wet piece(s) under the hall with no dry alternative in the list (?)` : ''}; nothing left unassigned`);
    
   if (L.kind === 'bigroom' && def && def.family) { L.Dbig = (L.grade ? bigRoomDoorsC : bigRoomDoors)(L, def.constraints || []);
@@ -1508,7 +1510,7 @@ function bigRoomBesideDeep(C, Wset, tries) {
   const wet = F.wetBand.rooms.filter(hasP).map(id => ({ id, x: RD(id) })), wetW = wet.map(o => wOf(o.x, wB));
   if (sum(wetW) > aP - lobD + 1e-6) return { fail: `the wet band beside the ${big.name.toLowerCase()} needs ${r2(sum(wetW))} m along it; ${r2(aP - lobD)} m` };
   let a = lobD; wet.forEach((o, i) => { const w = i === wet.length - 1 && r2(aP - a - wetW[i]) < LEFTOVER ? r2(aP - a) : wetW[i]; R.push(rid(o.id, o.x, 'proom', 'pub', [[r2(a), r2(a + w), bW0, bW1]], { wet: !!o.x.wet })); a = r2(a + w); });
-  if (aP - a > 0.01) R.push(room(1, 'fspw', 'Unassigned program floor (no use yet; the band’s leftover length)', 'spare', 'spare', [[a, aP, bW0, bW1]], { block: 'pool' }));
+  if (aP - a > 0.01) R.push(room(1, 'fspw', 'Unassigned program floor (no use yet; the band’s remaining length)', 'spare', 'spare', [[a, aP, bW0, bW1]], { block: 'pool' }));
   R.push(room(1, 'cor', 'Public corridor', 'circ', 'pcor', [[lobD, aP, bW1, bC1]], { block: 'pool', corridor: true }));
    
   const GS = greenSide(C, def, hasP, RD), gIds = GS ? GS.ids : [];
@@ -1517,7 +1519,7 @@ function bigRoomBesideDeep(C, Wset, tries) {
   if (strip) { const sB = r2(W - bC1), it = [], ws = []; let used = 0;
     for (const x of rear.slice()) { const w = wOf(x, sB); if (used + w > aP + 1e-6) break; it.push(x); ws.push(w); used = r2(used + w); rear.shift(); }
     a = 0; it.forEach((x, i) => { const w = i === it.length - 1 && r2(aP - a - ws[i]) < LEFTOVER ? r2(aP - a) : ws[i]; R.push(rid(x.id, x, 'proom', 'pub', [[r2(a), r2(a + w), bC1, W]])); a = r2(a + w); });
-    if (it.length && aP - a > 0.01) R.push(room(1, 'fsps', 'Unassigned program floor (no use yet; the band’s leftover length)', 'spare', 'spare', [[a, aP, bC1, W]], { block: 'pool' }));
+    if (it.length && aP - a > 0.01) R.push(room(1, 'fsps', 'Unassigned program floor (no use yet; the band’s remaining length)', 'spare', 'spare', [[a, aP, bC1, W]], { block: 'pool' }));
     if (!it.length) R.push(room(1, 'fsp1', 'Unassigned program floor (no use yet)', 'spare', 'spare', [[0, aP, bC1, W]], { block: 'pool' })); }
    
    
@@ -1530,7 +1532,7 @@ function bigRoomBesideDeep(C, Wset, tries) {
   items.forEach((x, i) => { const w = i === items.length - 1 && left < LEFTOVER ? r2(ws[i] + left) : ws[i]; R.push(rid(x.id, x, 'proom', x.block === 'gym' ? 'gym' : (x.wet ? 'plant' : 'pub'), [[i === 0 && pFirst ? aP : a0, aB, r2(b), r2(b + w)]], { wet: !!x.wet })); b = r2(b + w); });
   R.push(room(1, 'xcor', 'Public corridor (across, behind the big room)', 'circ', 'pcor', [[aP, r2(aP + cw), pFirst ? r2(ws[0]) : 0, W]], { block: 'pool', corridor: true }));
   if (GS) C.noRoof = [];    
-  if (left >= LEFTOVER) R.push(room(1, 'fspr', 'Unassigned program floor (no use yet; the band’s leftover length)', 'spare', 'spare', [[a0, aB, b, W]], { block: 'pool' }));
+  if (left >= LEFTOVER) R.push(room(1, 'fspr', 'Unassigned program floor (no use yet; the band’s remaining length)', 'spare', 'spare', [[a0, aB, b, W]], { block: 'pool' }));
   const progArea = sum(R.map(x => sum(x.r.map(ra))));
   if (GS) C.noRoof = R.filter(x => x.id === GS.gh.id).flatMap(x => x.r);
   const D = besideDC(C, W, R, aB, progArea);
@@ -2201,7 +2203,7 @@ function plantLayout(C, W, Da, MW, rooms, landings) {
   const need = { gen: [old.nG, gz.footprint], pad: [old.nT, tz.pad], hub: enc ? enc.slice() : null, chill: Math.max(0, old.nC - roofCh.length) };
   const city = C.S.city === 'edm' ? 'e' : 'v';
    
-  const okBox = r => { for (let a = r[0]; a <= r[1] + 1e-9; a += Math.max(0.5, (r[1] - r[0]) / 6)) for (let b = r[2]; b <= r[3] + 1e-9; b += Math.max(0.5, (r[3] - r[2]) / 6)) { const [u, v] = C.mapUV(Math.min(a, r[1]), Math.min(b, r[3])); if (!C.inYard(u, v)) return false; } return true; };
+  const okBox = r => { hardCheck(); for (let a = r[0]; a <= r[1] + 1e-9; a += Math.max(0.5, (r[1] - r[0]) / 6)) for (let b = r[2]; b <= r[3] + 1e-9; b += Math.max(0.5, (r[3] - r[2]) / 6)) { const [u, v] = C.mapUV(Math.min(a, r[1]), Math.min(b, r[3])); if (!C.inYard(u, v)) return false; } return true; };
   const wayOk = RULES.plantWay ? plantWayTest(C, lot, building, toAB, Da, aP, W) : null;
   let best = null; for (const order of [['gen', 'pad', 'hub', 'chill'], ['pad', 'gen', 'hub', 'chill'], ['chill', 'gen', 'pad', 'hub'], ['gen', 'chill', 'pad', 'hub']]) {
     const r = P.place([yard], lot, building, need, { order, city, keep: landings || [], okBox, wayOk }); if (!r.why) { best = r; break; } if (!best) best = r; }
@@ -2215,8 +2217,8 @@ function plantLayout(C, W, Da, MW, rooms, landings) {
     return { id: pre[it.kind] + k, n: nm[it.kind](k), kind: it.kind === 'chill' ? 'chiller' : it.kind === 'hub' ? 'gen' : it.kind, hub: it.kind === 'hub' || undefined, r: it.r.map(r2), z: (it.zone || it.r).map(r2), keep: (it.zone || it.r).map(r2) }; });
   roofCh.forEach(i => { cnt.chill = (cnt.chill || 0) + 1; items.push(Object.assign({}, i, { id: 'c' + cnt.chill })); });
   const why = best.why ? `${best.why} does not fit in the yard` : null;
-  return Object.assign({}, old, { ok: !best.why, why, whyAll: why, items, hubSetOut, packer: roofCh.length ? 'shared (tool/plantfit.js) in the yard; chillers on the lower roof by the older packer (spec rule 1)' : 'shared (tool/plantfit.js, eh/plantfit.py 11k + addition 1)',
-    rules: old.rules.concat(['placed by the hub’s shared packer (eh/plantfit.py at 11k + addition 1): every clearance packed to D1 (0.5 m), tank and pad distances to the building only, Edmonton set test noise 3.13 m (data centre) and 1.25 m (hub set) from lot lines']) });
+  return Object.assign({}, old, { ok: !best.why, why, whyAll: why, items, hubSetOut, packer: roofCh.length ? 'shared (tool/plantfit.js) in the yard; chillers on the lower roof by the older packer (spec rule 1)' : 'shared (tool/plantfit.js,  11k + addition 1)',
+    rules: old.rules.concat(['placed by the hub’s shared packer ( at 11k + addition 1): every clearance packed to D1 (0.5 m), tank and pad distances to the building only, Edmonton set test noise 3.13 m (data centre) and 1.25 m (hub set) from lot lines']) });
 }
  
 function plantWayTest(C, lot, building, toAB, Da, aP, W) { const S = C.S, g = 0.5, H = 6;
@@ -2279,13 +2281,13 @@ function plantLayoutOld(C, W, Da, MW, rooms) {
   const span = r2(Math.max(40, C.aMax + 60));
   const tryPlace = (it0, aFix) => { for (const rot of (it0.rot ? [false, true] : [false])) { const it = rot ? Object.assign({}, it0, { L: it0.Wd, Wd: it0.L, zone: it0.zoneR }) : it0;
     const aS0 = roof ? roof[0] : aFix != null ? aFix : side ? 0 : aP, aS1 = roof ? roof[1] : aFix != null ? aFix : Da + span;
-    for (let a = aS0; a <= aS1; a = r2(a + 0.5)) for (let b = roof ? roof[2] : -10; b <= (roof ? roof[3] : Wscan + 10); b = r2(b + 0.5)) {
+    for (let a = aS0; a <= aS1; a = r2(a + 0.5)) { hardCheck(); for (let b = roof ? roof[2] : -10; b <= (roof ? roof[3] : Wscan + 10); b = r2(b + 0.5)) {
       const r = [a, r2(a + it.L), b, r2(b + it.Wd)], z = it.zone ? it.zone(r) : r;
       if (items.some(o => !!o.roof === !!roof && (hit(z, o.keep) || hit(o.z, it.keepFor ? it.keepFor(r) : grow(r, 0)) || hit(grow(r, it.gap || 0), o.r)))) continue;    
       if (!okRect(r) || (it.zone && !okRect(z)) || (it.clear && !okRect(grow(r, it.clear)))) continue;    
       if (it.lot != null && lotDist(r) < it.lot - 1e-6) continue;
       return { r, z, rot };
-    } }
+    } } }
     return null; };
    
   for (let i = 0; i < nT; i++) { const p = tryPlace({ L: T.l, Wd: T.w, gap: 1.0 }, side ? null : aP); if (!p) { why.push(`transformer pad ${i + 1} of ${nT}`); break; }
@@ -2506,7 +2508,7 @@ function wetSideSwap(res, S) { if (RULES.planMode !== 'zones' || !res || !res.ro
     const ix = x.id, iy = y.id, TMP = '__swap__'; ['D', 'Dbig'].forEach(k => { if (res[k]) res[k].forEach(d => { if (+d[0] !== 1) return; for (const j of [1, 2]) { if (d[j] === ix) d[j] = TMP; } for (const j of [1, 2]) { if (d[j] === iy) d[j] = ix; } for (const j of [1, 2]) { if (d[j] === TMP) d[j] = iy; } }); });
     KEYS.forEach(k => { if (ty[k] === undefined) delete x[k]; else x[k] = ty[k]; if (tx[k] === undefined) delete y[k]; else y[k] = tx[k]; });
     done.push(ix + ' swapped with ' + iy + ' (now on the wet side)'); }
-  if (done.length) (res.flags || (res.flags = [])).push('Wet side (DECISIONS 20a): ' + done.join('; ')); }
+  if (done.length) (res.flags || (res.flags = [])).push('Wet side (project decision, 20a): ' + done.join('; ')); }
 function compactFill(res, S, frozen) { if (!RULES.compactFill || !res || !res.rooms || !res.rooms[1] || !S || !res.toUV) return;
   const R = res.rooms, sts = Object.keys(R).map(Number).sort((a, b) => a - b), T = res.toUV, FG = RULES.extFace || 0, edges = (S.edges || []).filter(e => (e.d || 0) > 0);
   const lotR = q => { const a = T(q[0], q[2]), c = T(q[1], q[3]); return [Math.min(a[0], c[0]), Math.max(a[0], c[0]), Math.min(a[1], c[1]), Math.max(a[1], c[1])]; };
@@ -2575,7 +2577,7 @@ function compactFill(res, S, frozen) { if (!RULES.compactFill || !res || !res.ro
        
       const zl = (RULES.planMode === 'zones' || RULES.compactAlways) && !pubs[0] && !dcs[0], pubTouch = zl && R[st].some(y => !isDC(y) && !y.stair && !y.lift && y.kind !== 'shaft' && (y.g === 'pub' || y.g === 'clin' || isPubCirc(y)) && wallAny(g, y.r));
       const pick = pubs[0] || dcs[0] || (zl ? { x: { id: null, block: null }, w: null } : null), pub = !!pubs[0] || pubTouch, id = (pub ? 'flex' : pick ? 'dcst' : 'ulf') + st + '_' + n;
-      const x = room(st, id, pub ? 'Flexible community space (leftover floor; project decision, 20 Nov project decision)' : pick ? 'Data-centre storage (leftover floor on the data-centre side; project decision, 20 Nov project decision)' : 'Unassigned floor (no door to circulation possible)', pub ? 'pub' : pick ? 'sup' : 'spare', pub ? 'proom' : pick ? 'sroom' : 'spare', g, pub ? { block: pick.x.block || null, compact: true } : pick ? { block: 'data centre', compact: true } : { compact: true, voidFill: true });
+      const x = room(st, id, pub ? 'Flexible community space (remaining floor; project decision, 20 Nov project decision)' : pick ? 'Data-centre storage (remaining floor on the data-centre side; project decision, 20 Nov project decision)' : 'Unassigned floor (no door to circulation possible)', pub ? 'pub' : pick ? 'sup' : 'spare', pub ? 'proom' : pick ? 'sroom' : 'spare', g, pub ? { block: pick.x.block || null, compact: true } : pick ? { block: 'data centre', compact: true } : { compact: true, voidFill: true });
       R[st].push(x); tot[pub ? 'pub' : pick ? 'dc' : 'left'] += a; made.push('storey ' + st + ' ' + (pub ? 'flex' : pick ? 'DC storage' : 'unassigned') + ' ' + r2(a) + ' m²');
       if (pick && pick.w) { const w = pick.w, c = r2((w.f + w.t) / 2), d = w.o === 'v' ? [st, id, pick.x.id, r2(w.at), c, 'v', RULES.door.w] : [st, id, pick.x.id, c, r2(w.at), 'h', RULES.door.w]; DD.push(d); } } }
   if (DD.length) { if (res.D) res.D = res.D.concat(DD); if (res.Dbig) res.Dbig = res.Dbig.concat(DD); }
@@ -3295,7 +3297,16 @@ function v2Checks(L, S) {
 }
 
  
-function build(P) { if (!P || !P.s || !P.s.M || !P.s.M.F) return null; const S = siteOf(P); const FB = root && root.BD && (root.BD.hubEngineOnly || S.typDef || S.wingTyp) ? null : frozenBoard(S); if (FB) return FB;
+function build(P) { if (!P || !P.s || !P.s.M || !P.s.M.F) return null;
+   
+  if ((P.boxes || []).some(b => b.id === 'refuge' && b.asIfRezoned)) return { hub: { doesntFit: true, asIfRezoned: true, why: 'Edmonton: the refuge is shown as if rezoned; the hub layout comes from the library' } };
+   
+  if (typeof document !== 'undefined' && RULES.deadline == null) { RULES.deadline = Date.now() + 6000; RULES.hardDeadline = Date.now() + RULES.hardMs;
+    try { return build0(P); } catch (e) { if (e !== HARD_STOP) throw e; const why = `the layout search passed its ${RULES.hardMs / 1000} s time limit in the browser before a plan was found; no plan here is not a finding that it does not fit (the library layouts for this lot are not affected)`;
+      return { hub: { doesntFit: { limiting: [why], timeout: true }, flags: ['Timeout: ' + why], variant: { main: 'stacked', flags: [], notBuilt: [] }, site: {}, timedOut: true } }; }
+    finally { RULES.deadline = null; RULES.hardDeadline = null; } }
+  return build0(P); }
+function build0(P) { const S = siteOf(P); const FB = root && root.BD && (root.BD.hubEngineOnly || S.typDef || S.wingTyp) ? null : frozenBoard(S); if (FB) return FB;
   const PL = fromSite(S), H = PL && PL.hub; if (RULES.transplant && H && !S.typDef && !S.wingTyp) { const sideBand = (H.flags || []).some(f => /^Storey 2 side band/.test(f)), need = H.estimate || variantNeed(S, H.rooms ? H : null) || (!H.rooms || sideBand ? { keys: [S.city === 'edm' ? 'growyard' : 'line'] } : null);     if (need) { const T = transplant(S, need.keys); if (T) return T; } } return PL; }    
  
 const FROZ = {}, BOARDFILE = { frozen: 'hub_frozen', clipped: 'hub_clip', engine: 'hub_laid' }, BOARDHAS = { clipped: ['van'], engine: ['van'] };    
@@ -3484,7 +3495,9 @@ function frozenBoard(S, B0, reg0) { applyPlanMode();
     if (REG.rms > 1) L.flags.push(`The board draws this lot as a simplified outline (no exact lot outline on the board); placed on the tool’s lot by best fit, about ${Math.round(REG.rms)} m off on average (?)`);
     return toPlan(L, S);
   } catch (e) { if (typeof console !== 'undefined') console.warn('frozen board', e); return null; } }
-function withV2(L, S) { try { L.v2 = v2Checks(L, S); if (L.v2 && L.v2.rows) L.v2.rows = publicRows(L.v2.rows); } catch (e) { L.v2 = { error: String(e && e.message || e) }; } return L; }    
+function withV2(L, S) {  
+  if (RULES.deadline && Date.now() > RULES.deadline) { L.v2 = { skipped: true, why: 'The detailed checks of this layout take too long to run in the browser; they are not shown here.' }; return L; }
+  try { L.v2 = v2Checks(L, S); if (L.v2 && L.v2.rows) L.v2.rows = publicRows(L.v2.rows); } catch (e) { L.v2 = { error: String(e && e.message || e) }; } return L; }    
  
  
 function hardFails(X) { return (X.apart || []).filter(a => a.status === 'fail').concat((X.travel || []).filter(t => t.status === 'fail').map(t => ({ zone: t.zone, apart_m: t.worst, need_m: t.limit || 45, travel: true })),
@@ -3492,7 +3505,9 @@ function hardFails(X) { return (X.apart || []).filter(a => a.status === 'fail').
   (X.far && X.far.status === 'fail' ? [{ zone: `FAR ${X.far.zone}`, apart_m: X.far.far, need_m: X.far.permitted, far: true }] : []),
   (RULES.stairsHard ? X.stairs || [] : []).filter(r => r.status === 'fail').map(r => ({ zone: `${r.stair === '-' ? '' : 'stair ' + String(r.stair).toUpperCase() + ': '}${r.row}`, apart_m: r.why, need_m: null, stairRow: true })),
   (RULES.dischargeHard ? X.discharge || [] : []).filter(d => d.status === 'fail').map(d => ({ zone: `stairs ${String(d.a).toUpperCase()} and ${String(d.b).toUpperCase()}`, apart_m: d.d, need_m: d.need, discharge: true }))); }    
-const hardWhy = f => f.stairRow ? `${f.zone} (${f.apart_m}; ${/\[check /.test(f.zone) ? 'l item 3' : /inside the yards/.test(f.zone) ? 'j (yards)' : /gate|Loading|Truck/.test(f.zone) ? "e" : "d"})` : f.far ? `${f.zone} ${f.apart_m} over the ${f.need_m} permitted` : f.discharge ? `${f.zone} discharge ${f.apart_m} m apart, ${f.need_m} m needed (11k addition 6)` : f.travel ? `${f.zone} travel ${f.apart_m} m to an exit, ${f.need_m || 45} m allowed${f.need_m === 40 ? ' (business and personal services, NBC(AE) 3.4.2.5.(1)(b))' : ''}` : f.egress ? `${f.zone}: its two egress doors are ${f.apart_m} m apart, ${f.need_m} m needed (VBBL 3.3.1.5)` : `the ${f.zone} exits are ${f.apart_m} m apart, ${f.need_m} m needed`;
+ 
+const mOr = v => v == null || v === '' || !isFinite(+v) ? 'not measured' : `${v} m`;
+const hardWhy = f => f.stairRow ? `${f.zone} (${f.apart_m}; ${/\[check /.test(f.zone) ? 'l item 3' : /inside the yards/.test(f.zone) ? 'j (yards)' : /gate|Loading|Truck/.test(f.zone) ? "e" : "d"})` : f.far ? `${f.zone} ${f.apart_m} over the ${f.need_m} permitted` : f.discharge ? `${f.zone} discharge ${mOr(f.apart_m)} apart, ${mOr(f.need_m)} needed (11k addition 6)` : f.travel ? `${f.zone} travel ${mOr(f.apart_m)} to an exit, ${f.need_m || 45} m allowed${f.need_m === 40 ? ' (business and personal services, NBC(AE) 3.4.2.5.(1)(b))' : ''}` : f.egress ? `${f.zone}: its two egress doors are ${mOr(f.apart_m)} apart, ${mOr(f.need_m)} needed (VBBL 3.3.1.5)` : `the ${f.zone} exits are ${mOr(f.apart_m)} apart, ${mOr(f.need_m)} needed`;
 const hardRule = f => f.travel ? 'travel distance' : f.egress ? 'egress door spacing' : 'exit spacing';
 function grown(S) {
   const lay = S1 => layout(Object.assign({}, S1, { noV2: true })), fails = hardFails;

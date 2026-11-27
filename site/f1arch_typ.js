@@ -7,7 +7,7 @@ if(!document.getElementById('f1c-typ')){ const st=document.createElement('style'
 .f1c-typ-tiles{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;width:100%;max-width:900px}
 .f1c-typ-tile{border:1px solid ${K.rule};background:#fff;padding:14px 16px 12px;display:flex;flex-direction:column;gap:6px;min-height:0}
 .f1c-typ-tile.on{border:1.8px solid ${K.ink}}
-.f1c-typ-tile.off{color:${K.faint};border-style:dashed}
+.f1c-typ-tile.off{color:var(--bd-ink-3);border-style:dashed}
 .f1c-typ-tile .h{font-size:15px;color:${K.ink}}
 .f1c-typ-tile.off .h{color:${K.mute}}
 .f1c-typ-tile .art{height:88px;display:flex;align-items:center;justify-content:center}
@@ -20,7 +20,7 @@ if(!document.getElementById('f1c-typ')){ const st=document.createElement('style'
 .f1c-typ-wrap{display:flex;flex-direction:column;align-items:center;width:100%}
 .f1c-typ-tab{display:inline-block;font-size:12.5px;border:1px solid ${K.rule};border-radius:999px;padding:5px 12px;margin:0 6px 0 0;color:${K.ink2}}
 .f1c-typ-tab.on{background:${K.ink};border-color:${K.ink};color:#fff}
-.f1c-typ-tab.off{color:${K.faint};border-style:dashed}
+.f1c-typ-tab.off{color:var(--bd-ink-3);border-style:dashed}
 .f1c-typ-tbl{display:grid;grid-template-columns:18px 1fr auto auto;gap:0 14px;align-items:center;width:100%;font-size:13px}
 .f1c-typ-tbl>*{padding:9px 0;border-bottom:1px solid ${K.hair}}
 .f1c-typ-tbl i{display:block;width:12px;height:12px;border-radius:2px}
@@ -47,7 +47,7 @@ const srcTxt=ids=>unique(ids||[]).join(', ')||'?';
 function planItems(P){ const s=P.s, uf=s.uf, dep=(u0,u1)=>{ const a=Math.abs(u0-uf), b=Math.abs(u1-uf); return [Math.min(a,b),Math.max(a,b)]; };
    
   const V=C.v1(P); if(V){ const out=[]; V.storeys.forEach((S,i)=>[].concat(S.rooms||[],S.corridors||[],S.stairs||[],S.lifts||[]).forEach(r=>{ if(!r.rect) return; const b=r.block, id=String(r.id||'');
-      const [nm,col]=b==='data centre'?[id==='hall'?'Data hall':'Data centre',id==='hall'?K.fillHall:K.fillSup]:b==='clinic'?['Clinic',K.fillClin]:b==='spare'?['Unassigned',K.fillSup]:[/^ref/.test(id)?'Refuge':/^shel/.test(id)?'Warming shelter':'Hub',K.fillPub];
+      const [nm,col]=b==='data centre'?[id==='hall'?'Data hall':'Data centre',id==='hall'?K.fillHall:K.fillSup]:b==='clinic'?['Clinic',K.fillClin]:b==='spare'?['Data-centre support',K.fillSup]:[/^ref/.test(id)?'Refuge':/^shel/.test(id)?'Warming shelter':'Hub',K.fillPub];
       out.push({id:id,name:nm,col,v:[r.rect[2],r.rect[3]],d:dep(r.rect[0],r.rect[1]),levels:[i]}); }));
     return out; }
   const items=[{id:'hall',name:'Data centre',col:K.fillHall,v:P.hall.v.slice(),d:dep(P.hall.u[0],P.hall.u[1]),levels:null}];
@@ -61,7 +61,7 @@ function planSVG(P,o){ const items=planItems(P), lv=o.level; const shown=items.f
     if(o.labels&&w>i.name.length*6.6+8&&h>20) g+=`<text x="${(x+w/2).toFixed(1)}" y="${(y+h/2+4.5).toFixed(1)}" text-anchor="middle" font-size="13.5" font-weight="500" fill="${K.ink}">${esc(i.name)}</text>`; }
   if(o.street){ const yy=H-pad-3; g+=`<line x1="0" y1="${yy}" x2="${W}" y2="${yy}" stroke="${K.faint}" stroke-width="1" stroke-dasharray="6 4"/>`; }
   return {svg:`<svg viewBox="0 0 ${W} ${H}" width="${W}" height="${H}" font-family="${FONT}" role="img" aria-label="${esc(o.aria||'Plan of the example layout')}">${g}</svg>`,items,sc,frame:items}; }
-const legend=P=>`<div class="f1c-key"><span><i style="background:${K.fillHall}"></i>data centre</span>${C.v1(P)?`<span><i style="background:${K.fillSup}"></i>data-centre support</span>`:''}<span><i style="background:${K.fillPub}"></i>public programs</span>${(C.v1(P)?C.v1(P).areas.clinic>0:P.boxes.some(b=>colOf(b)===K.fillClin))?`<span><i style="background:${K.fillClin}"></i>clinic</span>`:''}<span><i class="ln" style="border-color:${K.faint};border-top-style:dashed"></i>street</span></div>`;
+const legend=P=>`<div class="f1c-key"><span><i style="background:${K.fillHall}"></i>data centre</span>${C.v1(P)?`<span><i style="background:${K.fillSup}"></i>data-centre support</span>`:''}<span><i style="background:${K.fillPub}"></i>public programs</span>${(C.v1(P)?C.v1(P).areas.clinic>0:P.boxes.some(b=>colOf(b)===K.fillClin))?`<span><i style="background:${K.fillClin}"></i>clinic</span>`:''}<span><i class="ln" style="border-color:var(--bd-ink-3);border-top-style:dashed"></i>street</span></div>`;
 
  
 C.add(T,'Pick a typology',{chip:CHIP,async build(x){

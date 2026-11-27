@@ -158,6 +158,8 @@ async function text(){ if(!TXT) TXT=await fetch('f1/intro.json').then(r=>r.json(
 async function counts(){ if(!COUNTS) COUNTS=await fetch('data/approval_counts.json').then(r=>r.json()).catch(()=>null); return COUNTS; }
  
 const zl=(c,city)=>{ const z=c&&c[city]&&c[city].zones; if(!Array.isArray(z)||!z.length) return ''; const w=z.map(String); return w.length===1?w[0]:w.slice(0,-1).join(', ')+' and '+w[w.length-1]; };
+ 
+const MW339=()=>{ try{ const b=BD.hub&&BD.hub.boardsOf&&BD.hub.boardsOf('van'), m=b&&b['63819485']&&b['63819485'].MW; return Number.isFinite(+m)?`, ${(+m).toFixed(2)} MW`:''; }catch(e){ return ''; } };
 const lotsAllowed=(c,city)=>{ const r=c&&c[city]; return r&&isFinite(r.permitted)&&isFinite(r.conditional)?r.permitted+r.conditional:null; };
 const zkey=(city,z)=>city==='van'?String(z||'').trim():String(z||'').trim().split(/\s+/)[0].toUpperCase();  
  
@@ -300,7 +302,7 @@ const S_BUILT=[
    let st=''; for(let i=0;i<6;i++) st+=`<circle cx="${60+i*80}" cy="165" r="14" fill="${i===5?DC:'#fff'}" stroke="${DC}" stroke-width="1.5"/><text x="${60+i*80}" y="170" text-anchor="middle" font-size="12" fill="${i===5?'#fff':INKC}">${i+1}</text>`;
    await showCard('Approval process',svgW(520,330,`<line x1="60" y1="165" x2="460" y2="165" stroke="${G}"/>${st}`),panel('Process','Approval process','The Director of Planning decides, or the Development Permit Board.',[['Steps on this lot’s path','6'],['Appeal window','30 days']]),2200); },
   
- async function(sc){ caption(sc.captions); stage(mock('engineering','Engineering')); await wait(150);
+ async function(sc){ caption(sc.captions); stage(mock('engineering','Power, heat and water')); await wait(150);
    await showCard('Heat offered',svgW(520,330,`${iso(70,150,90,70,90,'#DCE6F2',DC)}<path d="M200 160 C 290 120, 360 120, 450 160" fill="none" stroke="${ORG}" stroke-width="3" class="flow"/><text x="320" y="110" text-anchor="middle" font-size="15" fill="${INKC}">11,300–19,700 MWh/yr</text><text x="320" y="200" text-anchor="middle" font-size="12" fill="${G}">heat offered, after the heat pump</text>`),
      panel('Exchanges','Heat offered','The heat the data centre gives off, raised by a heat pump for a neighbour to use.',[['Heat offered','11,300–19,700 MWh/yr'],['Size','2.5 MW, air-cooled']]),1900);
    const blds=[[80,60,60,40],[170,70,50,60],[300,50,70,40],[120,170,70,50],[260,160,60,60],[380,170,60,40],[90,250,50,40],[200,250,80,40],[350,250,60,40]].map(([x,y,w,h],i)=>`<rect x="${x}" y="${y}" width="${w}" height="${h}" fill="${[1,3,4].includes(i)?'#E79C66':'#F0EEE9'}" stroke="${G}"/>`).join('');
@@ -316,7 +318,7 @@ const S_BUILT=[
    await showCard('Variant',svgW(520,330,`<polygon points="120,250 300,160 470,245 290,330" fill="none" stroke="${INKC}" stroke-dasharray="6 4"/>${iso(230,250,110,80,45,'#D9E7CF','#7FA36A')}${iso(230,205,110,80,55,'#DCE6F2',DC)}<text x="60" y="80" font-size="14" fill="${INKC}">stacked: the data hall over the refuge and clinic</text>`),
      panel('Typology','Variant','The variant sets where the refuge stands; the tool fits it to the lot.',[['Variant','stacked'],['Lot','339 1st Ave E']]),1800);
    const sl=(y,f,s,t)=>`<polygon points="120,${y} 260,${y-60} 400,${y} 260,${y+60}" fill="${f}" stroke="${s}"/><text x="420" y="${y+4}" font-size="13" fill="${INKC}">${t}</text>`;
-   await showCard('Program diagram',svgW(520,330,sl(250,'#F6F5F2',G,'storey 1: refuge, day shelter, lobby')+sl(175,'#D9E7CF','#7FA36A','storey 2: clinic + support')+sl(100,'#DCE6F2',DC,'storey 3: data hall, 1.98 MW')),
+   await showCard('Program diagram',svgW(520,330,sl(250,'#F6F5F2',G,'storey 1: refuge, day shelter, lobby')+sl(175,'#D9E7CF','#7FA36A','storey 2: clinic + support')+sl(100,'#DCE6F2',DC,'storey 3: data hall'+MW339())),
      panel('Visualize','Program diagram','Who uses which floor, pulled apart by storey.',[['Storeys','3'],['Data hall','storey 3']]),2200); },
   
  async function(sc){ R.O.classList.remove('clear'); caption(sc.captions);

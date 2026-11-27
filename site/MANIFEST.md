@@ -1,6 +1,6 @@
 # Public web version: published files
 
-Built by `publish/build_public.py` from `tool/` (13 Nov 2026). 1344 files, 222.8 MB. Served by GitHub Pages from an Actions artifact: none of these data files is committed to git.
+Built by `publish/build_public.py` from `tool/` (13 Nov 2026). 1457 files, 262.1 MB. Served by GitHub Pages from an Actions artifact: none of these data files is committed to git.
 
 ## The leak check (the build fails on any of these)
 
@@ -15,7 +15,7 @@ Built by `publish/build_public.py` from `tool/` (13 Nov 2026). 1344 files, 222.8
 
 ## Result
 
-- Problems: 0. One- or two-corner board matches: 0. Single trivial corners like (0, 0) not listed: 1847.
+- Problems: 0. One- or two-corner board matches: 0. Single trivial corners like (0, 0) not listed: 1642.
 - licensed property records (local only) addresses also carried by a public record (kept): 111 5Th Ave E, 175 Cordova St W. Both are data-centre addresses the operators publish (the data-centre inventory, data/facilities.json).
 
 ## Left out as doubtful (the author’s rule: leave out, list, don’t ask)
@@ -25,7 +25,1281 @@ Built by `publish/build_public.py` from `tool/` (13 Nov 2026). 1344 files, 222.8
 - The typology specification copies (`f1/specs/`): written in the project’s working notes.
 - Fonts the tool no longer uses (Open Sans, Barlow).
 - `hero_preview.html`: no named source and licence in the build’s table
+- `howdc.html`: no named source and licence in the build’s table
 - `context/edm_structures.json`: no named source and licence in the build’s table
+- `f1/checks135.json`: no named source and licence in the build’s table
+- `f1/lag_van.json`: no named source and licence in the build’s table
+- `f1/lib_best_edm.json`: no named source and licence in the build’s table
+- `f1/lib_best_van.json`: no named source and licence in the build’s table
+- `f1/lotaddr_van.json`: no named source and licence in the build’s table
+- `f1/neu_van.json`: no named source and licence in the build’s table
+- `f1/old_fails.json`: no named source and licence in the build’s table
+- `f1/plans_edm_local.json`: no named source and licence in the build’s table
+- `f1/plant_van.json`: no named source and licence in the build’s table
+- `f1/whynot_van.json`: no named source and licence in the build’s table
+- `f1/anim/airflow/airflow.js`: no named source and licence in the build’s table
+- `f1/anim/airflow/airflow.json`: no named source and licence in the build’s table
+- `f1/anim/airflow/airflow_still.png`: no named source and licence in the build’s table
+- `f1/anim/battery/battery.js`: no named source and licence in the build’s table
+- `f1/anim/battery/battery.json`: no named source and licence in the build’s table
+- `f1/anim/battery/battery_still.png`: no named source and licence in the build’s table
+- `f1/anim/cooling/cooling.js`: no named source and licence in the build’s table
+- `f1/anim/cooling/cooling.json`: no named source and licence in the build’s table
+- `f1/anim/cooling/cooling_still.png`: no named source and licence in the build’s table
+- `f1/anim/fibre/fibre.js`: no named source and licence in the build’s table
+- `f1/anim/fibre/fibre.json`: no named source and licence in the build’s table
+- `f1/anim/fibre/fibre_still.png`: no named source and licence in the build’s table
+- `f1/anim/fire/fire.js`: no named source and licence in the build’s table
+- `f1/anim/fire/fire.json`: no named source and licence in the build’s table
+- `f1/anim/fire/fire_still.png`: no named source and licence in the build’s table
+- `f1/anim/generator/generator.js`: no named source and licence in the build’s table
+- `f1/anim/generator/generator.json`: no named source and licence in the build’s table
+- `f1/anim/generator/generator_still.png`: no named source and licence in the build’s table
+- `f1/anim/heatcap/heatcap.js`: no named source and licence in the build’s table
+- `f1/anim/heatcap/heatcap.json`: no named source and licence in the build’s table
+- `f1/anim/heatcap/heatcap_still.png`: no named source and licence in the build’s table
+- `f1/anim/power/power.js`: no named source and licence in the build’s table
+- `f1/anim/power/power.json`: no named source and licence in the build’s table
+- `f1/anim/power/power_still.png`: no named source and licence in the build’s table
+- `f1/anim/rack/rack.js`: no named source and licence in the build’s table
+- `f1/anim/rack/rack.json`: no named source and licence in the build’s table
+- `f1/anim/rack/rack_still.png`: no named source and licence in the build’s table
+- `f1/anim/security/security.js`: no named source and licence in the build’s table
+- `f1/anim/security/security.json`: no named source and licence in the build’s table
+- `f1/anim/security/security_still.png`: no named source and licence in the build’s table
+- `f1/anim/truck/truck.js`: no named source and licence in the build’s table
+- `f1/anim/truck/truck.json`: no named source and licence in the build’s table
+- `f1/anim/truck/truck_still.png`: no named source and licence in the build’s table
+- `f1/anim/water/water.js`: no named source and licence in the build’s table
+- `f1/anim/water/water.json`: no named source and licence in the build’s table
+- `f1/anim/water/water_still.png`: no named source and licence in the build’s table
+- `f1/dc/map_edm.json`: no named source and licence in the build’s table
+- `f1/dc/map_van.json`: no named source and licence in the build’s table
+- `f1/dc/water_van.json`: no named source and licence in the build’s table
+- `f1/dc/ctx/edm1.json`: no named source and licence in the build’s table
+- `f1/dc/ctx/edm11.json`: no named source and licence in the build’s table
+- `f1/dc/ctx/edm2.json`: no named source and licence in the build’s table
+- `f1/dc/ctx/edm3.json`: no named source and licence in the build’s table
+- `f1/dc/ctx/edm4.json`: no named source and licence in the build’s table
+- `f1/dc/ctx/edm5.json`: no named source and licence in the build’s table
+- `f1/dc/ctx/edm7.json`: no named source and licence in the build’s table
+- `f1/dc/ctx/edm8.json`: no named source and licence in the build’s table
+- `f1/dc/ctx/edm9.json`: no named source and licence in the build’s table
+- `f1/dc/ctx/van1.json`: no named source and licence in the build’s table
+- `f1/dc/ctx/van11.json`: no named source and licence in the build’s table
+- `f1/dc/ctx/van12.json`: no named source and licence in the build’s table
+- `f1/dc/ctx/van13.json`: no named source and licence in the build’s table
+- `f1/dc/ctx/van14.json`: no named source and licence in the build’s table
+- `f1/dc/ctx/van16.json`: no named source and licence in the build’s table
+- `f1/dc/ctx/van17.json`: no named source and licence in the build’s table
+- `f1/dc/ctx/van18.json`: no named source and licence in the build’s table
+- `f1/dc/ctx/van2.json`: no named source and licence in the build’s table
+- `f1/dc/ctx/van3.json`: no named source and licence in the build’s table
+- `f1/dc/ctx/van4.json`: no named source and licence in the build’s table
+- `f1/dc/ctx/van5.json`: no named source and licence in the build’s table
+- `f1/dc/ctx/van6.json`: no named source and licence in the build’s table
+- `f1/dc/ctx/van7.json`: no named source and licence in the build’s table
+- `f1/dc/ctx/van8.json`: no named source and licence in the build’s table
+- `f1/dc/ctx/van9.json`: no named source and licence in the build’s table
+- `f1/guidance/aquaponics.json`: no named source and licence in the build’s table
+- `f1/guidance/community_pool.json`: no named source and licence in the build’s table
+- `f1/guidance/conservatory.json`: no named source and licence in the build’s table
+- `f1/guidance/emergency_hub.json`: no named source and licence in the build’s table
+- `f1/guidance/food_hub.json`: no named source and licence in the build’s table
+- `f1/guidance/heat_cascade.json`: no named source and licence in the build’s table
+- `f1/guidance/scaled.json`: no named source and licence in the build’s table
+- `f1/guidance/shelter_laundry.json`: no named source and licence in the build’s table
+- `f1/guidance/warm_bath.json`: no named source and licence in the build’s table
+- `f1/l3/card7_339.json`: no named source and licence in the build’s table
+- `f1/l3/context339.json`: no named source and licence in the build’s table
+- `f1/l3/context339lot.json`: no named source and licence in the build’s table
+- `f1/l3/context339_uses.json`: no named source and licence in the build’s table
+- `f1/l3/cover339_title.svg`: no named source and licence in the build’s table
+- `f1/l3/heat339.json`: no named source and licence in the build’s table
+- `f1/l3/plan339.json`: no named source and licence in the build’s table
+- `f1/l3/section339.json`: no named source and licence in the build’s table
+- `f1/l3/a3v5/P08_map_stack.svg`: no named source and licence in the build’s table
+- `f1/l3/a3v5/P09_arrangement.svg`: no named source and licence in the build’s table
+- `f1/l3/a3v5/P10_site_plan.svg`: no named source and licence in the build’s table
+- `f1/l3/a3v5/P11_section_A.svg`: no named source and licence in the build’s table
+- `f1/l3/a3v5/P12_section_B.svg`: no named source and licence in the build’s table
+- `f1/l3/a3v5/P13_storey_1.svg`: no named source and licence in the build’s table
+- `f1/l3/a3v5/P14_storey_2.svg`: no named source and licence in the build’s table
+- `f1/l3/a3v5/P15_storey_3.svg`: no named source and licence in the build’s table
+- `f1/l3/a3v5/P16_energy.svg`: no named source and licence in the build’s table
+- `f1/l3/a3v5/P17_rooms_1.svg`: no named source and licence in the build’s table
+- `f1/l3/a3v5/P18_rooms_2.svg`: no named source and licence in the build’s table
+- `f1/plans/edm_lot_outlines.json`: no named source and licence in the build’s table
+- `f1/plans/van_15384032.json`: no named source and licence in the build’s table
+- `f1/plans/van_15384044.json`: no named source and licence in the build’s table
+- `f1/plans/van_15384060.json`: no named source and licence in the build’s table
+- `f1/plans/van_15684026.json`: no named source and licence in the build’s table
+- `f1/plans/van_15684043.json`: no named source and licence in the build’s table
+- `f1/plans/van_15684065.json`: no named source and licence in the build’s table
+- `f1/plans/van_16683112.json`: no named source and licence in the build’s table
+- `f1/plans/van_16683158.json`: no named source and licence in the build’s table
+- `f1/plans/van_16683386.json`: no named source and licence in the build’s table
+- `f1/plans/van_17083065.json`: no named source and licence in the build’s table
+- `f1/plans/van_17083096.json`: no named source and licence in the build’s table
+- `f1/plans/van_18183036.json`: no named source and licence in the build’s table
+- `f1/plans/van_18183076.json`: no named source and licence in the build’s table
+- `f1/plans/van_18183095.json`: no named source and licence in the build’s table
+- `f1/plans/van_18183188.json`: no named source and licence in the build’s table
+- `f1/plans/van_18183206.json`: no named source and licence in the build’s table
+- `f1/plans/van_18183314.json`: no named source and licence in the build’s table
+- `f1/plans/van_18183394.json`: no named source and licence in the build’s table
+- `f1/plans/van_18483024.json`: no named source and licence in the build’s table
+- `f1/plans/van_18483246.json`: no named source and licence in the build’s table
+- `f1/plans/van_18483294.json`: no named source and licence in the build’s table
+- `f1/plans/van_18483299.json`: no named source and licence in the build’s table
+- `f1/plans/van_19083205.json`: no named source and licence in the build’s table
+- `f1/plans/van_19083294.json`: no named source and licence in the build’s table
+- `f1/plans/van_19861543.json`: no named source and licence in the build’s table
+- `f1/plans/van_20183094.json`: no named source and licence in the build’s table
+- `f1/plans/van_21083037.json`: no named source and licence in the build’s table
+- `f1/plans/van_21859224.json`: no named source and licence in the build’s table
+- `f1/plans/van_21859244.json`: no named source and licence in the build’s table
+- `f1/plans/van_21859254.json`: no named source and licence in the build’s table
+- `f1/plans/van_21883060.json`: no named source and licence in the build’s table
+- `f1/plans/van_21963197.json`: no named source and licence in the build’s table
+- `f1/plans/van_22260604.json`: no named source and licence in the build’s table
+- `f1/plans/van_22263064.json`: no named source and licence in the build’s table
+- `f1/plans/van_22860703.json`: no named source and licence in the build’s table
+- `f1/plans/van_22860743.json`: no named source and licence in the build’s table
+- `f1/plans/van_22861245.json`: no named source and licence in the build’s table
+- `f1/plans/van_23059806.json`: no named source and licence in the build’s table
+- `f1/plans/van_23060607.json`: no named source and licence in the build’s table
+- `f1/plans/van_23060741.json`: no named source and licence in the build’s table
+- `f1/plans/van_23061205.json`: no named source and licence in the build’s table
+- `f1/plans/van_23063395.json`: no named source and licence in the build’s table
+- `f1/plans/van_23161195.json`: no named source and licence in the build’s table
+- `f1/plans/van_23263305.json`: no named source and licence in the build’s table
+- `f1/plans/van_30065053.json`: no named source and licence in the build’s table
+- `f1/plans/van_30563806.json`: no named source and licence in the build’s table
+- `f1/plans/van_30961233.json`: no named source and licence in the build’s table
+- `f1/plans/van_30961295.json`: no named source and licence in the build’s table
+- `f1/plans/van_32060725.json`: no named source and licence in the build’s table
+- `f1/plans/van_32060755.json`: no named source and licence in the build’s table
+- `f1/plans/van_32060799.json`: no named source and licence in the build’s table
+- `f1/plans/van_32065041.json`: no named source and licence in the build’s table
+- `f1/plans/van_32066503.json`: no named source and licence in the build’s table
+- `f1/plans/van_58625350.json`: no named source and licence in the build’s table
+- `f1/plans/van_58725305.json`: no named source and licence in the build’s table
+- `f1/plans/van_58725393.json`: no named source and licence in the build’s table
+- `f1/plans/van_59222629.json`: no named source and licence in the build’s table
+- `f1/plans/van_59222642.json`: no named source and licence in the build’s table
+- `f1/plans/van_59223039.json`: no named source and licence in the build’s table
+- `f1/plans/van_59423038.json`: no named source and licence in the build’s table
+- `f1/plans/van_59622662.json`: no named source and licence in the build’s table
+- `f1/plans/van_59623057.json`: no named source and licence in the build’s table
+- `f1/plans/van_60023096.json`: no named source and licence in the build’s table
+- `f1/plans/van_60023169.json`: no named source and licence in the build’s table
+- `f1/plans/van_60122296.json`: no named source and licence in the build’s table
+- `f1/plans/van_60423092.json`: no named source and licence in the build’s table
+- `f1/plans/van_60720574.json`: no named source and licence in the build’s table
+- `f1/plans/van_60721296.json`: no named source and licence in the build’s table
+- `f1/plans/van_60721724.json`: no named source and licence in the build’s table
+- `f1/plans/van_60721744.json`: no named source and licence in the build’s table
+- `f1/plans/van_60721784.json`: no named source and licence in the build’s table
+- `f1/plans/van_60721905.json`: no named source and licence in the build’s table
+- `f1/plans/van_60721998.json`: no named source and licence in the build’s table
+- `f1/plans/van_60722803.json`: no named source and licence in the build’s table
+- `f1/plans/van_60723194.json`: no named source and licence in the build’s table
+- `f1/plans/van_60730908.json`: no named source and licence in the build’s table
+- `f1/plans/van_60731240.json`: no named source and licence in the build’s table
+- `f1/plans/van_61222806.json`: no named source and licence in the build’s table
+- `f1/plans/van_61519804.json`: no named source and licence in the build’s table
+- `f1/plans/van_61519842.json`: no named source and licence in the build’s table
+- `f1/plans/van_61519876.json`: no named source and licence in the build’s table
+- `f1/plans/van_61519892.json`: no named source and licence in the build’s table
+- `f1/plans/van_62921873.json`: no named source and licence in the build’s table
+- `f1/plans/van_63019306.json`: no named source and licence in the build’s table
+- `f1/plans/van_63019311.json`: no named source and licence in the build’s table
+- `f1/plans/van_63019333.json`: no named source and licence in the build’s table
+- `f1/plans/van_63019392.json`: no named source and licence in the build’s table
+- `f1/plans/van_63019469.json`: no named source and licence in the build’s table
+- `f1/plans/van_63019495.json`: no named source and licence in the build’s table
+- `f1/plans/van_63019802.json`: no named source and licence in the build’s table
+- `f1/plans/van_63019807.json`: no named source and licence in the build’s table
+- `f1/plans/van_63019851.json`: no named source and licence in the build’s table
+- `f1/plans/van_63019853.json`: no named source and licence in the build’s table
+- `f1/plans/van_63021705.json`: no named source and licence in the build’s table
+- `f1/plans/van_63031205.json`: no named source and licence in the build’s table
+- `f1/plans/van_63121896.json`: no named source and licence in the build’s table
+- `f1/plans/van_63431224.json`: no named source and licence in the build’s table
+- `f1/plans/van_63519303.json`: no named source and licence in the build’s table
+- `f1/plans/van_63519365.json`: no named source and licence in the build’s table
+- `f1/plans/van_63519403.json`: no named source and licence in the build’s table
+- `f1/plans/van_63819363.json`: no named source and licence in the build’s table
+- `f1/plans/van_63819485.json`: no named source and licence in the build’s table
+- `f1/plans/van_64021473.json`: no named source and licence in the build’s table
+- `f1/plans/van_64022505.json`: no named source and licence in the build’s table
+- `f1/plans/van_64623007.json`: no named source and licence in the build’s table
+- `f1/plans/van_65030507.json`: no named source and licence in the build’s table
+- `f1/plans/van_66727706.json`: no named source and licence in the build’s table
+- `f1/plans/van_67030505.json`: no named source and licence in the build’s table
+- `f1/plans/van_67030513.json`: no named source and licence in the build’s table
+- `f1/plans/van_67030523.json`: no named source and licence in the build’s table
+- `f1/plans/van_67030599.json`: no named source and licence in the build’s table
+- `f1/plans/van_83018406.json`: no named source and licence in the build’s table
+- `f1/plans/van_83019070.json`: no named source and licence in the build’s table
+- `f1/plans/van_83020104.json`: no named source and licence in the build’s table
+- `f1/plans/van_83020326.json`: no named source and licence in the build’s table
+- `f1/plans/van_83020350.json`: no named source and licence in the build’s table
+- `f1/plans/van_83021802.json`: no named source and licence in the build’s table
+- `f1/plans/van_83022492.json`: no named source and licence in the build’s table
+- `f1/plans/van_83023608.json`: no named source and licence in the build’s table
+- `f1/plans/van_83222504.json`: no named source and licence in the build’s table
+- `f1/plans/van_83718435.json`: no named source and licence in the build’s table
+- `f1/plans/van_83719795.json`: no named source and licence in the build’s table
+- `f1/plans/van_83720109.json`: no named source and licence in the build’s table
+- `f1/plans/van_83721177.json`: no named source and licence in the build’s table
+- `f1/plans/van_83721185.json`: no named source and licence in the build’s table
+- `f1/plans/van_84015292.json`: no named source and licence in the build’s table
+- `f1/plans/van_84015306.json`: no named source and licence in the build’s table
+- `f1/plans/van_84015604.json`: no named source and licence in the build’s table
+- `f1/plans/van_84015614.json`: no named source and licence in the build’s table
+- `f1/plans/van_84016196.json`: no named source and licence in the build’s table
+- `f1/plans/van_84212296.json`: no named source and licence in the build’s table
+- `f1/plans/_to_delete/van_12283046.json`: no named source and licence in the build’s table
+- `f1/rooms/108994.json`: no named source and licence in the build’s table
+- `f1/rooms/109007.json`: no named source and licence in the build’s table
+- `f1/rooms/109009.json`: no named source and licence in the build’s table
+- `f1/rooms/149724.json`: no named source and licence in the build’s table
+- `f1/rooms/150134.json`: no named source and licence in the build’s table
+- `f1/rooms/15384032.json`: no named source and licence in the build’s table
+- `f1/rooms/15384044.json`: no named source and licence in the build’s table
+- `f1/rooms/156023.json`: no named source and licence in the build’s table
+- `f1/rooms/156024.json`: no named source and licence in the build’s table
+- `f1/rooms/15684026.json`: no named source and licence in the build’s table
+- `f1/rooms/15684043.json`: no named source and licence in the build’s table
+- `f1/rooms/15684065.json`: no named source and licence in the build’s table
+- `f1/rooms/16683112.json`: no named source and licence in the build’s table
+- `f1/rooms/16683386.json`: no named source and licence in the build’s table
+- `f1/rooms/17083065.json`: no named source and licence in the build’s table
+- `f1/rooms/18183188.json`: no named source and licence in the build’s table
+- `f1/rooms/18183394.json`: no named source and licence in the build’s table
+- `f1/rooms/18483024.json`: no named source and licence in the build’s table
+- `f1/rooms/18483294.json`: no named source and licence in the build’s table
+- `f1/rooms/19861543.json`: no named source and licence in the build’s table
+- `f1/rooms/20183094.json`: no named source and licence in the build’s table
+- `f1/rooms/21859224.json`: no named source and licence in the build’s table
+- `f1/rooms/21859244.json`: no named source and licence in the build’s table
+- `f1/rooms/21859254.json`: no named source and licence in the build’s table
+- `f1/rooms/21883060.json`: no named source and licence in the build’s table
+- `f1/rooms/21963197.json`: no named source and licence in the build’s table
+- `f1/rooms/22260604.json`: no named source and licence in the build’s table
+- `f1/rooms/22860703.json`: no named source and licence in the build’s table
+- `f1/rooms/23059806.json`: no named source and licence in the build’s table
+- `f1/rooms/23060607.json`: no named source and licence in the build’s table
+- `f1/rooms/23061205.json`: no named source and licence in the build’s table
+- `f1/rooms/23161195.json`: no named source and licence in the build’s table
+- `f1/rooms/23263305.json`: no named source and licence in the build’s table
+- `f1/rooms/30563806.json`: no named source and licence in the build’s table
+- `f1/rooms/58625350.json`: no named source and licence in the build’s table
+- `f1/rooms/58725305.json`: no named source and licence in the build’s table
+- `f1/rooms/58725393.json`: no named source and licence in the build’s table
+- `f1/rooms/59222629.json`: no named source and licence in the build’s table
+- `f1/rooms/59222642.json`: no named source and licence in the build’s table
+- `f1/rooms/59223039.json`: no named source and licence in the build’s table
+- `f1/rooms/59423038.json`: no named source and licence in the build’s table
+- `f1/rooms/59622662.json`: no named source and licence in the build’s table
+- `f1/rooms/59623057.json`: no named source and licence in the build’s table
+- `f1/rooms/59722.json`: no named source and licence in the build’s table
+- `f1/rooms/60023096.json`: no named source and licence in the build’s table
+- `f1/rooms/60023169.json`: no named source and licence in the build’s table
+- `f1/rooms/60423092.json`: no named source and licence in the build’s table
+- `f1/rooms/60721724.json`: no named source and licence in the build’s table
+- `f1/rooms/60721744.json`: no named source and licence in the build’s table
+- `f1/rooms/60721784.json`: no named source and licence in the build’s table
+- `f1/rooms/60721905.json`: no named source and licence in the build’s table
+- `f1/rooms/60722803.json`: no named source and licence in the build’s table
+- `f1/rooms/60723194.json`: no named source and licence in the build’s table
+- `f1/rooms/60731240.json`: no named source and licence in the build’s table
+- `f1/rooms/61222806.json`: no named source and licence in the build’s table
+- `f1/rooms/61519804.json`: no named source and licence in the build’s table
+- `f1/rooms/61519842.json`: no named source and licence in the build’s table
+- `f1/rooms/61519876.json`: no named source and licence in the build’s table
+- `f1/rooms/61519892.json`: no named source and licence in the build’s table
+- `f1/rooms/62921873.json`: no named source and licence in the build’s table
+- `f1/rooms/63019306.json`: no named source and licence in the build’s table
+- `f1/rooms/63019311.json`: no named source and licence in the build’s table
+- `f1/rooms/63019333.json`: no named source and licence in the build’s table
+- `f1/rooms/63019392.json`: no named source and licence in the build’s table
+- `f1/rooms/63019469.json`: no named source and licence in the build’s table
+- `f1/rooms/63019495.json`: no named source and licence in the build’s table
+- `f1/rooms/63019807.json`: no named source and licence in the build’s table
+- `f1/rooms/63019851.json`: no named source and licence in the build’s table
+- `f1/rooms/63019853.json`: no named source and licence in the build’s table
+- `f1/rooms/63021705.json`: no named source and licence in the build’s table
+- `f1/rooms/63431224.json`: no named source and licence in the build’s table
+- `f1/rooms/63519303.json`: no named source and licence in the build’s table
+- `f1/rooms/63519403.json`: no named source and licence in the build’s table
+- `f1/rooms/63819485.json`: no named source and licence in the build’s table
+- `f1/rooms/64022505.json`: no named source and licence in the build’s table
+- `f1/rooms/64623007.json`: no named source and licence in the build’s table
+- `f1/rooms/65030507.json`: no named source and licence in the build’s table
+- `f1/rooms/66727706.json`: no named source and licence in the build’s table
+- `f1/rooms/67030505.json`: no named source and licence in the build’s table
+- `f1/rooms/685396.json`: no named source and licence in the build’s table
+- `f1/rooms/83018406.json`: no named source and licence in the build’s table
+- `f1/rooms/83020104.json`: no named source and licence in the build’s table
+- `f1/rooms/83020326.json`: no named source and licence in the build’s table
+- `f1/rooms/83020350.json`: no named source and licence in the build’s table
+- `f1/rooms/83023608.json`: no named source and licence in the build’s table
+- `f1/rooms/83222504.json`: no named source and licence in the build’s table
+- `f1/rooms/83720109.json`: no named source and licence in the build’s table
+- `f1/rooms/83721177.json`: no named source and licence in the build’s table
+- `f1/rooms/84014996.json`: no named source and licence in the build’s table
+- `f1/rooms/84015306.json`: no named source and licence in the build’s table
+- `f1/rooms/84015604.json`: no named source and licence in the build’s table
+- `f1/rooms/84015614.json`: no named source and licence in the build’s table
+- `f1/rooms/84016196.json`: no named source and licence in the build’s table
+- `f1/rooms/957392.json`: no named source and licence in the build’s table
+- `f1/rooms/board63819485.json`: no named source and licence in the build’s table
+- `f1/rooms/EC1004165.json`: no named source and licence in the build’s table
+- `f1/rooms/EC100748.json`: no named source and licence in the build’s table
+- `f1/rooms/EC1010165.json`: no named source and licence in the build’s table
+- `f1/rooms/EC1011819.json`: no named source and licence in the build’s table
+- `f1/rooms/EC1011820.json`: no named source and licence in the build’s table
+- `f1/rooms/EC1013983.json`: no named source and licence in the build’s table
+- `f1/rooms/EC1017182.json`: no named source and licence in the build’s table
+- `f1/rooms/EC101810.json`: no named source and licence in the build’s table
+- `f1/rooms/EC102262.json`: no named source and licence in the build’s table
+- `f1/rooms/EC102266.json`: no named source and licence in the build’s table
+- `f1/rooms/EC102289.json`: no named source and licence in the build’s table
+- `f1/rooms/EC102290.json`: no named source and licence in the build’s table
+- `f1/rooms/EC102291.json`: no named source and licence in the build’s table
+- `f1/rooms/EC102292.json`: no named source and licence in the build’s table
+- `f1/rooms/EC102305.json`: no named source and licence in the build’s table
+- `f1/rooms/EC102306.json`: no named source and licence in the build’s table
+- `f1/rooms/EC102307.json`: no named source and licence in the build’s table
+- `f1/rooms/EC108924.json`: no named source and licence in the build’s table
+- `f1/rooms/EC108932.json`: no named source and licence in the build’s table
+- `f1/rooms/EC108933.json`: no named source and licence in the build’s table
+- `f1/rooms/EC108934.json`: no named source and licence in the build’s table
+- `f1/rooms/EC108935.json`: no named source and licence in the build’s table
+- `f1/rooms/EC108936.json`: no named source and licence in the build’s table
+- `f1/rooms/EC108938.json`: no named source and licence in the build’s table
+- `f1/rooms/EC108939.json`: no named source and licence in the build’s table
+- `f1/rooms/EC108981.json`: no named source and licence in the build’s table
+- `f1/rooms/EC108985.json`: no named source and licence in the build’s table
+- `f1/rooms/EC108986.json`: no named source and licence in the build’s table
+- `f1/rooms/EC108987.json`: no named source and licence in the build’s table
+- `f1/rooms/EC108994.json`: no named source and licence in the build’s table
+- `f1/rooms/EC109007.json`: no named source and licence in the build’s table
+- `f1/rooms/EC109009.json`: no named source and licence in the build’s table
+- `f1/rooms/EC109010.json`: no named source and licence in the build’s table
+- `f1/rooms/EC109018.json`: no named source and licence in the build’s table
+- `f1/rooms/EC109019.json`: no named source and licence in the build’s table
+- `f1/rooms/EC109021.json`: no named source and licence in the build’s table
+- `f1/rooms/EC109022.json`: no named source and licence in the build’s table
+- `f1/rooms/EC109024.json`: no named source and licence in the build’s table
+- `f1/rooms/EC109026.json`: no named source and licence in the build’s table
+- `f1/rooms/EC109028.json`: no named source and licence in the build’s table
+- `f1/rooms/EC109029.json`: no named source and licence in the build’s table
+- `f1/rooms/EC109030.json`: no named source and licence in the build’s table
+- `f1/rooms/EC109039.json`: no named source and licence in the build’s table
+- `f1/rooms/EC109041.json`: no named source and licence in the build’s table
+- `f1/rooms/EC109043.json`: no named source and licence in the build’s table
+- `f1/rooms/EC109071.json`: no named source and licence in the build’s table
+- `f1/rooms/EC109088.json`: no named source and licence in the build’s table
+- `f1/rooms/EC109982.json`: no named source and licence in the build’s table
+- `f1/rooms/EC109986.json`: no named source and licence in the build’s table
+- `f1/rooms/EC112816.json`: no named source and licence in the build’s table
+- `f1/rooms/EC112817.json`: no named source and licence in the build’s table
+- `f1/rooms/EC112818.json`: no named source and licence in the build’s table
+- `f1/rooms/EC112923.json`: no named source and licence in the build’s table
+- `f1/rooms/EC112929.json`: no named source and licence in the build’s table
+- `f1/rooms/EC129734.json`: no named source and licence in the build’s table
+- `f1/rooms/EC129735.json`: no named source and licence in the build’s table
+- `f1/rooms/EC129813.json`: no named source and licence in the build’s table
+- `f1/rooms/EC129814.json`: no named source and licence in the build’s table
+- `f1/rooms/EC129822.json`: no named source and licence in the build’s table
+- `f1/rooms/EC129829.json`: no named source and licence in the build’s table
+- `f1/rooms/EC129830.json`: no named source and licence in the build’s table
+- `f1/rooms/EC129832.json`: no named source and licence in the build’s table
+- `f1/rooms/EC129833.json`: no named source and licence in the build’s table
+- `f1/rooms/EC129865.json`: no named source and licence in the build’s table
+- `f1/rooms/EC129866.json`: no named source and licence in the build’s table
+- `f1/rooms/EC129867.json`: no named source and licence in the build’s table
+- `f1/rooms/EC129871.json`: no named source and licence in the build’s table
+- `f1/rooms/EC134965.json`: no named source and licence in the build’s table
+- `f1/rooms/EC135007.json`: no named source and licence in the build’s table
+- `f1/rooms/EC135009.json`: no named source and licence in the build’s table
+- `f1/rooms/EC135308.json`: no named source and licence in the build’s table
+- `f1/rooms/EC135309.json`: no named source and licence in the build’s table
+- `f1/rooms/EC145866.json`: no named source and licence in the build’s table
+- `f1/rooms/EC149641.json`: no named source and licence in the build’s table
+- `f1/rooms/EC149643.json`: no named source and licence in the build’s table
+- `f1/rooms/EC149659.json`: no named source and licence in the build’s table
+- `f1/rooms/EC149660.json`: no named source and licence in the build’s table
+- `f1/rooms/EC149680.json`: no named source and licence in the build’s table
+- `f1/rooms/EC149697.json`: no named source and licence in the build’s table
+- `f1/rooms/EC149698.json`: no named source and licence in the build’s table
+- `f1/rooms/EC149718.json`: no named source and licence in the build’s table
+- `f1/rooms/EC149724.json`: no named source and licence in the build’s table
+- `f1/rooms/EC149732.json`: no named source and licence in the build’s table
+- `f1/rooms/EC150077.json`: no named source and licence in the build’s table
+- `f1/rooms/EC150078.json`: no named source and licence in the build’s table
+- `f1/rooms/EC150083.json`: no named source and licence in the build’s table
+- `f1/rooms/EC150120.json`: no named source and licence in the build’s table
+- `f1/rooms/EC150121.json`: no named source and licence in the build’s table
+- `f1/rooms/EC150128.json`: no named source and licence in the build’s table
+- `f1/rooms/EC150129.json`: no named source and licence in the build’s table
+- `f1/rooms/EC150134.json`: no named source and licence in the build’s table
+- `f1/rooms/EC156022.json`: no named source and licence in the build’s table
+- `f1/rooms/EC156023.json`: no named source and licence in the build’s table
+- `f1/rooms/EC156024.json`: no named source and licence in the build’s table
+- `f1/rooms/EC160149.json`: no named source and licence in the build’s table
+- `f1/rooms/EC160381.json`: no named source and licence in the build’s table
+- `f1/rooms/EC161878.json`: no named source and licence in the build’s table
+- `f1/rooms/EC171861.json`: no named source and licence in the build’s table
+- `f1/rooms/EC172364.json`: no named source and licence in the build’s table
+- `f1/rooms/EC172569.json`: no named source and licence in the build’s table
+- `f1/rooms/EC172721.json`: no named source and licence in the build’s table
+- `f1/rooms/EC175399.json`: no named source and licence in the build’s table
+- `f1/rooms/EC181607.json`: no named source and licence in the build’s table
+- `f1/rooms/EC181665.json`: no named source and licence in the build’s table
+- `f1/rooms/EC181748.json`: no named source and licence in the build’s table
+- `f1/rooms/EC181873.json`: no named source and licence in the build’s table
+- `f1/rooms/EC190112.json`: no named source and licence in the build’s table
+- `f1/rooms/EC190602.json`: no named source and licence in the build’s table
+- `f1/rooms/EC193433.json`: no named source and licence in the build’s table
+- `f1/rooms/EC2966002.json`: no named source and licence in the build’s table
+- `f1/rooms/EC44870.json`: no named source and licence in the build’s table
+- `f1/rooms/EC451849.json`: no named source and licence in the build’s table
+- `f1/rooms/EC510617.json`: no named source and licence in the build’s table
+- `f1/rooms/EC59722.json`: no named source and licence in the build’s table
+- `f1/rooms/EC59824.json`: no named source and licence in the build’s table
+- `f1/rooms/EC59845.json`: no named source and licence in the build’s table
+- `f1/rooms/EC684429.json`: no named source and licence in the build’s table
+- `f1/rooms/EC685097.json`: no named source and licence in the build’s table
+- `f1/rooms/EC685134.json`: no named source and licence in the build’s table
+- `f1/rooms/EC685135.json`: no named source and licence in the build’s table
+- `f1/rooms/EC685396.json`: no named source and licence in the build’s table
+- `f1/rooms/EC686293.json`: no named source and licence in the build’s table
+- `f1/rooms/EC690603.json`: no named source and licence in the build’s table
+- `f1/rooms/EC696219.json`: no named source and licence in the build’s table
+- `f1/rooms/EC697741.json`: no named source and licence in the build’s table
+- `f1/rooms/EC700427.json`: no named source and licence in the build’s table
+- `f1/rooms/EC700437.json`: no named source and licence in the build’s table
+- `f1/rooms/EC701056.json`: no named source and licence in the build’s table
+- `f1/rooms/EC715426.json`: no named source and licence in the build’s table
+- `f1/rooms/EC715427.json`: no named source and licence in the build’s table
+- `f1/rooms/EC715445.json`: no named source and licence in the build’s table
+- `f1/rooms/EC715446.json`: no named source and licence in the build’s table
+- `f1/rooms/EC739238.json`: no named source and licence in the build’s table
+- `f1/rooms/EC744733.json`: no named source and licence in the build’s table
+- `f1/rooms/EC750368.json`: no named source and licence in the build’s table
+- `f1/rooms/EC777399.json`: no named source and licence in the build’s table
+- `f1/rooms/EC788210.json`: no named source and licence in the build’s table
+- `f1/rooms/EC796572.json`: no named source and licence in the build’s table
+- `f1/rooms/EC804552.json`: no named source and licence in the build’s table
+- `f1/rooms/EC815418.json`: no named source and licence in the build’s table
+- `f1/rooms/EC815419.json`: no named source and licence in the build’s table
+- `f1/rooms/EC821019.json`: no named source and licence in the build’s table
+- `f1/rooms/EC840820.json`: no named source and licence in the build’s table
+- `f1/rooms/EC849545.json`: no named source and licence in the build’s table
+- `f1/rooms/EC854847.json`: no named source and licence in the build’s table
+- `f1/rooms/EC95140.json`: no named source and licence in the build’s table
+- `f1/rooms/EC96552.json`: no named source and licence in the build’s table
+- `f1/rooms/EC96713.json`: no named source and licence in the build’s table
+- `f1/rooms/EC96793.json`: no named source and licence in the build’s table
+- `f1/rooms/EC96794.json`: no named source and licence in the build’s table
+- `f1/rooms/EC96861.json`: no named source and licence in the build’s table
+- `f1/rooms/EC97584.json`: no named source and licence in the build’s table
+- `f1/rooms/EC97588.json`: no named source and licence in the build’s table
+- `f1/rooms/EC97589.json`: no named source and licence in the build’s table
+- `f1/rooms/EC97591.json`: no named source and licence in the build’s table
+- `f1/rooms/EC97642.json`: no named source and licence in the build’s table
+- `f1/rooms/EC97643.json`: no named source and licence in the build’s table
+- `f1/rooms/EC98447.json`: no named source and licence in the build’s table
+- `f1/rooms/EC99009.json`: no named source and licence in the build’s table
+- `f1/rooms/EC99819.json`: no named source and licence in the build’s table
+- `f1/site/about_van.json`: no named source and licence in the build’s table
+- `f1/site/van_12063096.json`: no named source and licence in the build’s table
+- `f1/site/van_12283031.json`: no named source and licence in the build’s table
+- `f1/site/van_12283046.json`: no named source and licence in the build’s table
+- `f1/site/van_12283297.json`: no named source and licence in the build’s table
+- `f1/site/van_14484206.json`: no named source and licence in the build’s table
+- `f1/site/van_14484249.json`: no named source and licence in the build’s table
+- `f1/site/van_14984044.json`: no named source and licence in the build’s table
+- `f1/site/van_14984074.json`: no named source and licence in the build’s table
+- `f1/site/van_14984126.json`: no named source and licence in the build’s table
+- `f1/site/van_14984188.json`: no named source and licence in the build’s table
+- `f1/site/van_14984395.json`: no named source and licence in the build’s table
+- `f1/site/van_15184059.json`: no named source and licence in the build’s table
+- `f1/site/van_15184304.json`: no named source and licence in the build’s table
+- `f1/site/van_15184331.json`: no named source and licence in the build’s table
+- `f1/site/van_15184341.json`: no named source and licence in the build’s table
+- `f1/site/van_15184351.json`: no named source and licence in the build’s table
+- `f1/site/van_15184377.json`: no named source and licence in the build’s table
+- `f1/site/van_15184388.json`: no named source and licence in the build’s table
+- `f1/site/van_15384032.json`: no named source and licence in the build’s table
+- `f1/site/van_15384044.json`: no named source and licence in the build’s table
+- `f1/site/van_15384051.json`: no named source and licence in the build’s table
+- `f1/site/van_15384060.json`: no named source and licence in the build’s table
+- `f1/site/van_15384080.json`: no named source and licence in the build’s table
+- `f1/site/van_15684026.json`: no named source and licence in the build’s table
+- `f1/site/van_15684043.json`: no named source and licence in the build’s table
+- `f1/site/van_15684046.json`: no named source and licence in the build’s table
+- `f1/site/van_15684065.json`: no named source and licence in the build’s table
+- `f1/site/van_15684066.json`: no named source and licence in the build’s table
+- `f1/site/van_15684074.json`: no named source and licence in the build’s table
+- `f1/site/van_15684077.json`: no named source and licence in the build’s table
+- `f1/site/van_15684097.json`: no named source and licence in the build’s table
+- `f1/site/van_16184032.json`: no named source and licence in the build’s table
+- `f1/site/van_16184055.json`: no named source and licence in the build’s table
+- `f1/site/van_16683112.json`: no named source and licence in the build’s table
+- `f1/site/van_16683158.json`: no named source and licence in the build’s table
+- `f1/site/van_16683307.json`: no named source and licence in the build’s table
+- `f1/site/van_16683380.json`: no named source and licence in the build’s table
+- `f1/site/van_16683386.json`: no named source and licence in the build’s table
+- `f1/site/van_17083046.json`: no named source and licence in the build’s table
+- `f1/site/van_17083049+17083055.json`: no named source and licence in the build’s table
+- `f1/site/van_17083049.json`: no named source and licence in the build’s table
+- `f1/site/van_17083055.json`: no named source and licence in the build’s table
+- `f1/site/van_17083065.json`: no named source and licence in the build’s table
+- `f1/site/van_17083085.json`: no named source and licence in the build’s table
+- `f1/site/van_17083086.json`: no named source and licence in the build’s table
+- `f1/site/van_17083096.json`: no named source and licence in the build’s table
+- `f1/site/van_17283085.json`: no named source and licence in the build’s table
+- `f1/site/van_17283096.json`: no named source and licence in the build’s table
+- `f1/site/van_18183036.json`: no named source and licence in the build’s table
+- `f1/site/van_18183076.json`: no named source and licence in the build’s table
+- `f1/site/van_18183095.json`: no named source and licence in the build’s table
+- `f1/site/van_18183188.json`: no named source and licence in the build’s table
+- `f1/site/van_18183196.json`: no named source and licence in the build’s table
+- `f1/site/van_18183206.json`: no named source and licence in the build’s table
+- `f1/site/van_18183297.json`: no named source and licence in the build’s table
+- `f1/site/van_18183314.json`: no named source and licence in the build’s table
+- `f1/site/van_18183394.json`: no named source and licence in the build’s table
+- `f1/site/van_18483024.json`: no named source and licence in the build’s table
+- `f1/site/van_18483040.json`: no named source and licence in the build’s table
+- `f1/site/van_18483048+18483060.json`: no named source and licence in the build’s table
+- `f1/site/van_18483048.json`: no named source and licence in the build’s table
+- `f1/site/van_18483060.json`: no named source and licence in the build’s table
+- `f1/site/van_18483072+18483084.json`: no named source and licence in the build’s table
+- `f1/site/van_18483072.json`: no named source and licence in the build’s table
+- `f1/site/van_18483084.json`: no named source and licence in the build’s table
+- `f1/site/van_18483094.json`: no named source and licence in the build’s table
+- `f1/site/van_18483206.json`: no named source and licence in the build’s table
+- `f1/site/van_18483207.json`: no named source and licence in the build’s table
+- `f1/site/van_18483246.json`: no named source and licence in the build’s table
+- `f1/site/van_18483247.json`: no named source and licence in the build’s table
+- `f1/site/van_18483294.json`: no named source and licence in the build’s table
+- `f1/site/van_18483299.json`: no named source and licence in the build’s table
+- `f1/site/van_18659826.json`: no named source and licence in the build’s table
+- `f1/site/van_18664408.json`: no named source and licence in the build’s table
+- `f1/site/van_19063006.json`: no named source and licence in the build’s table
+- `f1/site/van_19063804.json`: no named source and licence in the build’s table
+- `f1/site/van_19063896.json`: no named source and licence in the build’s table
+- `f1/site/van_19064209.json`: no named source and licence in the build’s table
+- `f1/site/van_19083037+19083057.json`: no named source and licence in the build’s table
+- `f1/site/van_19083037.json`: no named source and licence in the build’s table
+- `f1/site/van_19083057.json`: no named source and licence in the build’s table
+- `f1/site/van_19083077+19083097.json`: no named source and licence in the build’s table
+- `f1/site/van_19083077.json`: no named source and licence in the build’s table
+- `f1/site/van_19083097.json`: no named source and licence in the build’s table
+- `f1/site/van_19083205.json`: no named source and licence in the build’s table
+- `f1/site/van_19083294.json`: no named source and licence in the build’s table
+- `f1/site/van_19083295.json`: no named source and licence in the build’s table
+- `f1/site/van_19260548.json`: no named source and licence in the build’s table
+- `f1/site/van_19363122.json`: no named source and licence in the build’s table
+- `f1/site/van_19363256.json`: no named source and licence in the build’s table
+- `f1/site/van_19363805.json`: no named source and licence in the build’s table
+- `f1/site/van_19783094.json`: no named source and licence in the build’s table
+- `f1/site/van_19861523.json`: no named source and licence in the build’s table
+- `f1/site/van_19861543.json`: no named source and licence in the build’s table
+- `f1/site/van_20183036.json`: no named source and licence in the build’s table
+- `f1/site/van_20183046.json`: no named source and licence in the build’s table
+- `f1/site/van_20183052.json`: no named source and licence in the build’s table
+- `f1/site/van_20183060.json`: no named source and licence in the build’s table
+- `f1/site/van_20183070.json`: no named source and licence in the build’s table
+- `f1/site/van_20183094.json`: no named source and licence in the build’s table
+- `f1/site/van_20183208.json`: no named source and licence in the build’s table
+- `f1/site/van_20183218.json`: no named source and licence in the build’s table
+- `f1/site/van_20183280.json`: no named source and licence in the build’s table
+- `f1/site/van_21083037.json`: no named source and licence in the build’s table
+- `f1/site/van_21083038.json`: no named source and licence in the build’s table
+- `f1/site/van_21083062.json`: no named source and licence in the build’s table
+- `f1/site/van_21083093.json`: no named source and licence in the build’s table
+- `f1/site/van_21083096.json`: no named source and licence in the build’s table
+- `f1/site/van_21083908.json`: no named source and licence in the build’s table
+- `f1/site/van_21083974.json`: no named source and licence in the build’s table
+- `f1/site/van_21083985.json`: no named source and licence in the build’s table
+- `f1/site/van_21083989.json`: no named source and licence in the build’s table
+- `f1/site/van_21183098.json`: no named source and licence in the build’s table
+- `f1/site/van_21760793.json`: no named source and licence in the build’s table
+- `f1/site/van_21859206.json`: no named source and licence in the build’s table
+- `f1/site/van_21859224.json`: no named source and licence in the build’s table
+- `f1/site/van_21859244.json`: no named source and licence in the build’s table
+- `f1/site/van_21859254.json`: no named source and licence in the build’s table
+- `f1/site/van_21859296.json`: no named source and licence in the build’s table
+- `f1/site/van_21883060.json`: no named source and licence in the build’s table
+- `f1/site/van_21883091.json`: no named source and licence in the build’s table
+- `f1/site/van_21883096.json`: no named source and licence in the build’s table
+- `f1/site/van_21960008.json`: no named source and licence in the build’s table
+- `f1/site/van_21960106.json`: no named source and licence in the build’s table
+- `f1/site/van_21960196.json`: no named source and licence in the build’s table
+- `f1/site/van_21963197.json`: no named source and licence in the build’s table
+- `f1/site/van_22259635.json`: no named source and licence in the build’s table
+- `f1/site/van_22260150.json`: no named source and licence in the build’s table
+- `f1/site/van_22260196.json`: no named source and licence in the build’s table
+- `f1/site/van_22260604.json`: no named source and licence in the build’s table
+- `f1/site/van_22260605.json`: no named source and licence in the build’s table
+- `f1/site/van_22260644+22260652.json`: no named source and licence in the build’s table
+- `f1/site/van_22260644.json`: no named source and licence in the build’s table
+- `f1/site/van_22260652.json`: no named source and licence in the build’s table
+- `f1/site/van_22260665.json`: no named source and licence in the build’s table
+- `f1/site/van_22260675.json`: no named source and licence in the build’s table
+- `f1/site/van_22260714.json`: no named source and licence in the build’s table
+- `f1/site/van_22260735.json`: no named source and licence in the build’s table
+- `f1/site/van_22260740.json`: no named source and licence in the build’s table
+- `f1/site/van_22260746.json`: no named source and licence in the build’s table
+- `f1/site/van_22260774.json`: no named source and licence in the build’s table
+- `f1/site/van_22260795.json`: no named source and licence in the build’s table
+- `f1/site/van_22261596.json`: no named source and licence in the build’s table
+- `f1/site/van_22263016.json`: no named source and licence in the build’s table
+- `f1/site/van_22263036.json`: no named source and licence in the build’s table
+- `f1/site/van_22263053.json`: no named source and licence in the build’s table
+- `f1/site/van_22263057.json`: no named source and licence in the build’s table
+- `f1/site/van_22263064.json`: no named source and licence in the build’s table
+- `f1/site/van_22263074.json`: no named source and licence in the build’s table
+- `f1/site/van_22263076.json`: no named source and licence in the build’s table
+- `f1/site/van_22263078.json`: no named source and licence in the build’s table
+- `f1/site/van_22263086.json`: no named source and licence in the build’s table
+- `f1/site/van_22483075.json`: no named source and licence in the build’s table
+- `f1/site/van_22583296.json`: no named source and licence in the build’s table
+- `f1/site/van_22583297.json`: no named source and licence in the build’s table
+- `f1/site/van_22583955.json`: no named source and licence in the build’s table
+- `f1/site/van_22658855.json`: no named source and licence in the build’s table
+- `f1/site/van_22860107.json`: no named source and licence in the build’s table
+- `f1/site/van_22860703.json`: no named source and licence in the build’s table
+- `f1/site/van_22860743.json`: no named source and licence in the build’s table
+- `f1/site/van_22861207.json`: no named source and licence in the build’s table
+- `f1/site/van_22861245.json`: no named source and licence in the build’s table
+- `f1/site/van_23059098+59223025.json`: no named source and licence in the build’s table
+- `f1/site/van_23059098.json`: no named source and licence in the build’s table
+- `f1/site/van_23059206.json`: no named source and licence in the build’s table
+- `f1/site/van_23059406.json`: no named source and licence in the build’s table
+- `f1/site/van_23059436.json`: no named source and licence in the build’s table
+- `f1/site/van_23059442.json`: no named source and licence in the build’s table
+- `f1/site/van_23059496.json`: no named source and licence in the build’s table
+- `f1/site/van_23059606.json`: no named source and licence in the build’s table
+- `f1/site/van_23059620.json`: no named source and licence in the build’s table
+- `f1/site/van_23059624.json`: no named source and licence in the build’s table
+- `f1/site/van_23059696.json`: no named source and licence in the build’s table
+- `f1/site/van_23059805.json`: no named source and licence in the build’s table
+- `f1/site/van_23059806.json`: no named source and licence in the build’s table
+- `f1/site/van_23060006.json`: no named source and licence in the build’s table
+- `f1/site/van_23060056.json`: no named source and licence in the build’s table
+- `f1/site/van_23060076.json`: no named source and licence in the build’s table
+- `f1/site/van_23060114.json`: no named source and licence in the build’s table
+- `f1/site/van_23060124.json`: no named source and licence in the build’s table
+- `f1/site/van_23060144.json`: no named source and licence in the build’s table
+- `f1/site/van_23060164.json`: no named source and licence in the build’s table
+- `f1/site/van_23060184.json`: no named source and licence in the build’s table
+- `f1/site/van_23060404.json`: no named source and licence in the build’s table
+- `f1/site/van_23060494.json`: no named source and licence in the build’s table
+- `f1/site/van_23060607.json`: no named source and licence in the build’s table
+- `f1/site/van_23060696.json`: no named source and licence in the build’s table
+- `f1/site/van_23060706.json`: no named source and licence in the build’s table
+- `f1/site/van_23060707.json`: no named source and licence in the build’s table
+- `f1/site/van_23060721.json`: no named source and licence in the build’s table
+- `f1/site/van_23060726.json`: no named source and licence in the build’s table
+- `f1/site/van_23060736.json`: no named source and licence in the build’s table
+- `f1/site/van_23060741.json`: no named source and licence in the build’s table
+- `f1/site/van_23060746.json`: no named source and licence in the build’s table
+- `f1/site/van_23060756.json`: no named source and licence in the build’s table
+- `f1/site/van_23060761.json`: no named source and licence in the build’s table
+- `f1/site/van_23060778.json`: no named source and licence in the build’s table
+- `f1/site/van_23060791.json`: no named source and licence in the build’s table
+- `f1/site/van_23061205.json`: no named source and licence in the build’s table
+- `f1/site/van_23063004.json`: no named source and licence in the build’s table
+- `f1/site/van_23063094.json`: no named source and licence in the build’s table
+- `f1/site/van_23063097.json`: no named source and licence in the build’s table
+- `f1/site/van_23063106.json`: no named source and licence in the build’s table
+- `f1/site/van_23063116.json`: no named source and licence in the build’s table
+- `f1/site/van_23063128.json`: no named source and licence in the build’s table
+- `f1/site/van_23063140.json`: no named source and licence in the build’s table
+- `f1/site/van_23063196.json`: no named source and licence in the build’s table
+- `f1/site/van_23063395.json`: no named source and licence in the build’s table
+- `f1/site/van_23063406.json`: no named source and licence in the build’s table
+- `f1/site/van_23064106.json`: no named source and licence in the build’s table
+- `f1/site/van_23064112.json`: no named source and licence in the build’s table
+- `f1/site/van_23064195.json`: no named source and licence in the build’s table
+- `f1/site/van_23160696.json`: no named source and licence in the build’s table
+- `f1/site/van_23160705+23160775.json`: no named source and licence in the build’s table
+- `f1/site/van_23160705.json`: no named source and licence in the build’s table
+- `f1/site/van_23160706.json`: no named source and licence in the build’s table
+- `f1/site/van_23160730.json`: no named source and licence in the build’s table
+- `f1/site/van_23160734.json`: no named source and licence in the build’s table
+- `f1/site/van_23160736.json`: no named source and licence in the build’s table
+- `f1/site/van_23160775.json`: no named source and licence in the build’s table
+- `f1/site/van_23160781+23160787.json`: no named source and licence in the build’s table
+- `f1/site/van_23160781.json`: no named source and licence in the build’s table
+- `f1/site/van_23160787.json`: no named source and licence in the build’s table
+- `f1/site/van_23160794.json`: no named source and licence in the build’s table
+- `f1/site/van_23161106.json`: no named source and licence in the build’s table
+- `f1/site/van_23161145.json`: no named source and licence in the build’s table
+- `f1/site/van_23161195.json`: no named source and licence in the build’s table
+- `f1/site/van_23263305.json`: no named source and licence in the build’s table
+- `f1/site/van_23263395.json`: no named source and licence in the build’s table
+- `f1/site/van_23263495.json`: no named source and licence in the build’s table
+- `f1/site/van_23359045.json`: no named source and licence in the build’s table
+- `f1/site/van_23359075.json`: no named source and licence in the build’s table
+- `f1/site/van_23359095.json`: no named source and licence in the build’s table
+- `f1/site/van_23359805.json`: no named source and licence in the build’s table
+- `f1/site/van_23359813.json`: no named source and licence in the build’s table
+- `f1/site/van_23683081.json`: no named source and licence in the build’s table
+- `f1/site/van_23683094.json`: no named source and licence in the build’s table
+- `f1/site/van_23683097.json`: no named source and licence in the build’s table
+- `f1/site/van_24183153.json`: no named source and licence in the build’s table
+- `f1/site/van_25058003.json`: no named source and licence in the build’s table
+- `f1/site/van_25058850.json`: no named source and licence in the build’s table
+- `f1/site/van_25358094.json`: no named source and licence in the build’s table
+- `f1/site/van_25358606.json`: no named source and licence in the build’s table
+- `f1/site/van_25358609.json`: no named source and licence in the build’s table
+- `f1/site/van_25358804.json`: no named source and licence in the build’s table
+- `f1/site/van_25358826.json`: no named source and licence in the build’s table
+- `f1/site/van_25358834.json`: no named source and licence in the build’s table
+- `f1/site/van_25557759.json`: no named source and licence in the build’s table
+- `f1/site/van_25558805.json`: no named source and licence in the build’s table
+- `f1/site/van_25558855.json`: no named source and licence in the build’s table
+- `f1/site/van_27766596.json`: no named source and licence in the build’s table
+- `f1/site/van_30065053.json`: no named source and licence in the build’s table
+- `f1/site/van_30065094.json`: no named source and licence in the build’s table
+- `f1/site/van_30366446.json`: no named source and licence in the build’s table
+- `f1/site/van_30563806.json`: no named source and licence in the build’s table
+- `f1/site/van_30566406.json`: no named source and licence in the build’s table
+- `f1/site/van_30566425.json`: no named source and licence in the build’s table
+- `f1/site/van_30566505.json`: no named source and licence in the build’s table
+- `f1/site/van_30566537.json`: no named source and licence in the build’s table
+- `f1/site/van_30566575.json`: no named source and licence in the build’s table
+- `f1/site/van_30783006.json`: no named source and licence in the build’s table
+- `f1/site/van_30961203.json`: no named source and licence in the build’s table
+- `f1/site/van_30961233.json`: no named source and licence in the build’s table
+- `f1/site/van_30961295.json`: no named source and licence in the build’s table
+- `f1/site/van_32060707.json`: no named source and licence in the build’s table
+- `f1/site/van_32060725.json`: no named source and licence in the build’s table
+- `f1/site/van_32060755.json`: no named source and licence in the build’s table
+- `f1/site/van_32060799.json`: no named source and licence in the build’s table
+- `f1/site/van_32063003.json`: no named source and licence in the build’s table
+- `f1/site/van_32063103.json`: no named source and licence in the build’s table
+- `f1/site/van_32063199.json`: no named source and licence in the build’s table
+- `f1/site/van_32063403.json`: no named source and licence in the build’s table
+- `f1/site/van_32065017.json`: no named source and licence in the build’s table
+- `f1/site/van_32065041.json`: no named source and licence in the build’s table
+- `f1/site/van_32065081.json`: no named source and licence in the build’s table
+- `f1/site/van_32066503.json`: no named source and licence in the build’s table
+- `f1/site/van_56528203.json`: no named source and licence in the build’s table
+- `f1/site/van_56829504.json`: no named source and licence in the build’s table
+- `f1/site/van_56829614.json`: no named source and licence in the build’s table
+- `f1/site/van_56829684.json`: no named source and licence in the build’s table
+- `f1/site/van_56829798.json`: no named source and licence in the build’s table
+- `f1/site/van_57819407.json`: no named source and licence in the build’s table
+- `f1/site/van_57819490.json`: no named source and licence in the build’s table
+- `f1/site/van_57919293.json`: no named source and licence in the build’s table
+- `f1/site/van_58021205.json`: no named source and licence in the build’s table
+- `f1/site/van_58022640.json`: no named source and licence in the build’s table
+- `f1/site/van_58023003.json`: no named source and licence in the build’s table
+- `f1/site/van_58023306.json`: no named source and licence in the build’s table
+- `f1/site/van_58023591.json`: no named source and licence in the build’s table
+- `f1/site/van_58025035.json`: no named source and licence in the build’s table
+- `f1/site/van_58025307.json`: no named source and licence in the build’s table
+- `f1/site/van_58025308.json`: no named source and licence in the build’s table
+- `f1/site/van_58025318.json`: no named source and licence in the build’s table
+- `f1/site/van_58025334.json`: no named source and licence in the build’s table
+- `f1/site/van_58025336.json`: no named source and licence in the build’s table
+- `f1/site/van_58025356.json`: no named source and licence in the build’s table
+- `f1/site/van_58025366.json`: no named source and licence in the build’s table
+- `f1/site/van_58025375.json`: no named source and licence in the build’s table
+- `f1/site/van_58025398.json`: no named source and licence in the build’s table
+- `f1/site/van_58625315.json`: no named source and licence in the build’s table
+- `f1/site/van_58625320.json`: no named source and licence in the build’s table
+- `f1/site/van_58625325.json`: no named source and licence in the build’s table
+- `f1/site/van_58625330.json`: no named source and licence in the build’s table
+- `f1/site/van_58625335.json`: no named source and licence in the build’s table
+- `f1/site/van_58625350.json`: no named source and licence in the build’s table
+- `f1/site/van_58625394.json`: no named source and licence in the build’s table
+- `f1/site/van_58625397.json`: no named source and licence in the build’s table
+- `f1/site/van_58725007.json`: no named source and licence in the build’s table
+- `f1/site/van_58725092.json`: no named source and licence in the build’s table
+- `f1/site/van_58725305.json`: no named source and licence in the build’s table
+- `f1/site/van_58725393.json`: no named source and licence in the build’s table
+- `f1/site/van_58822290.json`: no named source and licence in the build’s table
+- `f1/site/van_58822695.json`: no named source and licence in the build’s table
+- `f1/site/van_58823096.json`: no named source and licence in the build’s table
+- `f1/site/van_58825103.json`: no named source and licence in the build’s table
+- `f1/site/van_58825140.json`: no named source and licence in the build’s table
+- `f1/site/van_58825303.json`: no named source and licence in the build’s table
+- `f1/site/van_58825336.json`: no named source and licence in the build’s table
+- `f1/site/van_58825346.json`: no named source and licence in the build’s table
+- `f1/site/van_58825354.json`: no named source and licence in the build’s table
+- `f1/site/van_58825376.json`: no named source and licence in the build’s table
+- `f1/site/van_58920592.json`: no named source and licence in the build’s table
+- `f1/site/van_58921719.json`: no named source and licence in the build’s table
+- `f1/site/van_58921745.json`: no named source and licence in the build’s table
+- `f1/site/van_59022236.json`: no named source and licence in the build’s table
+- `f1/site/van_59022680.json`: no named source and licence in the build’s table
+- `f1/site/van_59221812.json`: no named source and licence in the build’s table
+- `f1/site/van_59222216.json`: no named source and licence in the build’s table
+- `f1/site/van_59222296.json`: no named source and licence in the build’s table
+- `f1/site/van_59222605.json`: no named source and licence in the build’s table
+- `f1/site/van_59222629.json`: no named source and licence in the build’s table
+- `f1/site/van_59222642.json`: no named source and licence in the build’s table
+- `f1/site/van_59222645.json`: no named source and licence in the build’s table
+- `f1/site/van_59222667.json`: no named source and licence in the build’s table
+- `f1/site/van_59222679.json`: no named source and licence in the build’s table
+- `f1/site/van_59222696.json`: no named source and licence in the build’s table
+- `f1/site/van_59222697.json`: no named source and licence in the build’s table
+- `f1/site/van_59223012.json`: no named source and licence in the build’s table
+- `f1/site/van_59223024.json`: no named source and licence in the build’s table
+- `f1/site/van_59223025.json`: no named source and licence in the build’s table
+- `f1/site/van_59223039.json`: no named source and licence in the build’s table
+- `f1/site/van_59223050.json`: no named source and licence in the build’s table
+- `f1/site/van_59223053.json`: no named source and licence in the build’s table
+- `f1/site/van_59223061.json`: no named source and licence in the build’s table
+- `f1/site/van_59223069.json`: no named source and licence in the build’s table
+- `f1/site/van_59223075.json`: no named source and licence in the build’s table
+- `f1/site/van_59223098.json`: no named source and licence in the build’s table
+- `f1/site/van_59421914.json`: no named source and licence in the build’s table
+- `f1/site/van_59421915.json`: no named source and licence in the build’s table
+- `f1/site/van_59422239.json`: no named source and licence in the build’s table
+- `f1/site/van_59422605.json`: no named source and licence in the build’s table
+- `f1/site/van_59422615+59422629.json`: no named source and licence in the build’s table
+- `f1/site/van_59422615.json`: no named source and licence in the build’s table
+- `f1/site/van_59422622.json`: no named source and licence in the build’s table
+- `f1/site/van_59422629.json`: no named source and licence in the build’s table
+- `f1/site/van_59422630.json`: no named source and licence in the build’s table
+- `f1/site/van_59422647.json`: no named source and licence in the build’s table
+- `f1/site/van_59422648.json`: no named source and licence in the build’s table
+- `f1/site/van_59422650.json`: no named source and licence in the build’s table
+- `f1/site/van_59422655.json`: no named source and licence in the build’s table
+- `f1/site/van_59422658.json`: no named source and licence in the build’s table
+- `f1/site/van_59422670.json`: no named source and licence in the build’s table
+- `f1/site/van_59422681.json`: no named source and licence in the build’s table
+- `f1/site/van_59422695.json`: no named source and licence in the build’s table
+- `f1/site/van_59422696.json`: no named source and licence in the build’s table
+- `f1/site/van_59423025.json`: no named source and licence in the build’s table
+- `f1/site/van_59423038.json`: no named source and licence in the build’s table
+- `f1/site/van_59423054.json`: no named source and licence in the build’s table
+- `f1/site/van_59423062.json`: no named source and licence in the build’s table
+- `f1/site/van_59423070.json`: no named source and licence in the build’s table
+- `f1/site/van_59423078.json`: no named source and licence in the build’s table
+- `f1/site/van_59423086.json`: no named source and licence in the build’s table
+- `f1/site/van_59423095.json`: no named source and licence in the build’s table
+- `f1/site/van_59423096.json`: no named source and licence in the build’s table
+- `f1/site/van_59621914.json`: no named source and licence in the build’s table
+- `f1/site/van_59621915.json`: no named source and licence in the build’s table
+- `f1/site/van_59621998.json`: no named source and licence in the build’s table
+- `f1/site/van_59622617.json`: no named source and licence in the build’s table
+- `f1/site/van_59622623.json`: no named source and licence in the build’s table
+- `f1/site/van_59622635.json`: no named source and licence in the build’s table
+- `f1/site/van_59622647.json`: no named source and licence in the build’s table
+- `f1/site/van_59622651.json`: no named source and licence in the build’s table
+- `f1/site/van_59622662.json`: no named source and licence in the build’s table
+- `f1/site/van_59622677+59622695.json`: no named source and licence in the build’s table
+- `f1/site/van_59622677.json`: no named source and licence in the build’s table
+- `f1/site/van_59622695.json`: no named source and licence in the build’s table
+- `f1/site/van_59623020.json`: no named source and licence in the build’s table
+- `f1/site/van_59623023.json`: no named source and licence in the build’s table
+- `f1/site/van_59623026.json`: no named source and licence in the build’s table
+- `f1/site/van_59623034.json`: no named source and licence in the build’s table
+- `f1/site/van_59623042.json`: no named source and licence in the build’s table
+- `f1/site/van_59623044.json`: no named source and licence in the build’s table
+- `f1/site/van_59623050.json`: no named source and licence in the build’s table
+- `f1/site/van_59623057.json`: no named source and licence in the build’s table
+- `f1/site/van_59623060+59623080.json`: no named source and licence in the build’s table
+- `f1/site/van_59623060.json`: no named source and licence in the build’s table
+- `f1/site/van_59623075.json`: no named source and licence in the build’s table
+- `f1/site/van_59623080.json`: no named source and licence in the build’s table
+- `f1/site/van_59623092.json`: no named source and licence in the build’s table
+- `f1/site/van_59623095.json`: no named source and licence in the build’s table
+- `f1/site/van_59821971.json`: no named source and licence in the build’s table
+- `f1/site/van_59821991.json`: no named source and licence in the build’s table
+- `f1/site/van_59822207.json`: no named source and licence in the build’s table
+- `f1/site/van_59822295.json`: no named source and licence in the build’s table
+- `f1/site/van_59822605.json`: no named source and licence in the build’s table
+- `f1/site/van_59822639.json`: no named source and licence in the build’s table
+- `f1/site/van_59822659.json`: no named source and licence in the build’s table
+- `f1/site/van_59822693.json`: no named source and licence in the build’s table
+- `f1/site/van_59823012.json`: no named source and licence in the build’s table
+- `f1/site/van_59823015.json`: no named source and licence in the build’s table
+- `f1/site/van_59823020.json`: no named source and licence in the build’s table
+- `f1/site/van_59823025.json`: no named source and licence in the build’s table
+- `f1/site/van_59823035.json`: no named source and licence in the build’s table
+- `f1/site/van_59823040.json`: no named source and licence in the build’s table
+- `f1/site/van_59823045.json`: no named source and licence in the build’s table
+- `f1/site/van_59823055.json`: no named source and licence in the build’s table
+- `f1/site/van_59823060.json`: no named source and licence in the build’s table
+- `f1/site/van_59823065.json`: no named source and licence in the build’s table
+- `f1/site/van_59823070.json`: no named source and licence in the build’s table
+- `f1/site/van_59823075.json`: no named source and licence in the build’s table
+- `f1/site/van_59823080.json`: no named source and licence in the build’s table
+- `f1/site/van_59823085.json`: no named source and licence in the build’s table
+- `f1/site/van_59823097.json`: no named source and licence in the build’s table
+- `f1/site/van_60020596.json`: no named source and licence in the build’s table
+- `f1/site/van_60021901.json`: no named source and licence in the build’s table
+- `f1/site/van_60021991.json`: no named source and licence in the build’s table
+- `f1/site/van_60022204.json`: no named source and licence in the build’s table
+- `f1/site/van_60022506.json`: no named source and licence in the build’s table
+- `f1/site/van_60022595.json`: no named source and licence in the build’s table
+- `f1/site/van_60022601.json`: no named source and licence in the build’s table
+- `f1/site/van_60023007.json`: no named source and licence in the build’s table
+- `f1/site/van_60023027.json`: no named source and licence in the build’s table
+- `f1/site/van_60023035.json`: no named source and licence in the build’s table
+- `f1/site/van_60023096.json`: no named source and licence in the build’s table
+- `f1/site/van_60023104.json`: no named source and licence in the build’s table
+- `f1/site/van_60023135.json`: no named source and licence in the build’s table
+- `f1/site/van_60023169.json`: no named source and licence in the build’s table
+- `f1/site/van_60023185.json`: no named source and licence in the build’s table
+- `f1/site/van_60023195.json`: no named source and licence in the build’s table
+- `f1/site/van_60023196.json`: no named source and licence in the build’s table
+- `f1/site/van_60023303.json`: no named source and licence in the build’s table
+- `f1/site/van_60023306.json`: no named source and licence in the build’s table
+- `f1/site/van_60023315.json`: no named source and licence in the build’s table
+- `f1/site/van_60023329.json`: no named source and licence in the build’s table
+- `f1/site/van_60023365.json`: no named source and licence in the build’s table
+- `f1/site/van_60023406+60023418.json`: no named source and licence in the build’s table
+- `f1/site/van_60023406.json`: no named source and licence in the build’s table
+- `f1/site/van_60023418.json`: no named source and licence in the build’s table
+- `f1/site/van_60023470.json`: no named source and licence in the build’s table
+- `f1/site/van_60023485.json`: no named source and licence in the build’s table
+- `f1/site/van_60023499.json`: no named source and licence in the build’s table
+- `f1/site/van_60023501.json`: no named source and licence in the build’s table
+- `f1/site/van_60023511.json`: no named source and licence in the build’s table
+- `f1/site/van_60023521.json`: no named source and licence in the build’s table
+- `f1/site/van_60023524.json`: no named source and licence in the build’s table
+- `f1/site/van_60023535.json`: no named source and licence in the build’s table
+- `f1/site/van_60023541.json`: no named source and licence in the build’s table
+- `f1/site/van_60023551.json`: no named source and licence in the build’s table
+- `f1/site/van_60023559.json`: no named source and licence in the build’s table
+- `f1/site/van_60023574+60023594.json`: no named source and licence in the build’s table
+- `f1/site/van_60023574.json`: no named source and licence in the build’s table
+- `f1/site/van_60023594.json`: no named source and licence in the build’s table
+- `f1/site/van_60023602.json`: no named source and licence in the build’s table
+- `f1/site/van_60023625.json`: no named source and licence in the build’s table
+- `f1/site/van_60023626.json`: no named source and licence in the build’s table
+- `f1/site/van_60023634.json`: no named source and licence in the build’s table
+- `f1/site/van_60023674.json`: no named source and licence in the build’s table
+- `f1/site/van_60023675.json`: no named source and licence in the build’s table
+- `f1/site/van_60023685.json`: no named source and licence in the build’s table
+- `f1/site/van_60023691.json`: no named source and licence in the build’s table
+- `f1/site/van_60023714.json`: no named source and licence in the build’s table
+- `f1/site/van_60023754.json`: no named source and licence in the build’s table
+- `f1/site/van_60027702.json`: no named source and licence in the build’s table
+- `f1/site/van_60119104.json`: no named source and licence in the build’s table
+- `f1/site/van_60122296.json`: no named source and licence in the build’s table
+- `f1/site/van_60122607+60122645.json`: no named source and licence in the build’s table
+- `f1/site/van_60122607.json`: no named source and licence in the build’s table
+- `f1/site/van_60122645.json`: no named source and licence in the build’s table
+- `f1/site/van_60122695.json`: no named source and licence in the build’s table
+- `f1/site/van_60122807.json`: no named source and licence in the build’s table
+- `f1/site/van_60123095.json`: no named source and licence in the build’s table
+- `f1/site/van_60123175.json`: no named source and licence in the build’s table
+- `f1/site/van_60123195.json`: no named source and licence in the build’s table
+- `f1/site/van_60422808.json`: no named source and licence in the build’s table
+- `f1/site/van_60422895.json`: no named source and licence in the build’s table
+- `f1/site/van_60422898+60622897.json`: no named source and licence in the build’s table
+- `f1/site/van_60422898.json`: no named source and licence in the build’s table
+- `f1/site/van_60423029.json`: no named source and licence in the build’s table
+- `f1/site/van_60423092.json`: no named source and licence in the build’s table
+- `f1/site/van_60622697.json`: no named source and licence in the build’s table
+- `f1/site/van_60622806.json`: no named source and licence in the build’s table
+- `f1/site/van_60622897.json`: no named source and licence in the build’s table
+- `f1/site/van_60623047.json`: no named source and licence in the build’s table
+- `f1/site/van_60623051.json`: no named source and licence in the build’s table
+- `f1/site/van_60623091.json`: no named source and licence in the build’s table
+- `f1/site/van_60623094+60723093.json`: no named source and licence in the build’s table
+- `f1/site/van_60623094.json`: no named source and licence in the build’s table
+- `f1/site/van_60623104.json`: no named source and licence in the build’s table
+- `f1/site/van_60623124.json`: no named source and licence in the build’s table
+- `f1/site/van_60719604.json`: no named source and licence in the build’s table
+- `f1/site/van_60719692.json`: no named source and licence in the build’s table
+- `f1/site/van_60720514.json`: no named source and licence in the build’s table
+- `f1/site/van_60720574.json`: no named source and licence in the build’s table
+- `f1/site/van_60721296.json`: no named source and licence in the build’s table
+- `f1/site/van_60721704.json`: no named source and licence in the build’s table
+- `f1/site/van_60721707.json`: no named source and licence in the build’s table
+- `f1/site/van_60721724.json`: no named source and licence in the build’s table
+- `f1/site/van_60721744.json`: no named source and licence in the build’s table
+- `f1/site/van_60721764.json`: no named source and licence in the build’s table
+- `f1/site/van_60721784.json`: no named source and licence in the build’s table
+- `f1/site/van_60721905.json`: no named source and licence in the build’s table
+- `f1/site/van_60721995.json`: no named source and licence in the build’s table
+- `f1/site/van_60721998.json`: no named source and licence in the build’s table
+- `f1/site/van_60722803.json`: no named source and licence in the build’s table
+- `f1/site/van_60723051.json`: no named source and licence in the build’s table
+- `f1/site/van_60723093.json`: no named source and licence in the build’s table
+- `f1/site/van_60723194.json`: no named source and licence in the build’s table
+- `f1/site/van_60723195.json`: no named source and licence in the build’s table
+- `f1/site/van_60730908.json`: no named source and licence in the build’s table
+- `f1/site/van_60731240.json`: no named source and licence in the build’s table
+- `f1/site/van_61222697.json`: no named source and licence in the build’s table
+- `f1/site/van_61222806.json`: no named source and licence in the build’s table
+- `f1/site/van_61223004.json`: no named source and licence in the build’s table
+- `f1/site/van_61223016.json`: no named source and licence in the build’s table
+- `f1/site/van_61223203.json`: no named source and licence in the build’s table
+- `f1/site/van_61223293.json`: no named source and licence in the build’s table
+- `f1/site/van_61519804.json`: no named source and licence in the build’s table
+- `f1/site/van_61519823.json`: no named source and licence in the build’s table
+- `f1/site/van_61519836.json`: no named source and licence in the build’s table
+- `f1/site/van_61519842.json`: no named source and licence in the build’s table
+- `f1/site/van_61519876.json`: no named source and licence in the build’s table
+- `f1/site/van_61519892.json`: no named source and licence in the build’s table
+- `f1/site/van_61520602.json`: no named source and licence in the build’s table
+- `f1/site/van_61521706.json`: no named source and licence in the build’s table
+- `f1/site/van_61521735.json`: no named source and licence in the build’s table
+- `f1/site/van_61521861.json`: no named source and licence in the build’s table
+- `f1/site/van_61521880.json`: no named source and licence in the build’s table
+- `f1/site/van_61521894.json`: no named source and licence in the build’s table
+- `f1/site/van_61623002.json`: no named source and licence in the build’s table
+- `f1/site/van_61623007.json`: no named source and licence in the build’s table
+- `f1/site/van_61623021.json`: no named source and licence in the build’s table
+- `f1/site/van_61630996.json`: no named source and licence in the build’s table
+- `f1/site/van_62921873.json`: no named source and licence in the build’s table
+- `f1/site/van_62921983.json`: no named source and licence in the build’s table
+- `f1/site/van_63009706.json`: no named source and licence in the build’s table
+- `f1/site/van_63019106.json`: no named source and licence in the build’s table
+- `f1/site/van_63019306.json`: no named source and licence in the build’s table
+- `f1/site/van_63019307.json`: no named source and licence in the build’s table
+- `f1/site/van_63019311.json`: no named source and licence in the build’s table
+- `f1/site/van_63019333.json`: no named source and licence in the build’s table
+- `f1/site/van_63019392.json`: no named source and licence in the build’s table
+- `f1/site/van_63019469.json`: no named source and licence in the build’s table
+- `f1/site/van_63019495.json`: no named source and licence in the build’s table
+- `f1/site/van_63019802.json`: no named source and licence in the build’s table
+- `f1/site/van_63019807.json`: no named source and licence in the build’s table
+- `f1/site/van_63019851.json`: no named source and licence in the build’s table
+- `f1/site/van_63019853.json`: no named source and licence in the build’s table
+- `f1/site/van_63020304.json`: no named source and licence in the build’s table
+- `f1/site/van_63021625.json`: no named source and licence in the build’s table
+- `f1/site/van_63021650.json`: no named source and licence in the build’s table
+- `f1/site/van_63021667+63021695.json`: no named source and licence in the build’s table
+- `f1/site/van_63021667.json`: no named source and licence in the build’s table
+- `f1/site/van_63021695.json`: no named source and licence in the build’s table
+- `f1/site/van_63021705.json`: no named source and licence in the build’s table
+- `f1/site/van_63021750.json`: no named source and licence in the build’s table
+- `f1/site/van_63021783.json`: no named source and licence in the build’s table
+- `f1/site/van_63031205.json`: no named source and licence in the build’s table
+- `f1/site/van_63031216.json`: no named source and licence in the build’s table
+- `f1/site/van_63117153.json`: no named source and licence in the build’s table
+- `f1/site/van_63121896.json`: no named source and licence in the build’s table
+- `f1/site/van_63319107.json`: no named source and licence in the build’s table
+- `f1/site/van_63319194.json`: no named source and licence in the build’s table
+- `f1/site/van_63323004.json`: no named source and licence in the build’s table
+- `f1/site/van_63412004.json`: no named source and licence in the build’s table
+- `f1/site/van_63412297.json`: no named source and licence in the build’s table
+- `f1/site/van_63423045.json`: no named source and licence in the build’s table
+- `f1/site/van_63423050+63423096.json`: no named source and licence in the build’s table
+- `f1/site/van_63423050.json`: no named source and licence in the build’s table
+- `f1/site/van_63423096.json`: no named source and licence in the build’s table
+- `f1/site/van_63431203.json`: no named source and licence in the build’s table
+- `f1/site/van_63431214.json`: no named source and licence in the build’s table
+- `f1/site/van_63431224.json`: no named source and licence in the build’s table
+- `f1/site/van_63519105.json`: no named source and licence in the build’s table
+- `f1/site/van_63519126.json`: no named source and licence in the build’s table
+- `f1/site/van_63519303.json`: no named source and licence in the build’s table
+- `f1/site/van_63519324.json`: no named source and licence in the build’s table
+- `f1/site/van_63519332.json`: no named source and licence in the build’s table
+- `f1/site/van_63519342.json`: no named source and licence in the build’s table
+- `f1/site/van_63519347.json`: no named source and licence in the build’s table
+- `f1/site/van_63519353.json`: no named source and licence in the build’s table
+- `f1/site/van_63519356.json`: no named source and licence in the build’s table
+- `f1/site/van_63519365.json`: no named source and licence in the build’s table
+- `f1/site/van_63519366.json`: no named source and licence in the build’s table
+- `f1/site/van_63519376.json`: no named source and licence in the build’s table
+- `f1/site/van_63519377.json`: no named source and licence in the build’s table
+- `f1/site/van_63519380.json`: no named source and licence in the build’s table
+- `f1/site/van_63519388.json`: no named source and licence in the build’s table
+- `f1/site/van_63519403.json`: no named source and licence in the build’s table
+- `f1/site/van_63519425.json`: no named source and licence in the build’s table
+- `f1/site/van_63612007.json`: no named source and licence in the build’s table
+- `f1/site/van_63812206.json`: no named source and licence in the build’s table
+- `f1/site/van_63818498.json`: no named source and licence in the build’s table
+- `f1/site/van_63819030.json`: no named source and licence in the build’s table
+- `f1/site/van_63819303.json`: no named source and licence in the build’s table
+- `f1/site/van_63819323.json`: no named source and licence in the build’s table
+- `f1/site/van_63819363.json`: no named source and licence in the build’s table
+- `f1/site/van_63819485.json`: no named source and licence in the build’s table
+- `f1/site/van_63819490.json`: no named source and licence in the build’s table
+- `f1/site/van_63822206.json`: no named source and licence in the build’s table
+- `f1/site/van_63822506.json`: no named source and licence in the build’s table
+- `f1/site/van_64017198.json`: no named source and licence in the build’s table
+- `f1/site/van_64017904.json`: no named source and licence in the build’s table
+- `f1/site/van_64018602.json`: no named source and licence in the build’s table
+- `f1/site/van_64018695.json`: no named source and licence in the build’s table
+- `f1/site/van_64019015.json`: no named source and licence in the build’s table
+- `f1/site/van_64019045.json`: no named source and licence in the build’s table
+- `f1/site/van_64019095.json`: no named source and licence in the build’s table
+- `f1/site/van_64019352.json`: no named source and licence in the build’s table
+- `f1/site/van_64019407.json`: no named source and licence in the build’s table
+- `f1/site/van_64019444.json`: no named source and licence in the build’s table
+- `f1/site/van_64019494.json`: no named source and licence in the build’s table
+- `f1/site/van_64021473.json`: no named source and licence in the build’s table
+- `f1/site/van_64022203.json`: no named source and licence in the build’s table
+- `f1/site/van_64022505.json`: no named source and licence in the build’s table
+- `f1/site/van_64117394.json`: no named source and licence in the build’s table
+- `f1/site/van_64117994.json`: no named source and licence in the build’s table
+- `f1/site/van_64118475.json`: no named source and licence in the build’s table
+- `f1/site/van_64118606.json`: no named source and licence in the build’s table
+- `f1/site/van_64212005.json`: no named source and licence in the build’s table
+- `f1/site/van_64212096.json`: no named source and licence in the build’s table
+- `f1/site/van_64212208.json`: no named source and licence in the build’s table
+- `f1/site/van_64217307.json`: no named source and licence in the build’s table
+- `f1/site/van_64217308.json`: no named source and licence in the build’s table
+- `f1/site/van_64217963.json`: no named source and licence in the build’s table
+- `f1/site/van_64218206.json`: no named source and licence in the build’s table
+- `f1/site/van_64218207.json`: no named source and licence in the build’s table
+- `f1/site/van_64218407.json`: no named source and licence in the build’s table
+- `f1/site/van_64218606.json`: no named source and licence in the build’s table
+- `f1/site/van_64417108.json`: no named source and licence in the build’s table
+- `f1/site/van_64417195.json`: no named source and licence in the build’s table
+- `f1/site/van_64417305.json`: no named source and licence in the build’s table
+- `f1/site/van_64418408.json`: no named source and licence in the build’s table
+- `f1/site/van_64517106.json`: no named source and licence in the build’s table
+- `f1/site/van_64517107.json`: no named source and licence in the build’s table
+- `f1/site/van_64517140.json`: no named source and licence in the build’s table
+- `f1/site/van_64518605.json`: no named source and licence in the build’s table
+- `f1/site/van_64519071.json`: no named source and licence in the build’s table
+- `f1/site/van_64519405.json`: no named source and licence in the build’s table
+- `f1/site/van_64519407.json`: no named source and licence in the build’s table
+- `f1/site/van_64617194.json`: no named source and licence in the build’s table
+- `f1/site/van_64617306.json`: no named source and licence in the build’s table
+- `f1/site/van_64618493.json`: no named source and licence in the build’s table
+- `f1/site/van_64618496.json`: no named source and licence in the build’s table
+- `f1/site/van_64618609.json`: no named source and licence in the build’s table
+- `f1/site/van_64622505.json`: no named source and licence in the build’s table
+- `f1/site/van_64623007.json`: no named source and licence in the build’s table
+- `f1/site/van_64817107.json`: no named source and licence in the build’s table
+- `f1/site/van_64818406.json`: no named source and licence in the build’s table
+- `f1/site/van_65027596.json`: no named source and licence in the build’s table
+- `f1/site/van_65029402.json`: no named source and licence in the build’s table
+- `f1/site/van_65029614.json`: no named source and licence in the build’s table
+- `f1/site/van_65030002.json`: no named source and licence in the build’s table
+- `f1/site/van_65030204.json`: no named source and licence in the build’s table
+- `f1/site/van_65030228.json`: no named source and licence in the build’s table
+- `f1/site/van_65030256.json`: no named source and licence in the build’s table
+- `f1/site/van_65030288.json`: no named source and licence in the build’s table
+- `f1/site/van_65030504.json`: no named source and licence in the build’s table
+- `f1/site/van_65030507.json`: no named source and licence in the build’s table
+- `f1/site/van_65030555.json`: no named source and licence in the build’s table
+- `f1/site/van_65030595.json`: no named source and licence in the build’s table
+- `f1/site/van_65031271.json`: no named source and licence in the build’s table
+- `f1/site/van_65031295.json`: no named source and licence in the build’s table
+- `f1/site/van_65031296.json`: no named source and licence in the build’s table
+- `f1/site/van_66430302.json`: no named source and licence in the build’s table
+- `f1/site/van_66727706.json`: no named source and licence in the build’s table
+- `f1/site/van_66727708.json`: no named source and licence in the build’s table
+- `f1/site/van_67028001.json`: no named source and licence in the build’s table
+- `f1/site/van_67030505.json`: no named source and licence in the build’s table
+- `f1/site/van_67030513.json`: no named source and licence in the build’s table
+- `f1/site/van_67030523.json`: no named source and licence in the build’s table
+- `f1/site/van_67030599.json`: no named source and licence in the build’s table
+- `f1/site/van_75822402.json`: no named source and licence in the build’s table
+- `f1/site/van_83017208.json`: no named source and licence in the build’s table
+- `f1/site/van_83017282.json`: no named source and licence in the build’s table
+- `f1/site/van_83017626.json`: no named source and licence in the build’s table
+- `f1/site/van_83017696.json`: no named source and licence in the build’s table
+- `f1/site/van_83018104.json`: no named source and licence in the build’s table
+- `f1/site/van_83018144.json`: no named source and licence in the build’s table
+- `f1/site/van_83018406.json`: no named source and licence in the build’s table
+- `f1/site/van_83018514.json`: no named source and licence in the build’s table
+- `f1/site/van_83018564.json`: no named source and licence in the build’s table
+- `f1/site/van_83018594.json`: no named source and licence in the build’s table
+- `f1/site/van_83019070.json`: no named source and licence in the build’s table
+- `f1/site/van_83019592.json`: no named source and licence in the build’s table
+- `f1/site/van_83019708.json`: no named source and licence in the build’s table
+- `f1/site/van_83019998.json`: no named source and licence in the build’s table
+- `f1/site/van_83020104.json`: no named source and licence in the build’s table
+- `f1/site/van_83020326.json`: no named source and licence in the build’s table
+- `f1/site/van_83020350.json`: no named source and licence in the build’s table
+- `f1/site/van_83020392.json`: no named source and licence in the build’s table
+- `f1/site/van_83021002.json`: no named source and licence in the build’s table
+- `f1/site/van_83021092.json`: no named source and licence in the build’s table
+- `f1/site/van_83021106.json`: no named source and licence in the build’s table
+- `f1/site/van_83021694.json`: no named source and licence in the build’s table
+- `f1/site/van_83021802.json`: no named source and licence in the build’s table
+- `f1/site/van_83022196.json`: no named source and licence in the build’s table
+- `f1/site/van_83022492.json`: no named source and licence in the build’s table
+- `f1/site/van_83022506.json`: no named source and licence in the build’s table
+- `f1/site/van_83023608.json`: no named source and licence in the build’s table
+- `f1/site/van_83023680.json`: no named source and licence in the build’s table
+- `f1/site/van_83023796.json`: no named source and licence in the build’s table
+- `f1/site/van_83031392.json`: no named source and licence in the build’s table
+- `f1/site/van_83218145.json`: no named source and licence in the build’s table
+- `f1/site/van_83222504.json`: no named source and licence in the build’s table
+- `f1/site/van_83222548.json`: no named source and licence in the build’s table
+- `f1/site/van_83716607.json`: no named source and licence in the build’s table
+- `f1/site/van_83716615.json`: no named source and licence in the build’s table
+- `f1/site/van_83718105.json`: no named source and licence in the build’s table
+- `f1/site/van_83718435.json`: no named source and licence in the build’s table
+- `f1/site/van_83719755.json`: no named source and licence in the build’s table
+- `f1/site/van_83719765.json`: no named source and licence in the build’s table
+- `f1/site/van_83719795.json`: no named source and licence in the build’s table
+- `f1/site/van_83720109.json`: no named source and licence in the build’s table
+- `f1/site/van_83721177.json`: no named source and licence in the build’s table
+- `f1/site/van_83721185.json`: no named source and licence in the build’s table
+- `f1/site/van_83721851.json`: no named source and licence in the build’s table
+- `f1/site/van_83723695.json`: no named source and licence in the build’s table
+- `f1/site/van_83917994.json`: no named source and licence in the build’s table
+- `f1/site/van_83918106.json`: no named source and licence in the build’s table
+- `f1/site/van_83918196.json`: no named source and licence in the build’s table
+- `f1/site/van_83918404.json`: no named source and licence in the build’s table
+- `f1/site/van_83918494.json`: no named source and licence in the build’s table
+- `f1/site/van_83919002.json`: no named source and licence in the build’s table
+- `f1/site/van_83919012.json`: no named source and licence in the build’s table
+- `f1/site/van_83919014.json`: no named source and licence in the build’s table
+- `f1/site/van_83919718.json`: no named source and licence in the build’s table
+- `f1/site/van_83919736.json`: no named source and licence in the build’s table
+- `f1/site/van_83920152.json`: no named source and licence in the build’s table
+- `f1/site/van_83920172.json`: no named source and licence in the build’s table
+- `f1/site/van_83920192.json`: no named source and licence in the build’s table
+- `f1/site/van_83921008.json`: no named source and licence in the build’s table
+- `f1/site/van_83922470.json`: no named source and licence in the build’s table
+- `f1/site/van_83922496.json`: no named source and licence in the build’s table
+- `f1/site/van_83922508.json`: no named source and licence in the build’s table
+- `f1/site/van_83923588.json`: no named source and licence in the build’s table
+- `f1/site/van_83923622.json`: no named source and licence in the build’s table
+- `f1/site/van_83924106.json`: no named source and licence in the build’s table
+- `f1/site/van_83927448.json`: no named source and licence in the build’s table
+- `f1/site/van_83927460.json`: no named source and licence in the build’s table
+- `f1/site/van_83931350.json`: no named source and licence in the build’s table
+- `f1/site/van_84014404.json`: no named source and licence in the build’s table
+- `f1/site/van_84014444.json`: no named source and licence in the build’s table
+- `f1/site/van_84014486.json`: no named source and licence in the build’s table
+- `f1/site/van_84014906.json`: no named source and licence in the build’s table
+- `f1/site/van_84014996.json`: no named source and licence in the build’s table
+- `f1/site/van_84015104.json`: no named source and licence in the build’s table
+- `f1/site/van_84015292.json`: no named source and licence in the build’s table
+- `f1/site/van_84015306.json`: no named source and licence in the build’s table
+- `f1/site/van_84015312.json`: no named source and licence in the build’s table
+- `f1/site/van_84015516.json`: no named source and licence in the build’s table
+- `f1/site/van_84015596.json`: no named source and licence in the build’s table
+- `f1/site/van_84015604.json`: no named source and licence in the build’s table
+- `f1/site/van_84015614.json`: no named source and licence in the build’s table
+- `f1/site/van_84015634+84015654.json`: no named source and licence in the build’s table
+- `f1/site/van_84015634.json`: no named source and licence in the build’s table
+- `f1/site/van_84015654.json`: no named source and licence in the build’s table
+- `f1/site/van_84015674+84015694.json`: no named source and licence in the build’s table
+- `f1/site/van_84015674.json`: no named source and licence in the build’s table
+- `f1/site/van_84015694.json`: no named source and licence in the build’s table
+- `f1/site/van_84016196.json`: no named source and licence in the build’s table
+- `f1/site/van_84112562.json`: no named source and licence in the build’s table
+- `f1/site/van_84114894.json`: no named source and licence in the build’s table
+- `f1/site/van_84212214.json`: no named source and licence in the build’s table
+- `f1/site/van_84212255.json`: no named source and licence in the build’s table
+- `f1/site/van_84212296.json`: no named source and licence in the build’s table
+- `f1/site/van_84212495.json`: no named source and licence in the build’s table
+- `f1/site/van_84214488.json`: no named source and licence in the build’s table
+- `f1/site/van_84314916.json`: no named source and licence in the build’s table
+- `f1/site/van_84315168.json`: no named source and licence in the build’s table
+- `f1/site/van_84315350.json`: no named source and licence in the build’s table
+- `f1/site/van_84414434.json`: no named source and licence in the build’s table
+- `f1/site/van_84414468.json`: no named source and licence in the build’s table
 - `tiles/edm/g_-1_-1.json`: no named source and licence in the build’s table
 - `tiles/edm/g_-1_-2.json`: no named source and licence in the build’s table
 - `tiles/edm/g_-1_-3.json`: no named source and licence in the build’s table
@@ -77,8 +1351,8 @@ Built by `publish/build_public.py` from `tool/` (13 Nov 2026). 1344 files, 222.8
 |---|---:|---|---|
 | `.nojekyll` | 0 | The public version’s own pages (publish/make_pages.py) and this list | the project’s own work (the project, UBC M.Arch): CC BY 4.0 |
 | `addons.js` | 57,274 | Beyond Data tool code and page (comments stripped, names rewritten) | the project’s own code (the project, UBC M.Arch): MIT licence |
-| `arch.js` | 99,599 | Beyond Data tool code and page (comments stripped, names rewritten) | the project’s own code (the project, UBC M.Arch): MIT licence |
-| `arch_programs.json` | 86,496 | The project’s research compilations and tool logic, each figure cited; operator figures labelled as claims | the project’s own work (the project, UBC M.Arch): CC BY 4.0 |
+| `arch.js` | 101,239 | Beyond Data tool code and page (comments stripped, names rewritten) | the project’s own code (the project, UBC M.Arch): MIT licence |
+| `arch_programs.json` | 86,504 | The project’s research compilations and tool logic, each figure cited; operator figures labelled as claims | the project’s own work (the project, UBC M.Arch): CC BY 4.0 |
 | `cards.js` | 67,689 | Beyond Data tool code and page (comments stripped, names rewritten) | the project’s own code (the project, UBC M.Arch): MIT licence |
 | `census_edm.json` | 2,784,484 | Statistics Canada, Census of Population 2021 and dissemination area boundaries | Statistics Canada Open Licence |
 | `census_van.json` | 738,393 | Statistics Canada, Census of Population 2021 and dissemination area boundaries | Statistics Canada Open Licence |
@@ -604,47 +1878,49 @@ Built by `publish/build_public.py` from `tool/` (13 Nov 2026). 1344 files, 222.8
 | `data/addons.json` | 900 | The project’s figures with their cited sources (register ids per entry); operator figures labelled as claims | the project’s own work (the project, UBC M.Arch): CC BY 4.0 |
 | `data/approval_counts.json` | 1,247 | The project’s counts and classes over City open data (Vancouver lot types only) | the project’s own work (the project, UBC M.Arch): CC BY 4.0; underlying data Open Government Licence – Vancouver, Open Government Licence – City of Edmonton |
 | `data/arch.json` | 4,533 | The project’s figures with their cited sources (register ids per entry); operator figures labelled as claims | the project’s own work (the project, UBC M.Arch): CC BY 4.0 |
-| `data/around_edm.json` | 535,255 | The project’s figures with their cited sources (register ids per entry); operator figures labelled as claims | the project’s own work (the project, UBC M.Arch): CC BY 4.0 |
-| `data/around_van.json` | 458,334 | The project’s figures with their cited sources (register ids per entry); operator figures labelled as claims | the project’s own work (the project, UBC M.Arch): CC BY 4.0 |
-| `data/assumptions_public.json` | 11,734 | The project’s figures with their cited sources (register ids per entry); operator figures labelled as claims | the project’s own work (the project, UBC M.Arch): CC BY 4.0 |
-| `data/c4_rooms.json` | 30,055 | The project’s oversize room lists per typology (read by the layout engine), each room cited in the typology definitions | the project’s own work (the project, UBC M.Arch): CC BY 4.0 |
-| `data/coverage_public.json` | 4,051 | The project’s figures with their cited sources (register ids per entry); operator figures labelled as claims | the project’s own work (the project, UBC M.Arch): CC BY 4.0 |
+| `data/assumptions_public.json` | 13,879 | The project’s figures with their cited sources (register ids per entry); operator figures labelled as claims | the project’s own work (the project, UBC M.Arch): CC BY 4.0 |
+| `data/c4_rooms.json` | 30,061 | The project’s oversize room lists per typology (read by the layout engine), each room cited in the typology definitions | the project’s own work (the project, UBC M.Arch): CC BY 4.0 |
+| `data/coverage_public.json` | 205,572 | The project’s figures with their cited sources (register ids per entry); operator figures labelled as claims | the project’s own work (the project, UBC M.Arch): CC BY 4.0 |
 | `data/dc_rooms.json` | 7,799 | The project’s figures with their cited sources (register ids per entry); operator figures labelled as claims | the project’s own work (the project, UBC M.Arch): CC BY 4.0 |
+| `data/edm_public.json` | 11,308,314 | Edmonton derived results for academic use (project decision): simplified lot shapes at 2 m bins and layout areas, counts and figures; no lot outline or layout geometry; keys are City of Edmonton parcel ids | the project’s own work (the project, UBC M.Arch): CC BY 4.0; Open Government Licence – City of Edmonton |
 | `data/envelope.json` | 1,946 | The project’s figures with their cited sources (register ids per entry); operator figures labelled as claims | the project’s own work (the project, UBC M.Arch): CC BY 4.0 |
 | `data/equipment.json` | 2,449 | The project’s figures with their cited sources (register ids per entry); operator figures labelled as claims | the project’s own work (the project, UBC M.Arch): CC BY 4.0 |
-| `data/facilities.json` | 44,644 | The project’s figures with their cited sources (register ids per entry); operator figures labelled as claims | the project’s own work (the project, UBC M.Arch): CC BY 4.0 |
+| `data/facilities.json` | 43,677 | The project’s figures with their cited sources (register ids per entry); operator figures labelled as claims | the project’s own work (the project, UBC M.Arch): CC BY 4.0 |
 | `data/flood_edm.json` | 581,323 | Government of Alberta, Alberta Flood Mapping (flood hazard layer) | Open Government Licence – Alberta |
-| `data/grade.json` | 2,122 | The project’s figures with their cited sources (register ids per entry); operator figures labelled as claims | the project’s own work (the project, UBC M.Arch): CC BY 4.0 |
+| `data/grade.json` | 2,117 | The project’s figures with their cited sources (register ids per entry); operator figures labelled as claims | the project’s own work (the project, UBC M.Arch): CC BY 4.0 |
 | `data/grade_points_van.json` | 354,097 | City of Vancouver Open Data: LiDAR 2022 ground, per-lot corner grades | Open Government Licence – Vancouver |
 | `data/heat.json` | 2,884 | The project’s figures with their cited sources (register ids per entry); operator figures labelled as claims | the project’s own work (the project, UBC M.Arch): CC BY 4.0 |
-| `data/hub_clip_van.json` | 210,505 | The project’s figures with their cited sources (register ids per entry); operator figures labelled as claims | the project’s own work (the project, UBC M.Arch): CC BY 4.0 |
-| `data/hub_frozen_van.json` | 199,288 | Vancouver hub test fits, freeze 11i (the project’s own) on City of Vancouver lot geometry | the project’s own work (the project, UBC M.Arch): CC BY 4.0; lot geometry Open Government Licence – Vancouver |
+| `data/hub_clip_van.json` | 209,936 | The project’s figures with their cited sources (register ids per entry); operator figures labelled as claims | the project’s own work (the project, UBC M.Arch): CC BY 4.0 |
+| `data/hub_frozen_van.json` | 198,692 | Vancouver hub test fits, freeze 11i (the project’s own) on City of Vancouver lot geometry | the project’s own work (the project, UBC M.Arch): CC BY 4.0; lot geometry Open Government Licence – Vancouver |
 | `data/hub_grow_van.json` | 51,962 | Vancouver hub test fits, freeze 11i (the project’s own) on City of Vancouver lot geometry | the project’s own work (the project, UBC M.Arch): CC BY 4.0; lot geometry Open Government Licence – Vancouver |
-| `data/hub_laid_van.json` | 48,577 | The project’s figures with their cited sources (register ids per entry); operator figures labelled as claims | the project’s own work (the project, UBC M.Arch): CC BY 4.0 |
-| `data/lib_best_edm.json` | 378,396 | The project’s figures with their cited sources (register ids per entry); operator figures labelled as claims | the project’s own work (the project, UBC M.Arch): CC BY 4.0 |
-| `data/lib_best_van.json` | 396,541 | The project’s figures with their cited sources (register ids per entry); operator figures labelled as claims | the project’s own work (the project, UBC M.Arch): CC BY 4.0 |
-| `data/logic_plain.json` | 10,447 | The project’s figures with their cited sources (register ids per entry); operator figures labelled as claims | the project’s own work (the project, UBC M.Arch): CC BY 4.0 |
+| `data/hub_laid_van.json` | 48,506 | The project’s figures with their cited sources (register ids per entry); operator figures labelled as claims | the project’s own work (the project, UBC M.Arch): CC BY 4.0 |
+| `data/layout_filters.json` | 3,104,907 | The project’s figures with their cited sources (register ids per entry); operator figures labelled as claims | the project’s own work (the project, UBC M.Arch): CC BY 4.0 |
+| `data/lib_best_edm.json` | 2,926,236 | The project’s figures with their cited sources (register ids per entry); operator figures labelled as claims | the project’s own work (the project, UBC M.Arch): CC BY 4.0 |
+| `data/lib_best_van.json` | 3,944,523 | The project’s figures with their cited sources (register ids per entry); operator figures labelled as claims | the project’s own work (the project, UBC M.Arch): CC BY 4.0 |
+| `data/lib_lots_edm.json` | 4,311,262 | The project’s figures with their cited sources (register ids per entry); operator figures labelled as claims | the project’s own work (the project, UBC M.Arch): CC BY 4.0 |
+| `data/lib_lots_van.json` | 4,808,458 | The project’s figures with their cited sources (register ids per entry); operator figures labelled as claims | the project’s own work (the project, UBC M.Arch): CC BY 4.0 |
+| `data/library.json` | 7,461,742 | The project’s figures with their cited sources (register ids per entry); operator figures labelled as claims | the project’s own work (the project, UBC M.Arch): CC BY 4.0 |
+| `data/logic_plain.json` | 10,457 | The project’s figures with their cited sources (register ids per entry); operator figures labelled as claims | the project’s own work (the project, UBC M.Arch): CC BY 4.0 |
 | `data/lot_types.json` | 18,233 | The project’s counts and classes over City open data (Vancouver lot types only) | the project’s own work (the project, UBC M.Arch): CC BY 4.0; underlying data Open Government Licence – Vancouver, Open Government Licence – City of Edmonton |
 | `data/lotside.json` | 5,778 | The project’s figures with their cited sources (register ids per entry); operator figures labelled as claims | the project’s own work (the project, UBC M.Arch): CC BY 4.0 |
 | `data/neu_service_area.json` | 4,903 | The project’s figures with their cited sources (register ids per entry); operator figures labelled as claims | the project’s own work (the project, UBC M.Arch): CC BY 4.0 |
 | `data/noise.json` | 1,934 | The project’s figures with their cited sources (register ids per entry); operator figures labelled as claims | the project’s own work (the project, UBC M.Arch): CC BY 4.0 |
-| `data/osm_places_edm.json` | 336,329 | The project’s figures with their cited sources (register ids per entry); operator figures labelled as claims | the project’s own work (the project, UBC M.Arch): CC BY 4.0 |
-| `data/osm_places_van.json` | 403,458 | The project’s figures with their cited sources (register ids per entry); operator figures labelled as claims | the project’s own work (the project, UBC M.Arch): CC BY 4.0 |
 | `data/plant_units.json` | 3,824 | The project’s figures with their cited sources (register ids per entry); operator figures labelled as claims | the project’s own work (the project, UBC M.Arch): CC BY 4.0 |
-| `data/register_ids.json` | 39,511 | The project’s figures with their cited sources (register ids per entry); operator figures labelled as claims | the project’s own work (the project, UBC M.Arch): CC BY 4.0 |
-| `data/size.json` | 1,506 | The project’s figures with their cited sources (register ids per entry); operator figures labelled as claims | the project’s own work (the project, UBC M.Arch): CC BY 4.0 |
-| `data/sources_public.json` | 491,768 | The project’s figures with their cited sources (register ids per entry); operator figures labelled as claims | the project’s own work (the project, UBC M.Arch): CC BY 4.0 |
-| `data/sparefill.json` | 16,248 | The project’s figures with their cited sources (register ids per entry); operator figures labelled as claims | the project’s own work (the project, UBC M.Arch): CC BY 4.0 |
-| `data/street_labels_edm.json` | 162,630 | The project’s figures with their cited sources (register ids per entry); operator figures labelled as claims | the project’s own work (the project, UBC M.Arch): CC BY 4.0 |
-| `data/street_labels_van.json` | 585,969 | The project’s figures with their cited sources (register ids per entry); operator figures labelled as claims | the project’s own work (the project, UBC M.Arch): CC BY 4.0 |
-| `data/typ_aquaponics.json` | 15,428 | The project’s figures with their cited sources (register ids per entry); operator figures labelled as claims | the project’s own work (the project, UBC M.Arch): CC BY 4.0 |
-| `data/typ_community_pool.json` | 21,749 | The project’s figures with their cited sources (register ids per entry); operator figures labelled as claims | the project’s own work (the project, UBC M.Arch): CC BY 4.0 |
-| `data/typ_conservatory.json` | 25,392 | The project’s figures with their cited sources (register ids per entry); operator figures labelled as claims | the project’s own work (the project, UBC M.Arch): CC BY 4.0 |
-| `data/typ_food_hub.json` | 15,040 | The project’s figures with their cited sources (register ids per entry); operator figures labelled as claims | the project’s own work (the project, UBC M.Arch): CC BY 4.0 |
-| `data/typ_heat_cascade.json` | 40,589 | The project’s figures with their cited sources (register ids per entry); operator figures labelled as claims | the project’s own work (the project, UBC M.Arch): CC BY 4.0 |
-| `data/typ_shelter_laundry.json` | 21,885 | The project’s figures with their cited sources (register ids per entry); operator figures labelled as claims | the project’s own work (the project, UBC M.Arch): CC BY 4.0 |
-| `data/typ_warm_bath.json` | 31,028 | The project’s figures with their cited sources (register ids per entry); operator figures labelled as claims | the project’s own work (the project, UBC M.Arch): CC BY 4.0 |
-| `data/typologies.json` | 9,442 | The project’s figures with their cited sources (register ids per entry); operator figures labelled as claims | the project’s own work (the project, UBC M.Arch): CC BY 4.0 |
+| `data/register_ids.json` | 39,522 | The project’s figures with their cited sources (register ids per entry); operator figures labelled as claims | the project’s own work (the project, UBC M.Arch): CC BY 4.0 |
+| `data/size.json` | 1,508 | The project’s figures with their cited sources (register ids per entry); operator figures labelled as claims | the project’s own work (the project, UBC M.Arch): CC BY 4.0 |
+| `data/source_notes.json` | 2,072 | The project’s figures with their cited sources (register ids per entry); operator figures labelled as claims | the project’s own work (the project, UBC M.Arch): CC BY 4.0 |
+| `data/sources_public.json` | 494,544 | The project’s figures with their cited sources (register ids per entry); operator figures labelled as claims | the project’s own work (the project, UBC M.Arch): CC BY 4.0 |
+| `data/sparefill.json` | 16,250 | The project’s figures with their cited sources (register ids per entry); operator figures labelled as claims | the project’s own work (the project, UBC M.Arch): CC BY 4.0 |
+| `data/street_labels_edm.json` | 162,632 | The project’s figures with their cited sources (register ids per entry); operator figures labelled as claims | the project’s own work (the project, UBC M.Arch): CC BY 4.0 |
+| `data/street_labels_van.json` | 585,971 | The project’s figures with their cited sources (register ids per entry); operator figures labelled as claims | the project’s own work (the project, UBC M.Arch): CC BY 4.0 |
+| `data/typ_aquaponics.json` | 15,397 | The project’s figures with their cited sources (register ids per entry); operator figures labelled as claims | the project’s own work (the project, UBC M.Arch): CC BY 4.0 |
+| `data/typ_community_pool.json` | 21,754 | The project’s figures with their cited sources (register ids per entry); operator figures labelled as claims | the project’s own work (the project, UBC M.Arch): CC BY 4.0 |
+| `data/typ_conservatory.json` | 25,301 | The project’s figures with their cited sources (register ids per entry); operator figures labelled as claims | the project’s own work (the project, UBC M.Arch): CC BY 4.0 |
+| `data/typ_food_hub.json` | 14,987 | The project’s figures with their cited sources (register ids per entry); operator figures labelled as claims | the project’s own work (the project, UBC M.Arch): CC BY 4.0 |
+| `data/typ_heat_cascade.json` | 40,581 | The project’s figures with their cited sources (register ids per entry); operator figures labelled as claims | the project’s own work (the project, UBC M.Arch): CC BY 4.0 |
+| `data/typ_shelter_laundry.json` | 21,908 | The project’s figures with their cited sources (register ids per entry); operator figures labelled as claims | the project’s own work (the project, UBC M.Arch): CC BY 4.0 |
+| `data/typ_warm_bath.json` | 30,963 | The project’s figures with their cited sources (register ids per entry); operator figures labelled as claims | the project’s own work (the project, UBC M.Arch): CC BY 4.0 |
+| `data/typologies.json` | 9,444 | The project’s figures with their cited sources (register ids per entry); operator figures labelled as claims | the project’s own work (the project, UBC M.Arch): CC BY 4.0 |
 | `data/uses_edm.json` | 753,292 | The project’s figures with their cited sources (register ids per entry); operator figures labelled as claims | the project’s own work (the project, UBC M.Arch): CC BY 4.0 |
 | `data/uses_share_edm.json` | 8,682 | The project’s figures with their cited sources (register ids per entry); operator figures labelled as claims | the project’s own work (the project, UBC M.Arch): CC BY 4.0 |
 | `data/uses_share_van.json` | 16,093 | The project’s figures with their cited sources (register ids per entry); operator figures labelled as claims | the project’s own work (the project, UBC M.Arch): CC BY 4.0 |
@@ -655,13 +1931,13 @@ Built by `publish/build_public.py` from `tool/` (13 Nov 2026). 1344 files, 222.8
 | `data/zones.json` | 22,756 | The project’s figures with their cited sources (register ids per entry); operator figures labelled as claims | the project’s own work (the project, UBC M.Arch): CC BY 4.0 |
 | `dcrooms.js` | 7,645 | Beyond Data tool code and page (comments stripped, names rewritten) | the project’s own code (the project, UBC M.Arch): MIT licence |
 | `decide.js` | 28,140 | Beyond Data tool code and page (comments stripped, names rewritten) | the project’s own code (the project, UBC M.Arch): MIT licence |
-| `engine.js` | 130,953 | Beyond Data tool code and page (comments stripped, names rewritten) | the project’s own code (the project, UBC M.Arch): MIT licence |
+| `engine.js` | 131,715 | Beyond Data tool code and page (comments stripped, names rewritten) | the project’s own code (the project, UBC M.Arch): MIT licence |
 | `ev_edm.json` | 5,617 | Natural Resources Canada, Electric Charging and Alternative Fuelling Stations Locator | Open Government Licence – Canada |
 | `ev_van.json` | 14,070 | Natural Resources Canada, Electric Charging and Alternative Fuelling Stations Locator | Open Government Licence – Canada |
 | `explain.js` | 24,651 | Beyond Data tool code and page (comments stripped, names rewritten) | the project’s own code (the project, UBC M.Arch): MIT licence |
-| `extras.js` | 28,700 | Beyond Data tool code and page (comments stripped, names rewritten) | the project’s own code (the project, UBC M.Arch): MIT licence |
-| `f1.css` | 44,563 | Beyond Data tool code and page (comments stripped, names rewritten) | the project’s own code (the project, UBC M.Arch): MIT licence |
-| `f1.js` | 46,243 | Beyond Data tool code and page (comments stripped, names rewritten) | the project’s own code (the project, UBC M.Arch): MIT licence |
+| `extras.js` | 28,528 | Beyond Data tool code and page (comments stripped, names rewritten) | the project’s own code (the project, UBC M.Arch): MIT licence |
+| `f1.css` | 52,588 | Beyond Data tool code and page (comments stripped, names rewritten) | the project’s own code (the project, UBC M.Arch): MIT licence |
+| `f1.js` | 48,913 | Beyond Data tool code and page (comments stripped, names rewritten) | the project’s own code (the project, UBC M.Arch): MIT licence |
 | `f1/eh_fits/v1330.json` | 5,805 | Vancouver hub test-fit drawings (the project’s own) on City of Vancouver lot geometry | the project’s own work (the project, UBC M.Arch): CC BY 4.0; lot geometry Open Government Licence – Vancouver |
 | `f1/eh_fits/v1353.json` | 8,777 | Vancouver hub test-fit drawings (the project’s own) on City of Vancouver lot geometry | the project’s own work (the project, UBC M.Arch): CC BY 4.0; lot geometry Open Government Licence – Vancouver |
 | `f1/eh_fits/v339.json` | 9,157 | Vancouver hub test-fit drawings (the project’s own) on City of Vancouver lot geometry | the project’s own work (the project, UBC M.Arch): CC BY 4.0; lot geometry Open Government Licence – Vancouver |
@@ -679,7 +1955,7 @@ Built by `publish/build_public.py` from `tool/` (13 Nov 2026). 1344 files, 222.8
 | `f1/img/hero.png` | 101,063 | Images and icons made for the tool (f1/l2: the new landing, art’s illustrations and icons) | the project’s own work (the project, UBC M.Arch): CC BY 4.0 |
 | `f1/img/municipal.png` | 61,425 | Images and icons made for the tool (f1/l2: the new landing, art’s illustrations and icons) | the project’s own work (the project, UBC M.Arch): CC BY 4.0 |
 | `f1/img/resident.png` | 86,157 | Images and icons made for the tool (f1/l2: the new landing, art’s illustrations and icons) | the project’s own work (the project, UBC M.Arch): CC BY 4.0 |
-| `f1/intro.json` | 3,791 | Tool text | the project’s own work (the project, UBC M.Arch): CC BY 4.0 |
+| `f1/intro.json` | 3,793 | Tool text | the project’s own work (the project, UBC M.Arch): CC BY 4.0 |
 | `f1/intro/rep_architecture_1.png` | 25,086 | Pages of the tool’s own reports on Vancouver example lots (map data: City of Vancouver open data; Canada Structures, Public Safety Canada) | the project’s own work (the project, UBC M.Arch): CC BY 4.0; map data Open Government Licence – Vancouver |
 | `f1/intro/rep_architecture_2.png` | 20,194 | Pages of the tool’s own reports on Vancouver example lots (map data: City of Vancouver open data; Canada Structures, Public Safety Canada) | the project’s own work (the project, UBC M.Arch): CC BY 4.0; map data Open Government Licence – Vancouver |
 | `f1/intro/rep_architecture_6.png` | 13,432 | Pages of the tool’s own reports on Vancouver example lots (map data: City of Vancouver open data; Canada Structures, Public Safety Canada) | the project’s own work (the project, UBC M.Arch): CC BY 4.0; map data Open Government Licence – Vancouver |
@@ -692,9 +1968,9 @@ Built by `publish/build_public.py` from `tool/` (13 Nov 2026). 1344 files, 222.8
 | `f1/intro/rep_resident_1.png` | 30,875 | Pages of the tool’s own reports on Vancouver example lots (map data: City of Vancouver open data; Canada Structures, Public Safety Canada) | the project’s own work (the project, UBC M.Arch): CC BY 4.0; map data Open Government Licence – Vancouver |
 | `f1/intro/rep_resident_2.png` | 11,322 | Pages of the tool’s own reports on Vancouver example lots (map data: City of Vancouver open data; Canada Structures, Public Safety Canada) | the project’s own work (the project, UBC M.Arch): CC BY 4.0; map data Open Government Licence – Vancouver |
 | `f1/intro/rep_resident_3.png` | 22,708 | Pages of the tool’s own reports on Vancouver example lots (map data: City of Vancouver open data; Canada Structures, Public Safety Canada) | the project’s own work (the project, UBC M.Arch): CC BY 4.0; map data Open Government Licence – Vancouver |
-| `f1/intro/snap/arc_pick.html` | 37,633 | Snapshots of the tool’s own screens on Vancouver example lots (City of Vancouver open data; Canada Structures, Public Safety Canada) | the project’s own work (the project, UBC M.Arch): CC BY 4.0; map data Open Government Licence – Vancouver |
-| `f1/intro/snap/arc_program.html` | 34,603 | Snapshots of the tool’s own screens on Vancouver example lots (City of Vancouver open data; Canada Structures, Public Safety Canada) | the project’s own work (the project, UBC M.Arch): CC BY 4.0; map data Open Government Licence – Vancouver |
-| `f1/intro/snap/arc_styles.html` | 134,227 | Snapshots of the tool’s own screens on Vancouver example lots (City of Vancouver open data; Canada Structures, Public Safety Canada) | the project’s own work (the project, UBC M.Arch): CC BY 4.0; map data Open Government Licence – Vancouver |
+| `f1/intro/snap/arc_pick.html` | 38,973 | Snapshots of the tool’s own screens on Vancouver example lots (City of Vancouver open data; Canada Structures, Public Safety Canada) | the project’s own work (the project, UBC M.Arch): CC BY 4.0; map data Open Government Licence – Vancouver |
+| `f1/intro/snap/arc_program.html` | 35,939 | Snapshots of the tool’s own screens on Vancouver example lots (City of Vancouver open data; Canada Structures, Public Safety Canada) | the project’s own work (the project, UBC M.Arch): CC BY 4.0; map data Open Government Licence – Vancouver |
+| `f1/intro/snap/arc_styles.html` | 148,996 | Snapshots of the tool’s own screens on Vancouver example lots (City of Vancouver open data; Canada Structures, Public Safety Canada) | the project’s own work (the project, UBC M.Arch): CC BY 4.0; map data Open Government Licence – Vancouver |
 | `f1/intro/snap/eng_district.html` | 261,970 | Snapshots of the tool’s own screens on Vancouver example lots (City of Vancouver open data; Canada Structures, Public Safety Canada) | the project’s own work (the project, UBC M.Arch): CC BY 4.0; map data Open Government Licence – Vancouver |
 | `f1/intro/snap/eng_fits.html` | 16,774 | Snapshots of the tool’s own screens on Vancouver example lots (City of Vancouver open data; Canada Structures, Public Safety Canada) | the project’s own work (the project, UBC M.Arch): CC BY 4.0; map data Open Government Licence – Vancouver |
 | `f1/intro/snap/index.json` | 618 | Snapshots of the tool’s own screens on Vancouver example lots (City of Vancouver open data; Canada Structures, Public Safety Canada) | the project’s own work (the project, UBC M.Arch): CC BY 4.0; map data Open Government Licence – Vancouver |
@@ -702,9 +1978,9 @@ Built by `publish/build_public.py` from `tool/` (13 Nov 2026). 1344 files, 222.8
 | `f1/intro/snap/mun_allowed.html` | 7,266 | Snapshots of the tool’s own screens on Vancouver example lots (City of Vancouver open data; Canada Structures, Public Safety Canada) | the project’s own work (the project, UBC M.Arch): CC BY 4.0; map data Open Government Licence – Vancouver |
 | `f1/intro/snap/mun_approval.html` | 7,533 | Snapshots of the tool’s own screens on Vancouver example lots (City of Vancouver open data; Canada Structures, Public Safety Canada) | the project’s own work (the project, UBC M.Arch): CC BY 4.0; map data Open Government Licence – Vancouver |
 | `f1/intro/snap/mun_yards.html` | 18,229 | Snapshots of the tool’s own screens on Vancouver example lots (City of Vancouver open data; Canada Structures, Public Safety Canada) | the project’s own work (the project, UBC M.Arch): CC BY 4.0; map data Open Government Licence – Vancouver |
-| `f1/intro/snap/res_find.html` | 1,183,115 | Snapshots of the tool’s own screens on Vancouver example lots (City of Vancouver open data; Canada Structures, Public Safety Canada) | the project’s own work (the project, UBC M.Arch): CC BY 4.0; map data Open Government Licence – Vancouver |
-| `f1/intro/snap/res_next.html` | 8,588 | Snapshots of the tool’s own screens on Vancouver example lots (City of Vancouver open data; Canada Structures, Public Safety Canada) | the project’s own work (the project, UBC M.Arch): CC BY 4.0; map data Open Government Licence – Vancouver |
-| `f1/intro/snap/res_report.html` | 308,846 | Snapshots of the tool’s own screens on Vancouver example lots (City of Vancouver open data; Canada Structures, Public Safety Canada) | the project’s own work (the project, UBC M.Arch): CC BY 4.0; map data Open Government Licence – Vancouver |
+| `f1/intro/snap/res_find.html` | 1,183,090 | Snapshots of the tool’s own screens on Vancouver example lots (City of Vancouver open data; Canada Structures, Public Safety Canada) | the project’s own work (the project, UBC M.Arch): CC BY 4.0; map data Open Government Licence – Vancouver |
+| `f1/intro/snap/res_next.html` | 8,564 | Snapshots of the tool’s own screens on Vancouver example lots (City of Vancouver open data; Canada Structures, Public Safety Canada) | the project’s own work (the project, UBC M.Arch): CC BY 4.0; map data Open Government Licence – Vancouver |
+| `f1/intro/snap/res_report.html` | 308,791 | Snapshots of the tool’s own screens on Vancouver example lots (City of Vancouver open data; Canada Structures, Public Safety Canada) | the project’s own work (the project, UBC M.Arch): CC BY 4.0; map data Open Government Licence – Vancouver |
 | `f1/intro/snap/styles.json` | 78,605 | Snapshots of the tool’s own screens on Vancouver example lots (City of Vancouver open data; Canada Structures, Public Safety Canada) | the project’s own work (the project, UBC M.Arch): CC BY 4.0; map data Open Government Licence – Vancouver |
 | `f1/kit/one_battery.png` | 71,276 | Images and icons made for the tool (f1/l2: the new landing, art’s illustrations and icons) | the project’s own work (the project, UBC M.Arch): CC BY 4.0 |
 | `f1/kit/one_chill.png` | 56,841 | Images and icons made for the tool (f1/l2: the new landing, art’s illustrations and icons) | the project’s own work (the project, UBC M.Arch): CC BY 4.0 |
@@ -744,29 +2020,78 @@ Built by `publish/build_public.py` from `tool/` (13 Nov 2026). 1344 files, 222.8
 | `f1/l2/thumb_resident_v3@2x.png` | 495,331 | Images and icons made for the tool (f1/l2: the new landing, art’s illustrations and icons) | the project’s own work (the project, UBC M.Arch): CC BY 4.0 |
 | `f1/l2/warm_bath_axo.svg` | 9,874 | Images and icons made for the tool (f1/l2: the new landing, art’s illustrations and icons) | the project’s own work (the project, UBC M.Arch): CC BY 4.0 |
 | `f1/takeaway_sample.json` | 7,045 | Tool text (a sample takeaway) | the project’s own work (the project, UBC M.Arch): CC BY 4.0 |
-| `f1arch.js` | 7,022 | Beyond Data tool code and page (comments stripped, names rewritten) | the project’s own code (the project, UBC M.Arch): MIT licence |
-| `f1arch_checks.js` | 78,636 | Beyond Data tool code and page (comments stripped, names rewritten) | the project’s own code (the project, UBC M.Arch): MIT licence |
+| `f1/typo/aquaponics_1440.svg` | 77,007 | Typology page drawings made for the tool (the project’s own illustrations, schematic; approved 26 Nov,  23rb) | the project’s own work (the project, UBC M.Arch): CC BY 4.0 |
+| `f1/typo/aquaponics_390.svg` | 77,337 | Typology page drawings made for the tool (the project’s own illustrations, schematic; approved 26 Nov,  23rb) | the project’s own work (the project, UBC M.Arch): CC BY 4.0 |
+| `f1/typo/community_pool_1440.svg` | 44,934 | Typology page drawings made for the tool (the project’s own illustrations, schematic; approved 26 Nov,  23rb) | the project’s own work (the project, UBC M.Arch): CC BY 4.0 |
+| `f1/typo/community_pool_390.svg` | 44,548 | Typology page drawings made for the tool (the project’s own illustrations, schematic; approved 26 Nov,  23rb) | the project’s own work (the project, UBC M.Arch): CC BY 4.0 |
+| `f1/typo/conservatory_1440.svg` | 48,394 | Typology page drawings made for the tool (the project’s own illustrations, schematic; approved 26 Nov,  23rb) | the project’s own work (the project, UBC M.Arch): CC BY 4.0 |
+| `f1/typo/conservatory_390.svg` | 48,530 | Typology page drawings made for the tool (the project’s own illustrations, schematic; approved 26 Nov,  23rb) | the project’s own work (the project, UBC M.Arch): CC BY 4.0 |
+| `f1/typo/emergency_hub_1440.svg` | 103,526 | Typology page drawings made for the tool (the project’s own illustrations, schematic; approved 26 Nov,  23rb) | the project’s own work (the project, UBC M.Arch): CC BY 4.0 |
+| `f1/typo/emergency_hub_390.svg` | 103,855 | Typology page drawings made for the tool (the project’s own illustrations, schematic; approved 26 Nov,  23rb) | the project’s own work (the project, UBC M.Arch): CC BY 4.0 |
+| `f1/typo/food_hub_1440.svg` | 81,547 | Typology page drawings made for the tool (the project’s own illustrations, schematic; approved 26 Nov,  23rb) | the project’s own work (the project, UBC M.Arch): CC BY 4.0 |
+| `f1/typo/food_hub_390.svg` | 81,502 | Typology page drawings made for the tool (the project’s own illustrations, schematic; approved 26 Nov,  23rb) | the project’s own work (the project, UBC M.Arch): CC BY 4.0 |
+| `f1/typo/heat_cascade_1440.svg` | 42,753 | Typology page drawings made for the tool (the project’s own illustrations, schematic; approved 26 Nov,  23rb) | the project’s own work (the project, UBC M.Arch): CC BY 4.0 |
+| `f1/typo/heat_cascade_390.svg` | 42,963 | Typology page drawings made for the tool (the project’s own illustrations, schematic; approved 26 Nov,  23rb) | the project’s own work (the project, UBC M.Arch): CC BY 4.0 |
+| `f1/typo/shelter_laundry_1440.svg` | 87,339 | Typology page drawings made for the tool (the project’s own illustrations, schematic; approved 26 Nov,  23rb) | the project’s own work (the project, UBC M.Arch): CC BY 4.0 |
+| `f1/typo/shelter_laundry_390.svg` | 87,279 | Typology page drawings made for the tool (the project’s own illustrations, schematic; approved 26 Nov,  23rb) | the project’s own work (the project, UBC M.Arch): CC BY 4.0 |
+| `f1/typo/typo_intro.json` | 1,379 | Typology page drawings made for the tool (the project’s own illustrations, schematic; approved 26 Nov,  23rb) | the project’s own work (the project, UBC M.Arch): CC BY 4.0 |
+| `f1/typo/warm_bath_1440.svg` | 37,558 | Typology page drawings made for the tool (the project’s own illustrations, schematic; approved 26 Nov,  23rb) | the project’s own work (the project, UBC M.Arch): CC BY 4.0 |
+| `f1/typo/warm_bath_390.svg` | 37,487 | Typology page drawings made for the tool (the project’s own illustrations, schematic; approved 26 Nov,  23rb) | the project’s own work (the project, UBC M.Arch): CC BY 4.0 |
+| `f1anim.js` | 4,283 | Beyond Data tool code and page (comments stripped, names rewritten) | the project’s own code (the project, UBC M.Arch): MIT licence |
+| `f1approvals.js` | 10,241 | Beyond Data tool code and page (comments stripped, names rewritten) | the project’s own code (the project, UBC M.Arch): MIT licence |
+| `f1arch.js` | 13,634 | Beyond Data tool code and page (comments stripped, names rewritten) | the project’s own code (the project, UBC M.Arch): MIT licence |
+| `f1arch2.js` | 28,605 | Beyond Data tool code and page (comments stripped, names rewritten) | the project’s own code (the project, UBC M.Arch): MIT licence |
+| `f1arch_checks.js` | 78,914 | Beyond Data tool code and page (comments stripped, names rewritten) | the project’s own code (the project, UBC M.Arch): MIT licence |
 | `f1arch_site.js` | 42,975 | Beyond Data tool code and page (comments stripped, names rewritten) | the project’s own code (the project, UBC M.Arch): MIT licence |
-| `f1arch_typ.js` | 33,558 | Beyond Data tool code and page (comments stripped, names rewritten) | the project’s own code (the project, UBC M.Arch): MIT licence |
-| `f1arch_vis.js` | 41,348 | Beyond Data tool code and page (comments stripped, names rewritten) | the project’s own code (the project, UBC M.Arch): MIT licence |
-| `f1around.js` | 13,881 | Beyond Data tool code and page (comments stripped, names rewritten) | the project’s own code (the project, UBC M.Arch): MIT licence |
+| `f1arch_typ.js` | 33,582 | Beyond Data tool code and page (comments stripped, names rewritten) | the project’s own code (the project, UBC M.Arch): MIT licence |
+| `f1arch_vis.js` | 41,370 | Beyond Data tool code and page (comments stripped, names rewritten) | the project’s own code (the project, UBC M.Arch): MIT licence |
 | `f1art.js` | 9,393 | Beyond Data tool code and page (comments stripped, names rewritten) | the project’s own code (the project, UBC M.Arch): MIT licence |
-| `f1cards.js` | 18,007 | Beyond Data tool code and page (comments stripped, names rewritten) | the project’s own code (the project, UBC M.Arch): MIT licence |
-| `f1eng_a.js` | 42,498 | Beyond Data tool code and page (comments stripped, names rewritten) | the project’s own code (the project, UBC M.Arch): MIT licence |
-| `f1eng_b.js` | 48,586 | Beyond Data tool code and page (comments stripped, names rewritten) | the project’s own code (the project, UBC M.Arch): MIT licence |
-| `f1eng_district.js` | 77,111 | Beyond Data tool code and page (comments stripped, names rewritten) | the project’s own code (the project, UBC M.Arch): MIT licence |
+| `f1best.js` | 11,664 | Beyond Data tool code and page (comments stripped, names rewritten) | the project’s own code (the project, UBC M.Arch): MIT licence |
+| `f1card7.js` | 9,535 | Beyond Data tool code and page (comments stripped, names rewritten) | the project’s own code (the project, UBC M.Arch): MIT licence |
+| `f1cards.js` | 25,649 | Beyond Data tool code and page (comments stripped, names rewritten) | the project’s own code (the project, UBC M.Arch): MIT licence |
+| `f1dcmap.js` | 15,004 | Beyond Data tool code and page (comments stripped, names rewritten) | the project’s own code (the project, UBC M.Arch): MIT licence |
+| `f1dcpage.js` | 14,355 | Beyond Data tool code and page (comments stripped, names rewritten) | the project’s own code (the project, UBC M.Arch): MIT licence |
+| `f1dcpanel.js` | 8,410 | Beyond Data tool code and page (comments stripped, names rewritten) | the project’s own code (the project, UBC M.Arch): MIT licence |
+| `f1decides.js` | 17,610 | Beyond Data tool code and page (comments stripped, names rewritten) | the project’s own code (the project, UBC M.Arch): MIT licence |
+| `f1deeplink.js` | 1,043 | Beyond Data tool code and page (comments stripped, names rewritten) | the project’s own code (the project, UBC M.Arch): MIT licence |
+| `f1edmlive.js` | 17,658 | Beyond Data tool code and page (comments stripped, names rewritten) | the project’s own code (the project, UBC M.Arch): MIT licence |
+| `f1eng2.js` | 15,165 | Beyond Data tool code and page (comments stripped, names rewritten) | the project’s own code (the project, UBC M.Arch): MIT licence |
+| `f1eng_a.js` | 65,755 | Beyond Data tool code and page (comments stripped, names rewritten) | the project’s own code (the project, UBC M.Arch): MIT licence |
+| `f1eng_b.js` | 55,491 | Beyond Data tool code and page (comments stripped, names rewritten) | the project’s own code (the project, UBC M.Arch): MIT licence |
+| `f1eng_district.js` | 77,140 | Beyond Data tool code and page (comments stripped, names rewritten) | the project’s own code (the project, UBC M.Arch): MIT licence |
+| `f1flood.js` | 5,483 | Beyond Data tool code and page (comments stripped, names rewritten) | the project’s own code (the project, UBC M.Arch): MIT licence |
 | `f1found.js` | 10,022 | Beyond Data tool code and page (comments stripped, names rewritten) | the project’s own code (the project, UBC M.Arch): MIT licence |
-| `f1intro.js` | 54,387 | Beyond Data tool code and page (comments stripped, names rewritten) | the project’s own code (the project, UBC M.Arch): MIT licence |
-| `f1land2.js` | 12,334 | Beyond Data tool code and page (comments stripped, names rewritten) | the project’s own code (the project, UBC M.Arch): MIT licence |
-| `f1lib.js` | 12,679 | Beyond Data tool code and page (comments stripped, names rewritten) | the project’s own code (the project, UBC M.Arch): MIT licence |
-| `f1logic.js` | 14,320 | Beyond Data tool code and page (comments stripped, names rewritten) | the project’s own code (the project, UBC M.Arch): MIT licence |
-| `f1map.js` | 18,655 | Beyond Data tool code and page (comments stripped, names rewritten) | the project’s own code (the project, UBC M.Arch): MIT licence |
-| `f1muni_a.js` | 47,103 | Beyond Data tool code and page (comments stripped, names rewritten) | the project’s own code (the project, UBC M.Arch): MIT licence |
-| `f1muni_b.js` | 56,209 | Beyond Data tool code and page (comments stripped, names rewritten) | the project’s own code (the project, UBC M.Arch): MIT licence |
-| `f1plans.js` | 54,535 | Beyond Data tool code and page (comments stripped, names rewritten) | the project’s own code (the project, UBC M.Arch): MIT licence |
-| `f1res.js` | 56,691 | Beyond Data tool code and page (comments stripped, names rewritten) | the project’s own code (the project, UBC M.Arch): MIT licence |
-| `f1typ.js` | 14,623 | Beyond Data tool code and page (comments stripped, names rewritten) | the project’s own code (the project, UBC M.Arch): MIT licence |
-| `flow.js` | 34,542 | Beyond Data tool code and page (comments stripped, names rewritten) | the project’s own code (the project, UBC M.Arch): MIT licence |
+| `f1funnel.js` | 9,049 | Beyond Data tool code and page (comments stripped, names rewritten) | the project’s own code (the project, UBC M.Arch): MIT licence |
+| `f1heatintro.js` | 9,422 | Beyond Data tool code and page (comments stripped, names rewritten) | the project’s own code (the project, UBC M.Arch): MIT licence |
+| `f1heatnear.js` | 16,009 | Beyond Data tool code and page (comments stripped, names rewritten) | the project’s own code (the project, UBC M.Arch): MIT licence |
+| `f1intro.js` | 54,600 | Beyond Data tool code and page (comments stripped, names rewritten) | the project’s own code (the project, UBC M.Arch): MIT licence |
+| `f1land2.js` | 12,587 | Beyond Data tool code and page (comments stripped, names rewritten) | the project’s own code (the project, UBC M.Arch): MIT licence |
+| `f1land3.js` | 43,848 | Beyond Data tool code and page (comments stripped, names rewritten) | the project’s own code (the project, UBC M.Arch): MIT licence |
+| `f1lib.js` | 30,955 | Beyond Data tool code and page (comments stripped, names rewritten) | the project’s own code (the project, UBC M.Arch): MIT licence |
+| `f1logic.js` | 19,864 | Beyond Data tool code and page (comments stripped, names rewritten) | the project’s own code (the project, UBC M.Arch): MIT licence |
+| `f1logicmap.js` | 18,916 | Beyond Data tool code and page (comments stripped, names rewritten) | the project’s own code (the project, UBC M.Arch): MIT licence |
+| `f1logicplain.js` | 15,119 | Beyond Data tool code and page (comments stripped, names rewritten) | the project’s own code (the project, UBC M.Arch): MIT licence |
+| `f1map.js` | 19,770 | Beyond Data tool code and page (comments stripped, names rewritten) | the project’s own code (the project, UBC M.Arch): MIT licence |
+| `f1massing.js` | 25,178 | Beyond Data tool code and page (comments stripped, names rewritten) | the project’s own code (the project, UBC M.Arch): MIT licence |
+| `f1muni_a.js` | 51,597 | Beyond Data tool code and page (comments stripped, names rewritten) | the project’s own code (the project, UBC M.Arch): MIT licence |
+| `f1muni_b.js` | 56,975 | Beyond Data tool code and page (comments stripped, names rewritten) | the project’s own code (the project, UBC M.Arch): MIT licence |
+| `f1noq.js` | 3,122 | Beyond Data tool code and page (comments stripped, names rewritten) | the project’s own code (the project, UBC M.Arch): MIT licence |
+| `f1pick3.js` | 26,221 | Beyond Data tool code and page (comments stripped, names rewritten) | the project’s own code (the project, UBC M.Arch): MIT licence |
+| `f1place.js` | 5,948 | Beyond Data tool code and page (comments stripped, names rewritten) | the project’s own code (the project, UBC M.Arch): MIT licence |
+| `f1plans.js` | 59,439 | Beyond Data tool code and page (comments stripped, names rewritten) | the project’s own code (the project, UBC M.Arch): MIT licence |
+| `f1report8.js` | 20,313 | Beyond Data tool code and page (comments stripped, names rewritten) | the project’s own code (the project, UBC M.Arch): MIT licence |
+| `f1reportA3.js` | 34,887 | Beyond Data tool code and page (comments stripped, names rewritten) | the project’s own code (the project, UBC M.Arch): MIT licence |
+| `f1reportA3v5.js` | 22,149 | Beyond Data tool code and page (comments stripped, names rewritten) | the project’s own code (the project, UBC M.Arch): MIT licence |
+| `f1res.js` | 57,234 | Beyond Data tool code and page (comments stripped, names rewritten) | the project’s own code (the project, UBC M.Arch): MIT licence |
+| `f1rooms.js` | 8,731 | Beyond Data tool code and page (comments stripped, names rewritten) | the project’s own code (the project, UBC M.Arch): MIT licence |
+| `f1scrub.js` | 2,161 | Beyond Data tool code and page (comments stripped, names rewritten) | the project’s own code (the project, UBC M.Arch): MIT licence |
+| `f1site2.js` | 20,228 | Beyond Data tool code and page (comments stripped, names rewritten) | the project’s own code (the project, UBC M.Arch): MIT licence |
+| `f1siteplan.js` | 21,079 | Beyond Data tool code and page (comments stripped, names rewritten) | the project’s own code (the project, UBC M.Arch): MIT licence |
+| `f1streets.js` | 4,045 | Beyond Data tool code and page (comments stripped, names rewritten) | the project’s own code (the project, UBC M.Arch): MIT licence |
+| `f1tokens.js` | 620 | Beyond Data tool code and page (comments stripped, names rewritten) | the project’s own code (the project, UBC M.Arch): MIT licence |
+| `f1typ.js` | 14,626 | Beyond Data tool code and page (comments stripped, names rewritten) | the project’s own code (the project, UBC M.Arch): MIT licence |
+| `f1zones.js` | 21,737 | Beyond Data tool code and page (comments stripped, names rewritten) | the project’s own code (the project, UBC M.Arch): MIT licence |
+| `flow.js` | 34,882 | Beyond Data tool code and page (comments stripped, names rewritten) | the project’s own code (the project, UBC M.Arch): MIT licence |
 | `fonts/IBMPlexSans-Light-Latin1.woff2` | 22,240 | IBM Plex Sans (IBM Corp.), unmodified files and licence text | SIL Open Font Licence 1.1 |
 | `fonts/IBMPlexSans-Light-Pi.woff2` | 7,624 | IBM Plex Sans (IBM Corp.), unmodified files and licence text | SIL Open Font Licence 1.1 |
 | `fonts/IBMPlexSans-Light.ttf` | 178,140 | IBM Plex Sans (IBM Corp.), unmodified files and licence text | SIL Open Font Licence 1.1 |
@@ -780,42 +2105,104 @@ Built by `publish/build_public.py` from `tool/` (13 Nov 2026). 1344 files, 222.8
 | `gfa_van.js` | 23,822 | Beyond Data tool code and page (comments stripped, names rewritten) | the project’s own code (the project, UBC M.Arch): MIT licence |
 | `growyard.js` | 26,177 | Beyond Data tool code and page (comments stripped, names rewritten) | the project’s own code (the project, UBC M.Arch): MIT licence |
 | `hero3d.js` | 42,139 | Beyond Data tool code and page (comments stripped, names rewritten) | the project’s own code (the project, UBC M.Arch): MIT licence |
-| `hub.js` | 486,242 | Beyond Data tool code and page (comments stripped, names rewritten) | the project’s own code (the project, UBC M.Arch): MIT licence |
-| `hubchecks.js` | 503,881 | Beyond Data tool code and page (comments stripped, names rewritten) | the project’s own code (the project, UBC M.Arch): MIT licence |
-| `index.html` | 91,466 | Beyond Data tool code and page (comments stripped, names rewritten) | the project’s own code (the project, UBC M.Arch): MIT licence |
+| `hub.js` | 487,686 | Beyond Data tool code and page (comments stripped, names rewritten) | the project’s own code (the project, UBC M.Arch): MIT licence |
+| `hubchecks.js` | 503,505 | Beyond Data tool code and page (comments stripped, names rewritten) | the project’s own code (the project, UBC M.Arch): MIT licence |
+| `index.html` | 93,641 | Beyond Data tool code and page (comments stripped, names rewritten) | the project’s own code (the project, UBC M.Arch): MIT licence |
 | `kit3d.js` | 28,831 | Beyond Data tool code and page (comments stripped, names rewritten) | the project’s own code (the project, UBC M.Arch): MIT licence |
 | `lidar_tiles_city.json` | 2,517 | The project’s research compilations and tool logic, each figure cited; operator figures labelled as claims | the project’s own work (the project, UBC M.Arch): CC BY 4.0 |
 | `logic.js` | 21,311 | Beyond Data tool code and page (comments stripped, names rewritten) | the project’s own code (the project, UBC M.Arch): MIT licence |
-| `logic.json` | 409,404 | The project’s research compilations and tool logic, each figure cited; operator figures labelled as claims | the project’s own work (the project, UBC M.Arch): CC BY 4.0 |
+| `logic.json` | 384,629 | The project’s research compilations and tool logic, each figure cited; operator figures labelled as claims | the project’s own work (the project, UBC M.Arch): CC BY 4.0 |
 | `lotside.js` | 11,872 | Beyond Data tool code and page (comments stripped, names rewritten) | the project’s own code (the project, UBC M.Arch): MIT licence |
+| `notes/alberta-offset-emission-factors.html` | 2,497 | Source notes: one page for each source the tool cites but cannot link (written by the project) | the project’s own work (the project, UBC M.Arch): CC BY 4.0 |
+| `notes/alberta-offset-emission-factors.pdf` | 74,447 | Source notes: one page for each source the tool cites but cannot link (written by the project) | the project’s own work (the project, UBC M.Arch): CC BY 4.0 |
+| `notes/ashrae-handbook-hvac-applications-2015.html` | 2,265 | Source notes: one page for each source the tool cites but cannot link (written by the project) | the project’s own work (the project, UBC M.Arch): CC BY 4.0 |
+| `notes/ashrae-handbook-hvac-applications-2015.pdf` | 69,169 | Source notes: one page for each source the tool cites but cannot link (written by the project) | the project’s own work (the project, UBC M.Arch): CC BY 4.0 |
+| `notes/ashrae-handbook-hvac-applications-2023.html` | 4,368 | Source notes: one page for each source the tool cites but cannot link (written by the project) | the project’s own work (the project, UBC M.Arch): CC BY 4.0 |
+| `notes/ashrae-handbook-hvac-applications-2023.pdf` | 87,031 | Source notes: one page for each source the tool cites but cannot link (written by the project) | the project’s own work (the project, UBC M.Arch): CC BY 4.0 |
+| `notes/ashrae-tc99-inlet-range.html` | 1,946 | Source notes: one page for each source the tool cites but cannot link (written by the project) | the project’s own work (the project, UBC M.Arch): CC BY 4.0 |
+| `notes/ashrae-tc99-inlet-range.pdf` | 60,747 | Source notes: one page for each source the tool cites but cannot link (written by the project) | the project’s own work (the project, UBC M.Arch): CC BY 4.0 |
+| `notes/ashrae-thermal-guidelines-5th.html` | 2,533 | Source notes: one page for each source the tool cites but cannot link (written by the project) | the project’s own work (the project, UBC M.Arch): CC BY 4.0 |
+| `notes/ashrae-thermal-guidelines-5th.pdf` | 80,808 | Source notes: one page for each source the tool cites but cannot link (written by the project) | the project’s own work (the project, UBC M.Arch): CC BY 4.0 |
+| `notes/ayuso-virgili-2023.html` | 2,085 | Source notes: one page for each source the tool cites but cannot link (written by the project) | the project’s own work (the project, UBC M.Arch): CC BY 4.0 |
+| `notes/ayuso-virgili-2023.pdf` | 70,642 | Source notes: one page for each source the tool cites but cannot link (written by the project) | the project’s own work (the project, UBC M.Arch): CC BY 4.0 |
+| `notes/barroso-2018.html` | 2,395 | Source notes: one page for each source the tool cites but cannot link (written by the project) | the project’s own work (the project, UBC M.Arch): CC BY 4.0 |
+| `notes/barroso-2018.pdf` | 77,655 | Source notes: one page for each source the tool cites but cannot link (written by the project) | the project’s own work (the project, UBC M.Arch): CC BY 4.0 |
+| `notes/bc-guidelines-pool-design.html` | 3,063 | Source notes: one page for each source the tool cites but cannot link (written by the project) | the project’s own work (the project, UBC M.Arch): CC BY 4.0 |
+| `notes/bc-guidelines-pool-design.pdf` | 91,323 | Source notes: one page for each source the tool cites but cannot link (written by the project) | the project’s own work (the project, UBC M.Arch): CC BY 4.0 |
+| `notes/bc-gwells.html` | 1,993 | Source notes: one page for each source the tool cites but cannot link (written by the project) | the project’s own work (the project, UBC M.Arch): CC BY 4.0 |
+| `notes/bc-gwells.pdf` | 61,250 | Source notes: one page for each source the tool cites but cannot link (written by the project) | the project’s own work (the project, UBC M.Arch): CC BY 4.0 |
+| `notes/blatchford-business-plan-2021.html` | 2,113 | Source notes: one page for each source the tool cites but cannot link (written by the project) | the project’s own work (the project, UBC M.Arch): CC BY 4.0 |
+| `notes/blatchford-business-plan-2021.pdf` | 65,786 | Source notes: one page for each source the tool cites but cannot link (written by the project) | the project’s own work (the project, UBC M.Arch): CC BY 4.0 |
+| `notes/bs-en-12572-2.html` | 2,729 | Source notes: one page for each source the tool cites but cannot link (written by the project) | the project’s own work (the project, UBC M.Arch): CC BY 4.0 |
+| `notes/bs-en-12572-2.pdf` | 88,627 | Source notes: one page for each source the tool cites but cannot link (written by the project) | the project’s own work (the project, UBC M.Arch): CC BY 4.0 |
+| `notes/cologix-van5-spec-sheet.html` | 2,050 | Source notes: one page for each source the tool cites but cannot link (written by the project) | the project’s own work (the project, UBC M.Arch): CC BY 4.0 |
+| `notes/cologix-van5-spec-sheet.pdf` | 59,398 | Source notes: one page for each source the tool cites but cannot link (written by the project) | the project’s own work (the project, UBC M.Arch): CC BY 4.0 |
+| `notes/csa-b139.html` | 4,350 | Source notes: one page for each source the tool cites but cannot link (written by the project) | the project’s own work (the project, UBC M.Arch): CC BY 4.0 |
+| `notes/csa-b139.pdf` | 103,406 | Source notes: one page for each source the tool cites but cannot link (written by the project) | the project’s own work (the project, UBC M.Arch): CC BY 4.0 |
+| `notes/csa-b149-1.html` | 2,325 | Source notes: one page for each source the tool cites but cannot link (written by the project) | the project’s own work (the project, UBC M.Arch): CC BY 4.0 |
+| `notes/csa-b149-1.pdf` | 70,888 | Source notes: one page for each source the tool cites but cannot link (written by the project) | the project’s own work (the project, UBC M.Arch): CC BY 4.0 |
+| `notes/csa-c22-1-canadian-electrical-code.html` | 3,705 | Source notes: one page for each source the tool cites but cannot link (written by the project) | the project’s own work (the project, UBC M.Arch): CC BY 4.0 |
+| `notes/csa-c22-1-canadian-electrical-code.pdf` | 85,757 | Source notes: one page for each source the tool cites but cannot link (written by the project) | the project’s own work (the project, UBC M.Arch): CC BY 4.0 |
+| `notes/csa-c282.html` | 3,401 | Source notes: one page for each source the tool cites but cannot link (written by the project) | the project’s own work (the project, UBC M.Arch): CC BY 4.0 |
+| `notes/csa-c282.pdf` | 79,482 | Source notes: one page for each source the tool cites but cannot link (written by the project) | the project’s own work (the project, UBC M.Arch): CC BY 4.0 |
+| `notes/edmonton-winter-design-guidelines.html` | 3,946 | Source notes: one page for each source the tool cites but cannot link (written by the project) | the project’s own work (the project, UBC M.Arch): CC BY 4.0 |
+| `notes/edmonton-winter-design-guidelines.pdf` | 75,258 | Source notes: one page for each source the tool cites but cannot link (written by the project) | the project’s own work (the project, UBC M.Arch): CC BY 4.0 |
+| `notes/fm-global-ds-1-57.html` | 2,991 | Source notes: one page for each source the tool cites but cannot link (written by the project) | the project’s own work (the project, UBC M.Arch): CC BY 4.0 |
+| `notes/fm-global-ds-1-57.pdf` | 85,368 | Source notes: one page for each source the tool cites but cannot link (written by the project) | the project’s own work (the project, UBC M.Arch): CC BY 4.0 |
+| `notes/fm-global-ds-5-28.html` | 3,194 | Source notes: one page for each source the tool cites but cannot link (written by the project) | the project’s own work (the project, UBC M.Arch): CC BY 4.0 |
+| `notes/fm-global-ds-5-28.pdf` | 85,042 | Source notes: one page for each source the tool cites but cannot link (written by the project) | the project’s own work (the project, UBC M.Arch): CC BY 4.0 |
+| `notes/fm-global-ds-5-32.html` | 6,077 | Source notes: one page for each source the tool cites but cannot link (written by the project) | the project’s own work (the project, UBC M.Arch): CC BY 4.0 |
+| `notes/fm-global-ds-5-32.pdf` | 97,102 | Source notes: one page for each source the tool cites but cannot link (written by the project) | the project’s own work (the project, UBC M.Arch): CC BY 4.0 |
+| `notes/ion-2022.html` | 2,160 | Source notes: one page for each source the tool cites but cannot link (written by the project) | the project’s own work (the project, UBC M.Arch): CC BY 4.0 |
+| `notes/ion-2022.pdf` | 69,722 | Source notes: one page for each source the tool cites but cannot link (written by the project) | the project’s own work (the project, UBC M.Arch): CC BY 4.0 |
+| `notes/iso-9613-2.html` | 1,906 | Source notes: one page for each source the tool cites but cannot link (written by the project) | the project’s own work (the project, UBC M.Arch): CC BY 4.0 |
+| `notes/iso-9613-2.pdf` | 57,175 | Source notes: one page for each source the tool cites but cannot link (written by the project) | the project’s own work (the project, UBC M.Arch): CC BY 4.0 |
+| `notes/lygnerud-werner-2018.html` | 2,544 | Source notes: one page for each source the tool cites but cannot link (written by the project) | the project’s own work (the project, UBC M.Arch): CC BY 4.0 |
+| `notes/lygnerud-werner-2018.pdf` | 81,217 | Source notes: one page for each source the tool cites but cannot link (written by the project) | the project’s own work (the project, UBC M.Arch): CC BY 4.0 |
+| `notes/monstadt-saltzman-2025.html` | 2,229 | Source notes: one page for each source the tool cites but cannot link (written by the project) | the project’s own work (the project, UBC M.Arch): CC BY 4.0 |
+| `notes/monstadt-saltzman-2025.pdf` | 77,599 | Source notes: one page for each source the tool cites but cannot link (written by the project) | the project’s own work (the project, UBC M.Arch): CC BY 4.0 |
+| `notes/nfpa-855.html` | 4,355 | Source notes: one page for each source the tool cites but cannot link (written by the project) | the project’s own work (the project, UBC M.Arch): CC BY 4.0 |
+| `notes/nfpa-855.pdf` | 87,098 | Source notes: one page for each source the tool cites but cannot link (written by the project) | the project’s own work (the project, UBC M.Arch): CC BY 4.0 |
+| `notes/nfpa-96.html` | 2,693 | Source notes: one page for each source the tool cites but cannot link (written by the project) | the project’s own work (the project, UBC M.Arch): CC BY 4.0 |
+| `notes/nfpa-96.pdf` | 76,761 | Source notes: one page for each source the tool cites but cannot link (written by the project) | the project’s own work (the project, UBC M.Arch): CC BY 4.0 |
+| `notes/nistad-2020.html` | 2,368 | Source notes: one page for each source the tool cites but cannot link (written by the project) | the project’s own work (the project, UBC M.Arch): CC BY 4.0 |
+| `notes/nistad-2020.pdf` | 72,789 | Source notes: one page for each source the tool cites but cannot link (written by the project) | the project’s own work (the project, UBC M.Arch): CC BY 4.0 |
+| `notes/rowley-2012.html` | 1,910 | Source notes: one page for each source the tool cites but cannot link (written by the project) | the project’s own work (the project, UBC M.Arch): CC BY 4.0 |
+| `notes/rowley-2012.pdf` | 53,993 | Source notes: one page for each source the tool cites but cannot link (written by the project) | the project’s own work (the project, UBC M.Arch): CC BY 4.0 |
+| `notes/vancouver-parking-bylaw-s5.html` | 4,472 | Source notes: one page for each source the tool cites but cannot link (written by the project) | the project’s own work (the project, UBC M.Arch): CC BY 4.0 |
+| `notes/vancouver-parking-bylaw-s5.pdf` | 87,786 | Source notes: one page for each source the tool cites but cannot link (written by the project) | the project’s own work (the project, UBC M.Arch): CC BY 4.0 |
+| `notes/vancouver-zoning-bylaw-s10.html` | 3,374 | Source notes: one page for each source the tool cites but cannot link (written by the project) | the project’s own work (the project, UBC M.Arch): CC BY 4.0 |
+| `notes/vancouver-zoning-bylaw-s10.pdf` | 85,687 | Source notes: one page for each source the tool cites but cannot link (written by the project) | the project’s own work (the project, UBC M.Arch): CC BY 4.0 |
+| `notes/wahlroos-2018.html` | 2,222 | Source notes: one page for each source the tool cites but cannot link (written by the project) | the project’s own work (the project, UBC M.Arch): CC BY 4.0 |
+| `notes/wahlroos-2018.pdf` | 72,008 | Source notes: one page for each source the tool cites but cannot link (written by the project) | the project’s own work (the project, UBC M.Arch): CC BY 4.0 |
 | `nrcan_pv.json` | 480 | Natural Resources Canada, Photovoltaic potential and solar resource maps of Canada | Open Government Licence – Canada |
 | `opps.js` | 41,578 | Beyond Data tool code and page (comments stripped, names rewritten) | the project’s own code (the project, UBC M.Arch): MIT licence |
-| `opps.json` | 1,798,568 | The project’s research compilations and tool logic, each figure cited; operator figures labelled as claims | the project’s own work (the project, UBC M.Arch): CC BY 4.0 |
+| `opps.json` | 1,438,545 | The project’s research compilations and tool logic, each figure cited; operator figures labelled as claims | the project’s own work (the project, UBC M.Arch): CC BY 4.0 |
 | `plan.js` | 14,102 | Beyond Data tool code and page (comments stripped, names rewritten) | the project’s own code (the project, UBC M.Arch): MIT licence |
 | `plant.js` | 18,391 | Beyond Data tool code and page (comments stripped, names rewritten) | the project’s own code (the project, UBC M.Arch): MIT licence |
 | `plantfit.js` | 8,399 | Beyond Data tool code and page (comments stripped, names rewritten) | the project’s own code (the project, UBC M.Arch): MIT licence |
 | `precedents.json` | 40,799 | The project’s research compilations and tool logic, each figure cited; operator figures labelled as claims | the project’s own work (the project, UBC M.Arch): CC BY 4.0 |
 | `public_rooms_edm.json` | 12,396 | City of Edmonton Open Data: Public Libraries, Recreation Facilities, Community League Halls | Open Government Licence – City of Edmonton |
 | `public_rooms_van.json` | 2,586 | City of Vancouver Open Data: libraries, community centres | Open Government Licence – Vancouver |
-| `receivers_edm.json` | 218,525 | Heat receivers: Statistics Canada ODEF, ODHF, ODSRF; City of Edmonton property assessment; Alberta continuing care reporting (no district-energy outlines, no campus list) | Statistics Canada Open Licence; Open Government Licence – City of Edmonton; Open Government Licence – Alberta |
+| `receivers_edm.json` | 218,527 | Heat receivers: Statistics Canada ODEF, ODHF, ODSRF; City of Edmonton property assessment; Alberta continuing care reporting (no district-energy outlines, no campus list) | Statistics Canada Open Licence; Open Government Licence – City of Edmonton; Open Government Licence – Alberta |
 | `receivers_van.json` | 147,941 | Heat receivers: Statistics Canada ODEF, ODHF, ODSRF; City of Vancouver non-market housing and energy benchmarking; BC residential care and post-secondary lists (no licensed property records (local only) points; no district-energy outlines) | Statistics Canada Open Licence; Open Government Licence – Vancouver; Open Government Licence – British Columbia |
 | `refs_sites.json` | 596 | The project’s research compilations and tool logic, each figure cited; operator figures labelled as claims | the project’s own work (the project, UBC M.Arch): CC BY 4.0 |
 | `report.js` | 43,728 | Beyond Data tool code and page (comments stripped, names rewritten) | the project’s own code (the project, UBC M.Arch): MIT licence |
 | `report3.js` | 53,595 | Beyond Data tool code and page (comments stripped, names rewritten) | the project’s own code (the project, UBC M.Arch): MIT licence |
 | `restyle.css` | 3,977 | Beyond Data tool code and page (comments stripped, names rewritten) | the project’s own code (the project, UBC M.Arch): MIT licence |
 | `restyle.js` | 1,686 | Beyond Data tool code and page (comments stripped, names rewritten) | the project’s own code (the project, UBC M.Arch): MIT licence |
-| `scene3d.js` | 61,818 | Beyond Data tool code and page (comments stripped, names rewritten) | the project’s own code (the project, UBC M.Arch): MIT licence |
+| `scene3d.js` | 61,834 | Beyond Data tool code and page (comments stripped, names rewritten) | the project’s own code (the project, UBC M.Arch): MIT licence |
 | `sheet.js` | 15,275 | Beyond Data tool code and page (comments stripped, names rewritten) | the project’s own code (the project, UBC M.Arch): MIT licence |
 | `shore.json` | 329,546 | Natural Resources Canada, CanVec 50K (hydro; transformer stations) | Open Government Licence – Canada |
 | `site.js` | 75,941 | Beyond Data tool code and page (comments stripped, names rewritten) | the project’s own code (the project, UBC M.Arch): MIT licence |
-| `sources.html` | 6,419 | The public version’s own pages (publish/make_pages.py) and this list | the project’s own work (the project, UBC M.Arch): CC BY 4.0 |
+| `sources.html` | 10,178 | The public version’s own pages (publish/make_pages.py) and this list | the project’s own work (the project, UBC M.Arch): CC BY 4.0 |
 | `stage.js` | 7,920 | Beyond Data tool code and page (comments stripped, names rewritten) | the project’s own code (the project, UBC M.Arch): MIT licence |
 | `streetnames.js` | 4,673 | Beyond Data tool code and page (comments stripped, names rewritten) | the project’s own code (the project, UBC M.Arch): MIT licence |
 | `streets_edm.json` | 4,257,104 | City of Edmonton Open Data: Road Network | Open Government Licence – City of Edmonton |
 | `streets_van.json` | 1,662,740 | City of Vancouver Open Data: Public streets, Lanes | Open Government Licence – Vancouver |
 | `substations.json` | 3,576 | Natural Resources Canada, CanVec 50K (hydro; transformer stations) | Open Government Licence – Canada |
 | `sun.json` | 16,565 | Environment and Climate Change Canada, CWEC weather years (statistics derived from them) | Open Government Licence – Canada |
-| `templates.json` | 92,726 | The project’s research compilations and tool logic, each figure cited; operator figures labelled as claims | the project’s own work (the project, UBC M.Arch): CC BY 4.0 |
+| `templates.json` | 92,830 | The project’s research compilations and tool logic, each figure cited; operator figures labelled as claims | the project’s own work (the project, UBC M.Arch): CC BY 4.0 |
 | `tiers.js` | 15,954 | Beyond Data tool code and page (comments stripped, names rewritten) | the project’s own code (the project, UBC M.Arch): MIT licence |
 | `tiles/edm/meta.json` | 1,173,179 | City of Edmonton Open Data: Zoning Bylaw geographical data (overview); tile index | Open Government Licence – City of Edmonton |
 | `tiles/edm/r_-1_-1.json` | 174,879 | City of Edmonton Open Data: Trees (eecg-fc54) | Open Government Licence – City of Edmonton |
@@ -938,7 +2325,7 @@ Built by `publish/build_public.py` from `tool/` (13 Nov 2026). 1344 files, 222.8
 | `tiles/edm/r_5_2.json` | 4,148 | City of Edmonton Open Data: Trees (eecg-fc54) | Open Government Licence – City of Edmonton |
 | `tiles/edm/r_5_3.json` | 50 | City of Edmonton Open Data: Trees (eecg-fc54) | Open Government Licence – City of Edmonton |
 | `tiles/edm/r_5_5.json` | 99 | City of Edmonton Open Data: Trees (eecg-fc54) | Open Government Licence – City of Edmonton |
-| `tiles/edm/receivers.json` | 218,543 | Heat receivers: Statistics Canada ODEF, ODHF, ODSRF; City of Edmonton property assessment; Alberta continuing care reporting (no district-energy outlines, no campus list) | Statistics Canada Open Licence; Open Government Licence – City of Edmonton; Open Government Licence – Alberta |
+| `tiles/edm/receivers.json` | 218,545 | Heat receivers: Statistics Canada ODEF, ODHF, ODSRF; City of Edmonton property assessment; Alberta continuing care reporting (no district-energy outlines, no campus list) | Statistics Canada Open Licence; Open Government Licence – City of Edmonton; Open Government Licence – Alberta |
 | `tiles/edm/s_1.tsv` | 4,482,153 | City of Edmonton Open Data: Property Information (address search) | Open Government Licence – City of Edmonton |
 | `tiles/edm/s_2.tsv` | 1,082,821 | City of Edmonton Open Data: Property Information (address search) | Open Government Licence – City of Edmonton |
 | `tiles/edm/s_3.tsv` | 808,612 | City of Edmonton Open Data: Property Information (address search) | Open Government Licence – City of Edmonton |
@@ -953,19 +2340,19 @@ Built by `publish/build_public.py` from `tool/` (13 Nov 2026). 1344 files, 222.8
 | `tiles/edm/t_-1_-3.json` | 815,874 | City of Edmonton Open Data: Property Information (dkk9-cj3x), Property Assessment Data (q7d6-ambg), Land Parcels_Assessment Parcels (Point) (dm3i-bp8w), rooflines and 3D buildings | Open Government Licence – City of Edmonton |
 | `tiles/edm/t_-1_-4.json` | 762,867 | City of Edmonton Open Data: Property Information (dkk9-cj3x), Property Assessment Data (q7d6-ambg), Land Parcels_Assessment Parcels (Point) (dm3i-bp8w), rooflines and 3D buildings | Open Government Licence – City of Edmonton |
 | `tiles/edm/t_-1_-5.json` | 698,929 | City of Edmonton Open Data: Property Information (dkk9-cj3x), Property Assessment Data (q7d6-ambg), Land Parcels_Assessment Parcels (Point) (dm3i-bp8w), rooflines and 3D buildings | Open Government Licence – City of Edmonton |
-| `tiles/edm/t_-1_-6.json` | 1,014,996 | City of Edmonton Open Data: Property Information (dkk9-cj3x), Property Assessment Data (q7d6-ambg), Land Parcels_Assessment Parcels (Point) (dm3i-bp8w), rooflines and 3D buildings | Open Government Licence – City of Edmonton |
+| `tiles/edm/t_-1_-6.json` | 1,014,998 | City of Edmonton Open Data: Property Information (dkk9-cj3x), Property Assessment Data (q7d6-ambg), Land Parcels_Assessment Parcels (Point) (dm3i-bp8w), rooflines and 3D buildings | Open Government Licence – City of Edmonton |
 | `tiles/edm/t_-1_-7.json` | 366,520 | City of Edmonton Open Data: Property Information (dkk9-cj3x), Property Assessment Data (q7d6-ambg), Land Parcels_Assessment Parcels (Point) (dm3i-bp8w), rooflines and 3D buildings | Open Government Licence – City of Edmonton |
 | `tiles/edm/t_-1_-8.json` | 4,061 | City of Edmonton Open Data: Property Information (dkk9-cj3x), Property Assessment Data (q7d6-ambg), Land Parcels_Assessment Parcels (Point) (dm3i-bp8w), rooflines and 3D buildings | Open Government Licence – City of Edmonton |
 | `tiles/edm/t_-1_0.json` | 645,946 | City of Edmonton Open Data: Property Information (dkk9-cj3x), Property Assessment Data (q7d6-ambg), Land Parcels_Assessment Parcels (Point) (dm3i-bp8w), rooflines and 3D buildings | Open Government Licence – City of Edmonton |
 | `tiles/edm/t_-1_1.json` | 373,612 | City of Edmonton Open Data: Property Information (dkk9-cj3x), Property Assessment Data (q7d6-ambg), Land Parcels_Assessment Parcels (Point) (dm3i-bp8w), rooflines and 3D buildings | Open Government Licence – City of Edmonton |
 | `tiles/edm/t_-1_2.json` | 1,109,001 | City of Edmonton Open Data: Property Information (dkk9-cj3x), Property Assessment Data (q7d6-ambg), Land Parcels_Assessment Parcels (Point) (dm3i-bp8w), rooflines and 3D buildings | Open Government Licence – City of Edmonton |
 | `tiles/edm/t_-1_3.json` | 939,556 | City of Edmonton Open Data: Property Information (dkk9-cj3x), Property Assessment Data (q7d6-ambg), Land Parcels_Assessment Parcels (Point) (dm3i-bp8w), rooflines and 3D buildings | Open Government Licence – City of Edmonton |
-| `tiles/edm/t_-1_4.json` | 647,049 | City of Edmonton Open Data: Property Information (dkk9-cj3x), Property Assessment Data (q7d6-ambg), Land Parcels_Assessment Parcels (Point) (dm3i-bp8w), rooflines and 3D buildings | Open Government Licence – City of Edmonton |
+| `tiles/edm/t_-1_4.json` | 647,055 | City of Edmonton Open Data: Property Information (dkk9-cj3x), Property Assessment Data (q7d6-ambg), Land Parcels_Assessment Parcels (Point) (dm3i-bp8w), rooflines and 3D buildings | Open Government Licence – City of Edmonton |
 | `tiles/edm/t_-2_-1.json` | 507,303 | City of Edmonton Open Data: Property Information (dkk9-cj3x), Property Assessment Data (q7d6-ambg), Land Parcels_Assessment Parcels (Point) (dm3i-bp8w), rooflines and 3D buildings | Open Government Licence – City of Edmonton |
 | `tiles/edm/t_-2_-2.json` | 359,547 | City of Edmonton Open Data: Property Information (dkk9-cj3x), Property Assessment Data (q7d6-ambg), Land Parcels_Assessment Parcels (Point) (dm3i-bp8w), rooflines and 3D buildings | Open Government Licence – City of Edmonton |
 | `tiles/edm/t_-2_-3.json` | 529,103 | City of Edmonton Open Data: Property Information (dkk9-cj3x), Property Assessment Data (q7d6-ambg), Land Parcels_Assessment Parcels (Point) (dm3i-bp8w), rooflines and 3D buildings | Open Government Licence – City of Edmonton |
 | `tiles/edm/t_-2_-4.json` | 657,041 | City of Edmonton Open Data: Property Information (dkk9-cj3x), Property Assessment Data (q7d6-ambg), Land Parcels_Assessment Parcels (Point) (dm3i-bp8w), rooflines and 3D buildings | Open Government Licence – City of Edmonton |
-| `tiles/edm/t_-2_-5.json` | 587,081 | City of Edmonton Open Data: Property Information (dkk9-cj3x), Property Assessment Data (q7d6-ambg), Land Parcels_Assessment Parcels (Point) (dm3i-bp8w), rooflines and 3D buildings | Open Government Licence – City of Edmonton |
+| `tiles/edm/t_-2_-5.json` | 587,083 | City of Edmonton Open Data: Property Information (dkk9-cj3x), Property Assessment Data (q7d6-ambg), Land Parcels_Assessment Parcels (Point) (dm3i-bp8w), rooflines and 3D buildings | Open Government Licence – City of Edmonton |
 | `tiles/edm/t_-2_-6.json` | 513,226 | City of Edmonton Open Data: Property Information (dkk9-cj3x), Property Assessment Data (q7d6-ambg), Land Parcels_Assessment Parcels (Point) (dm3i-bp8w), rooflines and 3D buildings | Open Government Licence – City of Edmonton |
 | `tiles/edm/t_-2_-7.json` | 419,573 | City of Edmonton Open Data: Property Information (dkk9-cj3x), Property Assessment Data (q7d6-ambg), Land Parcels_Assessment Parcels (Point) (dm3i-bp8w), rooflines and 3D buildings | Open Government Licence – City of Edmonton |
 | `tiles/edm/t_-2_-8.json` | 9,518 | City of Edmonton Open Data: Property Information (dkk9-cj3x), Property Assessment Data (q7d6-ambg), Land Parcels_Assessment Parcels (Point) (dm3i-bp8w), rooflines and 3D buildings | Open Government Licence – City of Edmonton |
@@ -973,10 +2360,10 @@ Built by `publish/build_public.py` from `tool/` (13 Nov 2026). 1344 files, 222.8
 | `tiles/edm/t_-2_0.json` | 1,040,437 | City of Edmonton Open Data: Property Information (dkk9-cj3x), Property Assessment Data (q7d6-ambg), Land Parcels_Assessment Parcels (Point) (dm3i-bp8w), rooflines and 3D buildings | Open Government Licence – City of Edmonton |
 | `tiles/edm/t_-2_1.json` | 734,877 | City of Edmonton Open Data: Property Information (dkk9-cj3x), Property Assessment Data (q7d6-ambg), Land Parcels_Assessment Parcels (Point) (dm3i-bp8w), rooflines and 3D buildings | Open Government Licence – City of Edmonton |
 | `tiles/edm/t_-2_2.json` | 703,302 | City of Edmonton Open Data: Property Information (dkk9-cj3x), Property Assessment Data (q7d6-ambg), Land Parcels_Assessment Parcels (Point) (dm3i-bp8w), rooflines and 3D buildings | Open Government Licence – City of Edmonton |
-| `tiles/edm/t_-2_3.json` | 882,419 | City of Edmonton Open Data: Property Information (dkk9-cj3x), Property Assessment Data (q7d6-ambg), Land Parcels_Assessment Parcels (Point) (dm3i-bp8w), rooflines and 3D buildings | Open Government Licence – City of Edmonton |
-| `tiles/edm/t_-2_4.json` | 82,947 | City of Edmonton Open Data: Property Information (dkk9-cj3x), Property Assessment Data (q7d6-ambg), Land Parcels_Assessment Parcels (Point) (dm3i-bp8w), rooflines and 3D buildings | Open Government Licence – City of Edmonton |
+| `tiles/edm/t_-2_3.json` | 882,423 | City of Edmonton Open Data: Property Information (dkk9-cj3x), Property Assessment Data (q7d6-ambg), Land Parcels_Assessment Parcels (Point) (dm3i-bp8w), rooflines and 3D buildings | Open Government Licence – City of Edmonton |
+| `tiles/edm/t_-2_4.json` | 82,951 | City of Edmonton Open Data: Property Information (dkk9-cj3x), Property Assessment Data (q7d6-ambg), Land Parcels_Assessment Parcels (Point) (dm3i-bp8w), rooflines and 3D buildings | Open Government Licence – City of Edmonton |
 | `tiles/edm/t_-3_-1.json` | 1,105,062 | City of Edmonton Open Data: Property Information (dkk9-cj3x), Property Assessment Data (q7d6-ambg), Land Parcels_Assessment Parcels (Point) (dm3i-bp8w), rooflines and 3D buildings | Open Government Licence – City of Edmonton |
-| `tiles/edm/t_-3_-2.json` | 732,980 | City of Edmonton Open Data: Property Information (dkk9-cj3x), Property Assessment Data (q7d6-ambg), Land Parcels_Assessment Parcels (Point) (dm3i-bp8w), rooflines and 3D buildings | Open Government Licence – City of Edmonton |
+| `tiles/edm/t_-3_-2.json` | 732,982 | City of Edmonton Open Data: Property Information (dkk9-cj3x), Property Assessment Data (q7d6-ambg), Land Parcels_Assessment Parcels (Point) (dm3i-bp8w), rooflines and 3D buildings | Open Government Licence – City of Edmonton |
 | `tiles/edm/t_-3_-3.json` | 444,694 | City of Edmonton Open Data: Property Information (dkk9-cj3x), Property Assessment Data (q7d6-ambg), Land Parcels_Assessment Parcels (Point) (dm3i-bp8w), rooflines and 3D buildings | Open Government Licence – City of Edmonton |
 | `tiles/edm/t_-3_-4.json` | 783,637 | City of Edmonton Open Data: Property Information (dkk9-cj3x), Property Assessment Data (q7d6-ambg), Land Parcels_Assessment Parcels (Point) (dm3i-bp8w), rooflines and 3D buildings | Open Government Licence – City of Edmonton |
 | `tiles/edm/t_-3_-5.json` | 799,328 | City of Edmonton Open Data: Property Information (dkk9-cj3x), Property Assessment Data (q7d6-ambg), Land Parcels_Assessment Parcels (Point) (dm3i-bp8w), rooflines and 3D buildings | Open Government Licence – City of Edmonton |
@@ -991,7 +2378,7 @@ Built by `publish/build_public.py` from `tool/` (13 Nov 2026). 1344 files, 222.8
 | `tiles/edm/t_-3_4.json` | 177 | City of Edmonton Open Data: Property Information (dkk9-cj3x), Property Assessment Data (q7d6-ambg), Land Parcels_Assessment Parcels (Point) (dm3i-bp8w), rooflines and 3D buildings | Open Government Licence – City of Edmonton |
 | `tiles/edm/t_-4_-1.json` | 669,596 | City of Edmonton Open Data: Property Information (dkk9-cj3x), Property Assessment Data (q7d6-ambg), Land Parcels_Assessment Parcels (Point) (dm3i-bp8w), rooflines and 3D buildings | Open Government Licence – City of Edmonton |
 | `tiles/edm/t_-4_-2.json` | 818,033 | City of Edmonton Open Data: Property Information (dkk9-cj3x), Property Assessment Data (q7d6-ambg), Land Parcels_Assessment Parcels (Point) (dm3i-bp8w), rooflines and 3D buildings | Open Government Licence – City of Edmonton |
-| `tiles/edm/t_-4_-3.json` | 644,322 | City of Edmonton Open Data: Property Information (dkk9-cj3x), Property Assessment Data (q7d6-ambg), Land Parcels_Assessment Parcels (Point) (dm3i-bp8w), rooflines and 3D buildings | Open Government Licence – City of Edmonton |
+| `tiles/edm/t_-4_-3.json` | 644,324 | City of Edmonton Open Data: Property Information (dkk9-cj3x), Property Assessment Data (q7d6-ambg), Land Parcels_Assessment Parcels (Point) (dm3i-bp8w), rooflines and 3D buildings | Open Government Licence – City of Edmonton |
 | `tiles/edm/t_-4_-4.json` | 197,914 | City of Edmonton Open Data: Property Information (dkk9-cj3x), Property Assessment Data (q7d6-ambg), Land Parcels_Assessment Parcels (Point) (dm3i-bp8w), rooflines and 3D buildings | Open Government Licence – City of Edmonton |
 | `tiles/edm/t_-4_-5.json` | 447,119 | City of Edmonton Open Data: Property Information (dkk9-cj3x), Property Assessment Data (q7d6-ambg), Land Parcels_Assessment Parcels (Point) (dm3i-bp8w), rooflines and 3D buildings | Open Government Licence – City of Edmonton |
 | `tiles/edm/t_-4_-6.json` | 723,038 | City of Edmonton Open Data: Property Information (dkk9-cj3x), Property Assessment Data (q7d6-ambg), Land Parcels_Assessment Parcels (Point) (dm3i-bp8w), rooflines and 3D buildings | Open Government Licence – City of Edmonton |
@@ -1002,11 +2389,11 @@ Built by `publish/build_public.py` from `tool/` (13 Nov 2026). 1344 files, 222.8
 | `tiles/edm/t_-4_1.json` | 47,364 | City of Edmonton Open Data: Property Information (dkk9-cj3x), Property Assessment Data (q7d6-ambg), Land Parcels_Assessment Parcels (Point) (dm3i-bp8w), rooflines and 3D buildings | Open Government Licence – City of Edmonton |
 | `tiles/edm/t_-4_2.json` | 11,344 | City of Edmonton Open Data: Property Information (dkk9-cj3x), Property Assessment Data (q7d6-ambg), Land Parcels_Assessment Parcels (Point) (dm3i-bp8w), rooflines and 3D buildings | Open Government Licence – City of Edmonton |
 | `tiles/edm/t_-4_3.json` | 181 | City of Edmonton Open Data: Property Information (dkk9-cj3x), Property Assessment Data (q7d6-ambg), Land Parcels_Assessment Parcels (Point) (dm3i-bp8w), rooflines and 3D buildings | Open Government Licence – City of Edmonton |
-| `tiles/edm/t_-5_-1.json` | 543,058 | City of Edmonton Open Data: Property Information (dkk9-cj3x), Property Assessment Data (q7d6-ambg), Land Parcels_Assessment Parcels (Point) (dm3i-bp8w), rooflines and 3D buildings | Open Government Licence – City of Edmonton |
+| `tiles/edm/t_-5_-1.json` | 543,060 | City of Edmonton Open Data: Property Information (dkk9-cj3x), Property Assessment Data (q7d6-ambg), Land Parcels_Assessment Parcels (Point) (dm3i-bp8w), rooflines and 3D buildings | Open Government Licence – City of Edmonton |
 | `tiles/edm/t_-5_-2.json` | 795,873 | City of Edmonton Open Data: Property Information (dkk9-cj3x), Property Assessment Data (q7d6-ambg), Land Parcels_Assessment Parcels (Point) (dm3i-bp8w), rooflines and 3D buildings | Open Government Licence – City of Edmonton |
 | `tiles/edm/t_-5_-3.json` | 873,923 | City of Edmonton Open Data: Property Information (dkk9-cj3x), Property Assessment Data (q7d6-ambg), Land Parcels_Assessment Parcels (Point) (dm3i-bp8w), rooflines and 3D buildings | Open Government Licence – City of Edmonton |
-| `tiles/edm/t_-5_-4.json` | 737,316 | City of Edmonton Open Data: Property Information (dkk9-cj3x), Property Assessment Data (q7d6-ambg), Land Parcels_Assessment Parcels (Point) (dm3i-bp8w), rooflines and 3D buildings | Open Government Licence – City of Edmonton |
-| `tiles/edm/t_-5_-5.json` | 129,955 | City of Edmonton Open Data: Property Information (dkk9-cj3x), Property Assessment Data (q7d6-ambg), Land Parcels_Assessment Parcels (Point) (dm3i-bp8w), rooflines and 3D buildings | Open Government Licence – City of Edmonton |
+| `tiles/edm/t_-5_-4.json` | 737,330 | City of Edmonton Open Data: Property Information (dkk9-cj3x), Property Assessment Data (q7d6-ambg), Land Parcels_Assessment Parcels (Point) (dm3i-bp8w), rooflines and 3D buildings | Open Government Licence – City of Edmonton |
+| `tiles/edm/t_-5_-5.json` | 129,957 | City of Edmonton Open Data: Property Information (dkk9-cj3x), Property Assessment Data (q7d6-ambg), Land Parcels_Assessment Parcels (Point) (dm3i-bp8w), rooflines and 3D buildings | Open Government Licence – City of Edmonton |
 | `tiles/edm/t_-5_-6.json` | 16,738 | City of Edmonton Open Data: Property Information (dkk9-cj3x), Property Assessment Data (q7d6-ambg), Land Parcels_Assessment Parcels (Point) (dm3i-bp8w), rooflines and 3D buildings | Open Government Licence – City of Edmonton |
 | `tiles/edm/t_-5_-7.json` | 1,222 | City of Edmonton Open Data: Property Information (dkk9-cj3x), Property Assessment Data (q7d6-ambg), Land Parcels_Assessment Parcels (Point) (dm3i-bp8w), rooflines and 3D buildings | Open Government Licence – City of Edmonton |
 | `tiles/edm/t_-5_-8.json` | 7,149 | City of Edmonton Open Data: Property Information (dkk9-cj3x), Property Assessment Data (q7d6-ambg), Land Parcels_Assessment Parcels (Point) (dm3i-bp8w), rooflines and 3D buildings | Open Government Licence – City of Edmonton |
@@ -1025,18 +2412,18 @@ Built by `publish/build_public.py` from `tool/` (13 Nov 2026). 1344 files, 222.8
 | `tiles/edm/t_0_-3.json` | 227,276 | City of Edmonton Open Data: Property Information (dkk9-cj3x), Property Assessment Data (q7d6-ambg), Land Parcels_Assessment Parcels (Point) (dm3i-bp8w), rooflines and 3D buildings | Open Government Licence – City of Edmonton |
 | `tiles/edm/t_0_-4.json` | 321,547 | City of Edmonton Open Data: Property Information (dkk9-cj3x), Property Assessment Data (q7d6-ambg), Land Parcels_Assessment Parcels (Point) (dm3i-bp8w), rooflines and 3D buildings | Open Government Licence – City of Edmonton |
 | `tiles/edm/t_0_-5.json` | 268,314 | City of Edmonton Open Data: Property Information (dkk9-cj3x), Property Assessment Data (q7d6-ambg), Land Parcels_Assessment Parcels (Point) (dm3i-bp8w), rooflines and 3D buildings | Open Government Licence – City of Edmonton |
-| `tiles/edm/t_0_-6.json` | 565,460 | City of Edmonton Open Data: Property Information (dkk9-cj3x), Property Assessment Data (q7d6-ambg), Land Parcels_Assessment Parcels (Point) (dm3i-bp8w), rooflines and 3D buildings | Open Government Licence – City of Edmonton |
-| `tiles/edm/t_0_-7.json` | 113,857 | City of Edmonton Open Data: Property Information (dkk9-cj3x), Property Assessment Data (q7d6-ambg), Land Parcels_Assessment Parcels (Point) (dm3i-bp8w), rooflines and 3D buildings | Open Government Licence – City of Edmonton |
+| `tiles/edm/t_0_-6.json` | 565,462 | City of Edmonton Open Data: Property Information (dkk9-cj3x), Property Assessment Data (q7d6-ambg), Land Parcels_Assessment Parcels (Point) (dm3i-bp8w), rooflines and 3D buildings | Open Government Licence – City of Edmonton |
+| `tiles/edm/t_0_-7.json` | 113,859 | City of Edmonton Open Data: Property Information (dkk9-cj3x), Property Assessment Data (q7d6-ambg), Land Parcels_Assessment Parcels (Point) (dm3i-bp8w), rooflines and 3D buildings | Open Government Licence – City of Edmonton |
 | `tiles/edm/t_0_0.json` | 767,367 | City of Edmonton Open Data: Property Information (dkk9-cj3x), Property Assessment Data (q7d6-ambg), Land Parcels_Assessment Parcels (Point) (dm3i-bp8w), rooflines and 3D buildings | Open Government Licence – City of Edmonton |
 | `tiles/edm/t_0_1.json` | 1,258,843 | City of Edmonton Open Data: Property Information (dkk9-cj3x), Property Assessment Data (q7d6-ambg), Land Parcels_Assessment Parcels (Point) (dm3i-bp8w), rooflines and 3D buildings | Open Government Licence – City of Edmonton |
 | `tiles/edm/t_0_2.json` | 1,005,381 | City of Edmonton Open Data: Property Information (dkk9-cj3x), Property Assessment Data (q7d6-ambg), Land Parcels_Assessment Parcels (Point) (dm3i-bp8w), rooflines and 3D buildings | Open Government Licence – City of Edmonton |
 | `tiles/edm/t_0_3.json` | 1,067,792 | City of Edmonton Open Data: Property Information (dkk9-cj3x), Property Assessment Data (q7d6-ambg), Land Parcels_Assessment Parcels (Point) (dm3i-bp8w), rooflines and 3D buildings | Open Government Licence – City of Edmonton |
-| `tiles/edm/t_0_4.json` | 836,097 | City of Edmonton Open Data: Property Information (dkk9-cj3x), Property Assessment Data (q7d6-ambg), Land Parcels_Assessment Parcels (Point) (dm3i-bp8w), rooflines and 3D buildings | Open Government Licence – City of Edmonton |
+| `tiles/edm/t_0_4.json` | 836,101 | City of Edmonton Open Data: Property Information (dkk9-cj3x), Property Assessment Data (q7d6-ambg), Land Parcels_Assessment Parcels (Point) (dm3i-bp8w), rooflines and 3D buildings | Open Government Licence – City of Edmonton |
 | `tiles/edm/t_1_-1.json` | 1,136,855 | City of Edmonton Open Data: Property Information (dkk9-cj3x), Property Assessment Data (q7d6-ambg), Land Parcels_Assessment Parcels (Point) (dm3i-bp8w), rooflines and 3D buildings | Open Government Licence – City of Edmonton |
 | `tiles/edm/t_1_-2.json` | 553,036 | City of Edmonton Open Data: Property Information (dkk9-cj3x), Property Assessment Data (q7d6-ambg), Land Parcels_Assessment Parcels (Point) (dm3i-bp8w), rooflines and 3D buildings | Open Government Licence – City of Edmonton |
 | `tiles/edm/t_1_-3.json` | 421,285 | City of Edmonton Open Data: Property Information (dkk9-cj3x), Property Assessment Data (q7d6-ambg), Land Parcels_Assessment Parcels (Point) (dm3i-bp8w), rooflines and 3D buildings | Open Government Licence – City of Edmonton |
 | `tiles/edm/t_1_-4.json` | 730,034 | City of Edmonton Open Data: Property Information (dkk9-cj3x), Property Assessment Data (q7d6-ambg), Land Parcels_Assessment Parcels (Point) (dm3i-bp8w), rooflines and 3D buildings | Open Government Licence – City of Edmonton |
-| `tiles/edm/t_1_-5.json` | 787,627 | City of Edmonton Open Data: Property Information (dkk9-cj3x), Property Assessment Data (q7d6-ambg), Land Parcels_Assessment Parcels (Point) (dm3i-bp8w), rooflines and 3D buildings | Open Government Licence – City of Edmonton |
+| `tiles/edm/t_1_-5.json` | 787,629 | City of Edmonton Open Data: Property Information (dkk9-cj3x), Property Assessment Data (q7d6-ambg), Land Parcels_Assessment Parcels (Point) (dm3i-bp8w), rooflines and 3D buildings | Open Government Licence – City of Edmonton |
 | `tiles/edm/t_1_-6.json` | 1,343,825 | City of Edmonton Open Data: Property Information (dkk9-cj3x), Property Assessment Data (q7d6-ambg), Land Parcels_Assessment Parcels (Point) (dm3i-bp8w), rooflines and 3D buildings | Open Government Licence – City of Edmonton |
 | `tiles/edm/t_1_-7.json` | 116,451 | City of Edmonton Open Data: Property Information (dkk9-cj3x), Property Assessment Data (q7d6-ambg), Land Parcels_Assessment Parcels (Point) (dm3i-bp8w), rooflines and 3D buildings | Open Government Licence – City of Edmonton |
 | `tiles/edm/t_1_-8.json` | 1,053 | City of Edmonton Open Data: Property Information (dkk9-cj3x), Property Assessment Data (q7d6-ambg), Land Parcels_Assessment Parcels (Point) (dm3i-bp8w), rooflines and 3D buildings | Open Government Licence – City of Edmonton |
@@ -1044,42 +2431,42 @@ Built by `publish/build_public.py` from `tool/` (13 Nov 2026). 1344 files, 222.8
 | `tiles/edm/t_1_1.json` | 833,895 | City of Edmonton Open Data: Property Information (dkk9-cj3x), Property Assessment Data (q7d6-ambg), Land Parcels_Assessment Parcels (Point) (dm3i-bp8w), rooflines and 3D buildings | Open Government Licence – City of Edmonton |
 | `tiles/edm/t_1_2.json` | 961,631 | City of Edmonton Open Data: Property Information (dkk9-cj3x), Property Assessment Data (q7d6-ambg), Land Parcels_Assessment Parcels (Point) (dm3i-bp8w), rooflines and 3D buildings | Open Government Licence – City of Edmonton |
 | `tiles/edm/t_1_3.json` | 1,276,606 | City of Edmonton Open Data: Property Information (dkk9-cj3x), Property Assessment Data (q7d6-ambg), Land Parcels_Assessment Parcels (Point) (dm3i-bp8w), rooflines and 3D buildings | Open Government Licence – City of Edmonton |
-| `tiles/edm/t_1_4.json` | 772,242 | City of Edmonton Open Data: Property Information (dkk9-cj3x), Property Assessment Data (q7d6-ambg), Land Parcels_Assessment Parcels (Point) (dm3i-bp8w), rooflines and 3D buildings | Open Government Licence – City of Edmonton |
+| `tiles/edm/t_1_4.json` | 772,250 | City of Edmonton Open Data: Property Information (dkk9-cj3x), Property Assessment Data (q7d6-ambg), Land Parcels_Assessment Parcels (Point) (dm3i-bp8w), rooflines and 3D buildings | Open Government Licence – City of Edmonton |
 | `tiles/edm/t_1_5.json` | 527 | City of Edmonton Open Data: Property Information (dkk9-cj3x), Property Assessment Data (q7d6-ambg), Land Parcels_Assessment Parcels (Point) (dm3i-bp8w), rooflines and 3D buildings | Open Government Licence – City of Edmonton |
 | `tiles/edm/t_2_-1.json` | 249,626 | City of Edmonton Open Data: Property Information (dkk9-cj3x), Property Assessment Data (q7d6-ambg), Land Parcels_Assessment Parcels (Point) (dm3i-bp8w), rooflines and 3D buildings | Open Government Licence – City of Edmonton |
 | `tiles/edm/t_2_-2.json` | 94,879 | City of Edmonton Open Data: Property Information (dkk9-cj3x), Property Assessment Data (q7d6-ambg), Land Parcels_Assessment Parcels (Point) (dm3i-bp8w), rooflines and 3D buildings | Open Government Licence – City of Edmonton |
 | `tiles/edm/t_2_-3.json` | 843,295 | City of Edmonton Open Data: Property Information (dkk9-cj3x), Property Assessment Data (q7d6-ambg), Land Parcels_Assessment Parcels (Point) (dm3i-bp8w), rooflines and 3D buildings | Open Government Licence – City of Edmonton |
-| `tiles/edm/t_2_-4.json` | 1,184,697 | City of Edmonton Open Data: Property Information (dkk9-cj3x), Property Assessment Data (q7d6-ambg), Land Parcels_Assessment Parcels (Point) (dm3i-bp8w), rooflines and 3D buildings | Open Government Licence – City of Edmonton |
-| `tiles/edm/t_2_-5.json` | 861,886 | City of Edmonton Open Data: Property Information (dkk9-cj3x), Property Assessment Data (q7d6-ambg), Land Parcels_Assessment Parcels (Point) (dm3i-bp8w), rooflines and 3D buildings | Open Government Licence – City of Edmonton |
-| `tiles/edm/t_2_-6.json` | 231,524 | City of Edmonton Open Data: Property Information (dkk9-cj3x), Property Assessment Data (q7d6-ambg), Land Parcels_Assessment Parcels (Point) (dm3i-bp8w), rooflines and 3D buildings | Open Government Licence – City of Edmonton |
+| `tiles/edm/t_2_-4.json` | 1,184,699 | City of Edmonton Open Data: Property Information (dkk9-cj3x), Property Assessment Data (q7d6-ambg), Land Parcels_Assessment Parcels (Point) (dm3i-bp8w), rooflines and 3D buildings | Open Government Licence – City of Edmonton |
+| `tiles/edm/t_2_-5.json` | 861,892 | City of Edmonton Open Data: Property Information (dkk9-cj3x), Property Assessment Data (q7d6-ambg), Land Parcels_Assessment Parcels (Point) (dm3i-bp8w), rooflines and 3D buildings | Open Government Licence – City of Edmonton |
+| `tiles/edm/t_2_-6.json` | 231,530 | City of Edmonton Open Data: Property Information (dkk9-cj3x), Property Assessment Data (q7d6-ambg), Land Parcels_Assessment Parcels (Point) (dm3i-bp8w), rooflines and 3D buildings | Open Government Licence – City of Edmonton |
 | `tiles/edm/t_2_-7.json` | 12,097 | City of Edmonton Open Data: Property Information (dkk9-cj3x), Property Assessment Data (q7d6-ambg), Land Parcels_Assessment Parcels (Point) (dm3i-bp8w), rooflines and 3D buildings | Open Government Licence – City of Edmonton |
 | `tiles/edm/t_2_-8.json` | 1,661 | City of Edmonton Open Data: Property Information (dkk9-cj3x), Property Assessment Data (q7d6-ambg), Land Parcels_Assessment Parcels (Point) (dm3i-bp8w), rooflines and 3D buildings | Open Government Licence – City of Edmonton |
 | `tiles/edm/t_2_0.json` | 564,583 | City of Edmonton Open Data: Property Information (dkk9-cj3x), Property Assessment Data (q7d6-ambg), Land Parcels_Assessment Parcels (Point) (dm3i-bp8w), rooflines and 3D buildings | Open Government Licence – City of Edmonton |
 | `tiles/edm/t_2_1.json` | 967,449 | City of Edmonton Open Data: Property Information (dkk9-cj3x), Property Assessment Data (q7d6-ambg), Land Parcels_Assessment Parcels (Point) (dm3i-bp8w), rooflines and 3D buildings | Open Government Licence – City of Edmonton |
-| `tiles/edm/t_2_2.json` | 611,568 | City of Edmonton Open Data: Property Information (dkk9-cj3x), Property Assessment Data (q7d6-ambg), Land Parcels_Assessment Parcels (Point) (dm3i-bp8w), rooflines and 3D buildings | Open Government Licence – City of Edmonton |
-| `tiles/edm/t_2_3.json` | 938,466 | City of Edmonton Open Data: Property Information (dkk9-cj3x), Property Assessment Data (q7d6-ambg), Land Parcels_Assessment Parcels (Point) (dm3i-bp8w), rooflines and 3D buildings | Open Government Licence – City of Edmonton |
-| `tiles/edm/t_2_4.json` | 250,537 | City of Edmonton Open Data: Property Information (dkk9-cj3x), Property Assessment Data (q7d6-ambg), Land Parcels_Assessment Parcels (Point) (dm3i-bp8w), rooflines and 3D buildings | Open Government Licence – City of Edmonton |
+| `tiles/edm/t_2_2.json` | 611,570 | City of Edmonton Open Data: Property Information (dkk9-cj3x), Property Assessment Data (q7d6-ambg), Land Parcels_Assessment Parcels (Point) (dm3i-bp8w), rooflines and 3D buildings | Open Government Licence – City of Edmonton |
+| `tiles/edm/t_2_3.json` | 938,468 | City of Edmonton Open Data: Property Information (dkk9-cj3x), Property Assessment Data (q7d6-ambg), Land Parcels_Assessment Parcels (Point) (dm3i-bp8w), rooflines and 3D buildings | Open Government Licence – City of Edmonton |
+| `tiles/edm/t_2_4.json` | 250,545 | City of Edmonton Open Data: Property Information (dkk9-cj3x), Property Assessment Data (q7d6-ambg), Land Parcels_Assessment Parcels (Point) (dm3i-bp8w), rooflines and 3D buildings | Open Government Licence – City of Edmonton |
 | `tiles/edm/t_2_5.json` | 11,627 | City of Edmonton Open Data: Property Information (dkk9-cj3x), Property Assessment Data (q7d6-ambg), Land Parcels_Assessment Parcels (Point) (dm3i-bp8w), rooflines and 3D buildings | Open Government Licence – City of Edmonton |
 | `tiles/edm/t_2_6.json` | 6,804 | City of Edmonton Open Data: Property Information (dkk9-cj3x), Property Assessment Data (q7d6-ambg), Land Parcels_Assessment Parcels (Point) (dm3i-bp8w), rooflines and 3D buildings | Open Government Licence – City of Edmonton |
 | `tiles/edm/t_2_7.json` | 6,680 | City of Edmonton Open Data: Property Information (dkk9-cj3x), Property Assessment Data (q7d6-ambg), Land Parcels_Assessment Parcels (Point) (dm3i-bp8w), rooflines and 3D buildings | Open Government Licence – City of Edmonton |
 | `tiles/edm/t_3_-2.json` | 146,892 | City of Edmonton Open Data: Property Information (dkk9-cj3x), Property Assessment Data (q7d6-ambg), Land Parcels_Assessment Parcels (Point) (dm3i-bp8w), rooflines and 3D buildings | Open Government Licence – City of Edmonton |
 | `tiles/edm/t_3_-3.json` | 461,141 | City of Edmonton Open Data: Property Information (dkk9-cj3x), Property Assessment Data (q7d6-ambg), Land Parcels_Assessment Parcels (Point) (dm3i-bp8w), rooflines and 3D buildings | Open Government Licence – City of Edmonton |
 | `tiles/edm/t_3_-4.json` | 935,356 | City of Edmonton Open Data: Property Information (dkk9-cj3x), Property Assessment Data (q7d6-ambg), Land Parcels_Assessment Parcels (Point) (dm3i-bp8w), rooflines and 3D buildings | Open Government Licence – City of Edmonton |
-| `tiles/edm/t_3_-5.json` | 438,669 | City of Edmonton Open Data: Property Information (dkk9-cj3x), Property Assessment Data (q7d6-ambg), Land Parcels_Assessment Parcels (Point) (dm3i-bp8w), rooflines and 3D buildings | Open Government Licence – City of Edmonton |
+| `tiles/edm/t_3_-5.json` | 438,681 | City of Edmonton Open Data: Property Information (dkk9-cj3x), Property Assessment Data (q7d6-ambg), Land Parcels_Assessment Parcels (Point) (dm3i-bp8w), rooflines and 3D buildings | Open Government Licence – City of Edmonton |
 | `tiles/edm/t_3_-6.json` | 16,084 | City of Edmonton Open Data: Property Information (dkk9-cj3x), Property Assessment Data (q7d6-ambg), Land Parcels_Assessment Parcels (Point) (dm3i-bp8w), rooflines and 3D buildings | Open Government Licence – City of Edmonton |
 | `tiles/edm/t_3_-7.json` | 13,487 | City of Edmonton Open Data: Property Information (dkk9-cj3x), Property Assessment Data (q7d6-ambg), Land Parcels_Assessment Parcels (Point) (dm3i-bp8w), rooflines and 3D buildings | Open Government Licence – City of Edmonton |
 | `tiles/edm/t_3_-8.json` | 5,017 | City of Edmonton Open Data: Property Information (dkk9-cj3x), Property Assessment Data (q7d6-ambg), Land Parcels_Assessment Parcels (Point) (dm3i-bp8w), rooflines and 3D buildings | Open Government Licence – City of Edmonton |
 | `tiles/edm/t_3_0.json` | 2,878 | City of Edmonton Open Data: Property Information (dkk9-cj3x), Property Assessment Data (q7d6-ambg), Land Parcels_Assessment Parcels (Point) (dm3i-bp8w), rooflines and 3D buildings | Open Government Licence – City of Edmonton |
 | `tiles/edm/t_3_1.json` | 85,208 | City of Edmonton Open Data: Property Information (dkk9-cj3x), Property Assessment Data (q7d6-ambg), Land Parcels_Assessment Parcels (Point) (dm3i-bp8w), rooflines and 3D buildings | Open Government Licence – City of Edmonton |
 | `tiles/edm/t_3_2.json` | 343,359 | City of Edmonton Open Data: Property Information (dkk9-cj3x), Property Assessment Data (q7d6-ambg), Land Parcels_Assessment Parcels (Point) (dm3i-bp8w), rooflines and 3D buildings | Open Government Licence – City of Edmonton |
-| `tiles/edm/t_3_3.json` | 344,950 | City of Edmonton Open Data: Property Information (dkk9-cj3x), Property Assessment Data (q7d6-ambg), Land Parcels_Assessment Parcels (Point) (dm3i-bp8w), rooflines and 3D buildings | Open Government Licence – City of Edmonton |
+| `tiles/edm/t_3_3.json` | 344,952 | City of Edmonton Open Data: Property Information (dkk9-cj3x), Property Assessment Data (q7d6-ambg), Land Parcels_Assessment Parcels (Point) (dm3i-bp8w), rooflines and 3D buildings | Open Government Licence – City of Edmonton |
 | `tiles/edm/t_3_4.json` | 50,174 | City of Edmonton Open Data: Property Information (dkk9-cj3x), Property Assessment Data (q7d6-ambg), Land Parcels_Assessment Parcels (Point) (dm3i-bp8w), rooflines and 3D buildings | Open Government Licence – City of Edmonton |
 | `tiles/edm/t_3_5.json` | 11,298 | City of Edmonton Open Data: Property Information (dkk9-cj3x), Property Assessment Data (q7d6-ambg), Land Parcels_Assessment Parcels (Point) (dm3i-bp8w), rooflines and 3D buildings | Open Government Licence – City of Edmonton |
 | `tiles/edm/t_3_6.json` | 9,932 | City of Edmonton Open Data: Property Information (dkk9-cj3x), Property Assessment Data (q7d6-ambg), Land Parcels_Assessment Parcels (Point) (dm3i-bp8w), rooflines and 3D buildings | Open Government Licence – City of Edmonton |
 | `tiles/edm/t_3_7.json` | 8,362 | City of Edmonton Open Data: Property Information (dkk9-cj3x), Property Assessment Data (q7d6-ambg), Land Parcels_Assessment Parcels (Point) (dm3i-bp8w), rooflines and 3D buildings | Open Government Licence – City of Edmonton |
 | `tiles/edm/t_4_-2.json` | 5,667 | City of Edmonton Open Data: Property Information (dkk9-cj3x), Property Assessment Data (q7d6-ambg), Land Parcels_Assessment Parcels (Point) (dm3i-bp8w), rooflines and 3D buildings | Open Government Licence – City of Edmonton |
 | `tiles/edm/t_4_-3.json` | 54,345 | City of Edmonton Open Data: Property Information (dkk9-cj3x), Property Assessment Data (q7d6-ambg), Land Parcels_Assessment Parcels (Point) (dm3i-bp8w), rooflines and 3D buildings | Open Government Licence – City of Edmonton |
-| `tiles/edm/t_4_-4.json` | 29,026 | City of Edmonton Open Data: Property Information (dkk9-cj3x), Property Assessment Data (q7d6-ambg), Land Parcels_Assessment Parcels (Point) (dm3i-bp8w), rooflines and 3D buildings | Open Government Licence – City of Edmonton |
+| `tiles/edm/t_4_-4.json` | 29,028 | City of Edmonton Open Data: Property Information (dkk9-cj3x), Property Assessment Data (q7d6-ambg), Land Parcels_Assessment Parcels (Point) (dm3i-bp8w), rooflines and 3D buildings | Open Government Licence – City of Edmonton |
 | `tiles/edm/t_4_-5.json` | 1,075 | City of Edmonton Open Data: Property Information (dkk9-cj3x), Property Assessment Data (q7d6-ambg), Land Parcels_Assessment Parcels (Point) (dm3i-bp8w), rooflines and 3D buildings | Open Government Licence – City of Edmonton |
 | `tiles/edm/t_4_-6.json` | 1,699 | City of Edmonton Open Data: Property Information (dkk9-cj3x), Property Assessment Data (q7d6-ambg), Land Parcels_Assessment Parcels (Point) (dm3i-bp8w), rooflines and 3D buildings | Open Government Licence – City of Edmonton |
 | `tiles/edm/t_4_-7.json` | 2,341 | City of Edmonton Open Data: Property Information (dkk9-cj3x), Property Assessment Data (q7d6-ambg), Land Parcels_Assessment Parcels (Point) (dm3i-bp8w), rooflines and 3D buildings | Open Government Licence – City of Edmonton |
@@ -1087,7 +2474,7 @@ Built by `publish/build_public.py` from `tool/` (13 Nov 2026). 1344 files, 222.8
 | `tiles/edm/t_4_1.json` | 24,954 | City of Edmonton Open Data: Property Information (dkk9-cj3x), Property Assessment Data (q7d6-ambg), Land Parcels_Assessment Parcels (Point) (dm3i-bp8w), rooflines and 3D buildings | Open Government Licence – City of Edmonton |
 | `tiles/edm/t_4_2.json` | 19,216 | City of Edmonton Open Data: Property Information (dkk9-cj3x), Property Assessment Data (q7d6-ambg), Land Parcels_Assessment Parcels (Point) (dm3i-bp8w), rooflines and 3D buildings | Open Government Licence – City of Edmonton |
 | `tiles/edm/t_4_3.json` | 102,930 | City of Edmonton Open Data: Property Information (dkk9-cj3x), Property Assessment Data (q7d6-ambg), Land Parcels_Assessment Parcels (Point) (dm3i-bp8w), rooflines and 3D buildings | Open Government Licence – City of Edmonton |
-| `tiles/edm/t_4_4.json` | 111,474 | City of Edmonton Open Data: Property Information (dkk9-cj3x), Property Assessment Data (q7d6-ambg), Land Parcels_Assessment Parcels (Point) (dm3i-bp8w), rooflines and 3D buildings | Open Government Licence – City of Edmonton |
+| `tiles/edm/t_4_4.json` | 111,480 | City of Edmonton Open Data: Property Information (dkk9-cj3x), Property Assessment Data (q7d6-ambg), Land Parcels_Assessment Parcels (Point) (dm3i-bp8w), rooflines and 3D buildings | Open Government Licence – City of Edmonton |
 | `tiles/edm/t_4_5.json` | 27,521 | City of Edmonton Open Data: Property Information (dkk9-cj3x), Property Assessment Data (q7d6-ambg), Land Parcels_Assessment Parcels (Point) (dm3i-bp8w), rooflines and 3D buildings | Open Government Licence – City of Edmonton |
 | `tiles/edm/t_4_6.json` | 16,178 | City of Edmonton Open Data: Property Information (dkk9-cj3x), Property Assessment Data (q7d6-ambg), Land Parcels_Assessment Parcels (Point) (dm3i-bp8w), rooflines and 3D buildings | Open Government Licence – City of Edmonton |
 | `tiles/edm/t_4_7.json` | 5,703 | City of Edmonton Open Data: Property Information (dkk9-cj3x), Property Assessment Data (q7d6-ambg), Land Parcels_Assessment Parcels (Point) (dm3i-bp8w), rooflines and 3D buildings | Open Government Licence – City of Edmonton |

@@ -398,7 +398,7 @@ function arch(d){
   note('Simple massing: where each block sits is drawn by the tool, not a design. '+(d.roomNote?d.roomNote+' ':'')+heightsNote()+'.'); key(sw(C.grey,'data hall (light), electrical and battery rooms (darker); dashed: secure line')+sw(C.edge,'programs')+sw(C.acc,'selected or a rule flagged')); }
 const FN={model,heat,energy,water,materials,social,opp,arch};
 
-async function ensureTiles(c){ if(!BD.loadTile) return; const S=BD.S, m=S.meta[S.city]; if(!m) return; const T0=m.T, keys=[];
+async function ensureTiles(c){ if(!BD.loadTile) return; const S=BD.S, m=S.meta[S.city]; if(!m||!m.tileset) return; const T0=m.T, keys=[];    
   for(let i=Math.floor((c[0]-RAD)/T0);i<=Math.floor((c[0]+RAD)/T0);i++) for(let j=Math.floor((c[1]-RAD)/T0);j<=Math.floor((c[1]+RAD)/T0);j++){ const k=i+'_'+j; if(m.tileset.has(k)&&!S.tiles[S.city+':'+k]) keys.push(k); }
   if(keys.length){ note('Loading neighbours to 1.5 km…'); await Promise.all(keys.map(k=>BD.loadTile(S.city,k))); } }
 function siteKey(){ const S=BD.S, M=BD.model?BD.model():null; return S.city+'|'+S.sel.id+'|'+JSON.stringify(S.answers)+'|'+(M?M.footArea:0)+'|'+(light3d()?'L':'D'); }

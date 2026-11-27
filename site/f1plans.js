@@ -8,7 +8,9 @@ const BOARD_COL={hall:'#B9CCE1',sup:'#E2EAF3',load:'#E2EAF3',pub:'#E7D9BF',clin:
 const HUB=new Set(['pub','clin','circ']), DCG=new Set(['hall','sup','load','spare']), HUB_IDS=new Set(['pmec']);
 const CIRC=/corridor|lobby|passage|vestibule|\blift\b/i;
 const HEAD=rm=>String(rm.n||'').split('(')[0];    
-const isCirc=rm=>!(rm.stair||/shaft|riser/i.test(HEAD(rm)))&&rm.g!=='spare'&&(rm.g==='circ'||CIRC.test(HEAD(rm)));
+ 
+const isCirc=rm=>rm.role!==undefined&&rm.role!==null||rm.role===null&&rm.fromExport?rm.role==='circulation':(!(rm.stair||/shaft|riser/i.test(HEAD(rm)))&&rm.g!=='spare'&&(rm.g==='circ'||CIRC.test(HEAD(rm))));
+const isShaft=rm=>rm.fromExport?rm.role==='shaft':/shaft|riser/i.test(HEAD(rm));
 const side=rm=>HUB_IDS.has(rm.id)?'hub':HUB.has(rm.g)?'hub':DCG.has(rm.g)?'dc':null;
 const f1=x=>x.toFixed(1), E=1e-6;
 function shared(a,b){ const out=[];
@@ -113,7 +115,7 @@ function energySvg(E,city){ const n0=x=>Math.round(x).toLocaleString('en-CA'), W
   s.push(`<svg width="${W}" height="330" viewBox="0 0 ${W} 330" font-family="${FONT}" role="img" aria-label="Where the data hall’s heat goes in a year">`);
   s.push(`<rect x="0" y="30" width="120" height="226" fill="#BCCDE4"/><text x="8" y="52" font-size="13" font-weight="500" fill="${INK}">Data hall</text><text x="8" y="70" font-size="11" fill="${INK2}">${E.mw.toFixed(2)} MW of servers</text><text x="8" y="196" font-size="11" fill="${INK2}">heat, all year:</text><text x="8" y="214" font-size="12.5" fill="${INK}">${n0(E.av[0])}–${n0(E.av[1])}</text><text x="8" y="227" font-size="10.5" fill="${INK2}">MWh/yr</text>`);
   s.push(`<path d="M120,30 C220,30 250,30 330,30 L330,200 C250,200 220,200 120,200 Z" fill="${PLANTT}"/><rect x="330" y="30" width="134" height="170" fill="${PLANTT}" stroke="${PLANT}" stroke-width="0.6"/>`);
-  s.push(`<text x="340" y="50" font-size="12.5" font-weight="500" fill="${INK}">For neighbours</text><text x="340" y="66" font-size="10.5" fill="${INK2}">potential external</text><text x="340" y="80" font-size="10.5" fill="${INK2}">receivers (Engineering)</text><text x="340" y="156" font-size="15" fill="${INK}">${(100-E.share[1]).toFixed(1)}–${(100-E.share[0]).toFixed(1)} %</text><text x="340" y="170" font-size="10.5" fill="${INK2}">of the hall’s heat; until</text><text x="340" y="183" font-size="10.5" fill="${INK2}">used, the chillers reject it</text>`);
+  s.push(`<text x="340" y="50" font-size="12.5" font-weight="500" fill="${INK}">For neighbours</text><text x="340" y="66" font-size="10.5" fill="${INK2}">potential external</text><text x="340" y="80" font-size="10.5" fill="${INK2}">receivers (Power, heat and water)</text><text x="340" y="156" font-size="15" fill="${INK}">${(100-E.share[1]).toFixed(1)}–${(100-E.share[0]).toFixed(1)} %</text><text x="340" y="170" font-size="10.5" fill="${INK2}">of the hall’s heat; until</text><text x="340" y="183" font-size="10.5" fill="${INK2}">used, the chillers reject it</text>`);
   s.push(`<path d="M120,226 C190,226 200,256 250,256 L250,266 C200,266 190,236 120,236 Z" fill="${HEATC}"/><text x="128" y="276" font-size="10.5" fill="${HEATC}">warm water 20–25 °C</text>`);
   s.push(`<rect x="250" y="236" width="146" height="50" fill="${HEATT}" stroke="${HEATC}" stroke-width="0.8"/><text x="258" y="256" font-size="12.5" font-weight="500" fill="${INK}">Heat pump</text><text x="258" y="273" font-size="10.5" fill="${INK2}">COP ${E.cop[0]}–${E.cop[1]}${E.peak?` · ${n0(E.peak)} kW peak`:' · peak ?'}</text>`);
   s.push(`<path d="M310,236 L310,222" stroke="${INK2}" stroke-width="1.2"/><polygon points="306,224 314,224 310,232" fill="${INK2}"/><text x="318" y="226" font-size="10.5" fill="${INK2}">+ ${n0(E.hp[0])}–${n0(E.hp[1])} MWh/yr electricity</text>`);
@@ -122,19 +124,32 @@ function energySvg(E,city){ const n0=x=>Math.round(x).toLocaleString('en-CA'), W
   s.push(`<rect x="556" y="206" width="148" height="56" fill="${PUBT}" stroke="${PUB}" stroke-width="0.8"/><text x="564" y="224" font-size="12" font-weight="500" fill="${INK}">Hub rooms</text><text x="564" y="239" font-size="10.5" fill="${INK2}">refuge, shelter, clinic, lobby</text>`);
   s.push(`<rect x="556" y="268" width="148" height="56" fill="${DCT}" stroke="${DC}" stroke-width="0.8"/><text x="564" y="286" font-size="12" font-weight="500" fill="${INK}">Data-centre staff rooms</text><text x="564" y="301" font-size="10.5" fill="${INK2}">offices, NOC, staging, ${n0(E.acc)} m²</text>`);
   s.push(`<text x="404" y="300" font-size="10.5" fill="${INK2}">together ${E.share[0].toFixed(1)}–${E.share[1].toFixed(1)} %</text><text x="404" y="313" font-size="10.5" fill="${INK2}">of the hall’s heat</text>`);
-  [['1','The servers turn their power into heat, all year.'],['2','A heat pump lifts a small share to building temperature for the hub and the data centre’s own staff rooms.'],['3','The rest is for neighbours (see the Engineering report). Until one connects, the chillers reject it to the air.']].forEach(([n,t],i)=>{ const y=30+i*52;
+  [['1','The servers turn their power into heat, all year.'],['2','A heat pump lifts a small share to building temperature for the hub and the data centre’s own staff rooms.'],['3','The rest is for neighbours (see the Power, heat and water report). Until one connects, the chillers reject it to the air.']].forEach(([n,t],i)=>{ const y=30+i*52;
     s.push(`<circle cx="490" cy="${y+6}" r="9" fill="none" stroke="${INK}" stroke-width="0.8"/><text x="490" y="${y+10}" font-size="10.5" fill="${INK}" text-anchor="middle">${n}</text><foreignObject x="506" y="${y-4}" width="198" height="52"><div xmlns="http://www.w3.org/1999/xhtml" style="font-size:12px;line-height:1.35;color:${INK2};font-family:${FONT}">${t}</div></foreignObject>`); });
   s.push('</svg>');
   let s2='';
   if(city==='van'){ const seas=[['Winter (Dec–Feb)',47.0],['Spring and fall',50.5],['Summer (Jun–Aug)',2.5]]; s2=`<svg width="${W}" height="150" viewBox="0 0 ${W} 150" font-family="${FONT}" role="img" aria-label="When the hub needs heat">`;
-    seas.forEach(([t,v],i)=>{ const y=18+i*40; s2+=`<text x="0" y="${y+14}" font-size="12" fill="${INK}">${t}</text><rect x="150" y="${y}" width="${(v/50.5*300).toFixed(0)}" height="20" fill="${HEATC}"/><text x="${(150+v/50.5*300+8).toFixed(0)}" y="${y+15}" font-size="11.5" fill="${INK2}">${v.toFixed(1)} % · about ${n0(E.dem*v/100)} MWh</text><rect x="150" y="${y+22}" width="${(25/100*380*4/1.98).toFixed(0)}" height="4" fill="#BCCDE4"/>`; });
+    seas.forEach(([t,v],i)=>{ const y=18+i*40; s2+=`<text x="0" y="${y+14}" font-size="12" fill="${INK}">${t}</text><rect x="150" y="${y}" width="${(v/50.5*300).toFixed(0)}" height="20" fill="${HEATC}"/><text x="${(150+v/50.5*300+8).toFixed(0)}" y="${y+15}" font-size="11.5" fill="${INK2}">${v.toFixed(1)} % · about ${n0(E.dem*v/100)} MWh</text><rect x="150" y="${y+22}" width="${(25/50.5*300).toFixed(0)}" height="4" fill="#BCCDE4"/>`; });
     s2+=`<text x="0" y="142" font-size="10.5" fill="${MUTE}">Orange: the building’s heat need (hub and staff rooms). Thin blue: the data centre’s heat, nearly flat all year (a quarter of it each season).</text></svg>`; }
   return {svg:s.join(''),seasons:s2}; }
  
 const BIG={hall:'#BCCDE4',sup:'#BCCDE4',load:'#BCCDE4',pub:'#CFE0CB',clin:'#CFE0CB',circ:'#FFFFFF',plant:'#DCDBD6',spare:'#F4F4F2'}, RULE='#DAD9D5';
 const C30=Math.cos(Math.PI/6), S30=0.5, iso=(x,y,z,ox,oy,k)=>[ox+(x-y)*C30*k, oy+(x+y)*S30*k-z*k];
 const ply=(pts,fill,stroke,sw,dash)=>`<polygon points="${pts.map(q=>q[0].toFixed(1)+','+q[1].toFixed(1)).join(' ')}" fill="${fill}" stroke="${stroke||INK}" stroke-width="${sw==null?0.9:sw}" stroke-linejoin="round"${dash?` stroke-dasharray="${dash}"`:''}/>`;
-function exploded(L,W,H){ W=W||400; H=H||236; const G=L.G, S=G.S, sts=Object.keys(S).map(Number).sort((a,b)=>a-b), gap=15, zs={}; sts.forEach(st=>zs[st]=(st-1)*gap);
+ 
+const ZONE_OF=rm=>{ if(rm.zoneKey) return rm.zoneKey==='circulation-dc'?'circulation':rm.zoneKey==='public-program'?'public':rm.zoneKey;    
+  const nm=String(rm.n||rm.id||''), dcs=rm.g==='sup'||rm.g==='hall'||rm.block==='data centre'||/^s\d|^e2|^e3|^sh\d/.test(rm.id||'');
+  if(rm.g==='hall'||rm.kind==='hall') return 'hall';
+  if(rm.stair||rm.lift||/shaft|riser|\blift\b(?!\s*lobby)/i.test(nm)) return dcs?'core-dc':'core-public';    
+  if(rm.g==='load'||rm.kind==='bay'||/^dock/.test(rm.id||'')) return 'loading';
+  if(rm.g==='plant') return 'plant';
+  if(rm.g==='sup'||rm.block==='data centre'||rm.g==='spare') return 'dc';
+  if(rm.g==='clin') return 'clinic';
+  if(rm.g==='circ'||rm.corridor||/corridor|lobby|passage|vestibule/i.test(nm.split('(')[0])) return 'circulation';
+  return 'public'; };
+const TYP_OF=L=>(L&&(L.typology||(L.G&&L.G.typology)))||'emergency_hub';
+function exploded(L,W,H,typ){ if(BD.f1mass&&L&&L.G&&L.G.S){ const sts=BD.f1mass.fromRooms(L.G.S,L.H,ZONE_OF); return `<div class="f1p-mass" style="max-width:${W||400}px">${BD.f1mass.render(sts,{typology:typ||TYP_OF(L),exploded:true,w:W||400})}</div>`; }    
+  W=W||400; H=H||236; const G=L.G, S=G.S, sts=Object.keys(S).map(Number).sort((a,b)=>a-b), gap=15, zs={}; sts.forEach(st=>zs[st]=(st-1)*gap);
   const allr=sts.flatMap(st=>S[st].flatMap(rm=>rm.r)), U0=Math.min(...allr.map(r=>r[0])), U1=Math.max(...allr.map(r=>r[1])), V0=Math.min(...allr.map(r=>r[2])), V1=Math.max(...allr.map(r=>r[3]));
   const plant=((L.plant&&L.plant.items)||[]).filter(it=>!it.roof&&it.r);
   const P=(u,v,z,ox,oy,k)=>iso(-u,-v,z,ox,oy,k), uMax=Math.max(U1,...plant.map(it=>it.r[1]));
@@ -215,11 +230,12 @@ async function massing(x,P,L,o){ o=o||{}; const W=o.W||760, Hh=o.H||540, M=P.s.M
     const sides=[[[u0,v0],[u1,v0],[0,-1]],[[u1,v0],[u1,v1],[1,0]],[[u1,v1],[u0,v1],[0,1]],[[u0,v1],[u0,v0],[-1,0]]].filter(sd=>VIS(sd[2][0],sd[2][1]));
     objs.push([DEP(u0+u1,v0+v1),sides.map(sd=>ply([Q(sd[0][0],sd[0][1],0),Q(sd[1][0],sd[1][1],0),Q(sd[1][0],sd[1][1],hh),Q(sd[0][0],sd[0][1],hh)],shade(BIG.plant,sd[2][0]?0.8:0.9),INK2,0.5)).join('')+ply([Q(u0,v0,hh),Q(u1,v0,hh),Q(u1,v1,hh),Q(u0,v1,hh)],BIG.plant,INK2,0.5)]); }
    
-  const GC={dc:'#BCCDE4',pub:'#CFE0CB',plant:'#DCDBD6',spare:'#F4F4F2'};
-  const g0=g=>(g==='hall'||g==='sup'||g==='load')?'dc':(g==='pub'||g==='clin')?'pub':g==='plant'?'plant':g==='spare'?'spare':null;
+   
+  const TYP=TYP_OF(L), ZC=z=>BD.f1mass?BD.f1mass.colour(z,TYP):({dc:'#BCCDE4',hall:'#8C9DBD',public:'#CFE0CB',clinic:'#E4EDD9',plant:'#DCDBD6',loading:'#B5BAC3',circulation:'#DDE2EA','core-dc':'#3D5185','core-public':'#9AA3B5'}[z]||'#E9ECF1');
+  const GC=new Proxy({},{get:(t,z)=>ZC(z)});
   const shareLen=(a,b)=>{ let L=0; for(const x of [a[0],a[1]]) if(Math.abs(x-b[0])<1e-6||Math.abs(x-b[1])<1e-6) L+=Math.max(0,Math.min(a[3],b[3])-Math.max(a[2],b[2]));
     for(const y of [a[2],a[3]]) if(Math.abs(y-b[2])<1e-6||Math.abs(y-b[3])<1e-6) L+=Math.max(0,Math.min(a[1],b[1])-Math.max(a[0],b[0])); return L; };
-  const groupsOf=st=>{ const R=[]; for(const rm of S[st]) for(const r of rm.r) R.push({r,g:g0(rm.g),fix:!!g0(rm.g)&&rm.g!=='load'});
+  const groupsOf=st=>{ const R=[]; for(const rm of S[st]) for(const r of rm.r) R.push({r,g:ZONE_OF(rm),fix:true});
     const nb=o=>{ const w={}; for(const q of R){ if(q===o||!q.g) continue; const L=shareLen(o.r,q.r); if(L>0) w[q.g]=(w[q.g]||0)+L; } let best=null; for(const k in w) if(!best||w[k]>w[best]) best=k; return best; };
     for(let it=0;it<6;it++) for(const o of R) if(!o.g||(!o.fix&&o.g==='dc')){ const b=nb(o); if(b) o.g=b; }    
     for(const o of R) if(!o.g) o.g='dc';
@@ -244,7 +260,7 @@ async function massing(x,P,L,o){ o=o||{}; const W=o.W||760, Hh=o.H||540, M=P.s.M
     for(const [k,es] of byPt){ const vs=es.filter(e=>vis.includes(e)); if(!vs.length) continue; const hid=es.some(e=>!vis.includes(e)), diff=new Set(vs.map(e=>e.g)).size>1, straight=vs.length===2&&vs[0].n[0]===vs[1].n[0]&&vs[0].n[1]===vs[1].n[1];
       if(hid||(diff)){ const pt=vs[0].a&&key(vs[0].a)===k?vs[0].a:vs[0].b, A=Q(pt[0],pt[1],z0), B=Q(pt[0],pt[1],z1); lines.push(`<line x1="${A[0].toFixed(1)}" y1="${A[1].toFixed(1)}" x2="${B[0].toFixed(1)}" y2="${B[1].toFixed(1)}" stroke="${DK}" stroke-width="0.8"/>`); } }
     faces.sort((p1,p2)=>p1[0]-p2[0]); bsvg+=faces.map(z=>z[1]).join('')+lines.join(''); base=z1;
-    if(st===sts[sts.length-1]){  
+    {  
       for(const o of R) bsvg+=ply([Q(o.r[0],o.r[2],z1),Q(o.r[1],o.r[2],z1),Q(o.r[1],o.r[3],z1),Q(o.r[0],o.r[3],z1)],GC[o.g],GC[o.g],0.6);
       for(const e of E){ const A=Q(e.a[0],e.a[1],z1), B=Q(e.b[0],e.b[1],z1); bsvg+=`<line x1="${A[0].toFixed(1)}" y1="${A[1].toFixed(1)}" x2="${B[0].toFixed(1)}" y2="${B[1].toFixed(1)}" stroke="${DK}" stroke-width="0.8"/>`; }
       for(let a=0;a<R.length;a++) for(let b=a+1;b<R.length;b++){ if(R[a].g===R[b].g) continue; const ra=R[a].r, rb=R[b].r;
@@ -253,10 +269,10 @@ async function massing(x,P,L,o){ o=o||{}; const W=o.W||760, Hh=o.H||540, M=P.s.M
   objs.push([DEP(cA/nC,cB/nC),bsvg]);
   objs.sort((p1,p2)=>p1[0]-p2[0]); out.push(...objs.map(z=>z[1]));
   out.push('</svg>');
-  const key=`<div style="font-size:12px;color:${INK2};margin-top:4px"><span style="display:inline-block;width:10px;height:10px;background:#BCCDE4;vertical-align:-1px;margin-right:6px"></span>data centre <span style="display:inline-block;width:10px;height:10px;background:#CFE0CB;vertical-align:-1px;margin:0 6px 0 10px"></span>refuge, shelter, clinic <span style="display:inline-block;width:10px;height:10px;background:${BIG.plant};vertical-align:-1px;margin:0 6px 0 10px"></span>plant <span style="display:inline-block;width:10px;height:10px;background:#fff;border:1px solid #B9B8B3;vertical-align:-1px;margin:0 6px 0 10px"></span>neighbours (${x.city==='van'?'City LiDAR 2022':'City footprints'})</div>`;
+  const key=`<div style="font-size:12px;color:${INK2};margin-top:4px;display:flex;flex-wrap:wrap;gap:4px 12px">${BD.f1mass?BD.f1mass.legend(BD.f1mass.fromRooms(S,H,ZONE_OF),TYP):''}<span><span style="display:inline-block;width:10px;height:10px;background:#fff;border:1px solid #B9B8B3;vertical-align:-1px;margin-right:6px"></span>neighbours (${x.city==='van'?'City LiDAR 2022':'City footprints'})</span></div>`;    
   return {svg:out.join(''),key,from}; }
 const C_bbox=r=>{ let a=1e18,b=1e18,c=-1e18,d=-1e18; for(let i=0;i<r.length;i+=2){ a=Math.min(a,r[i]); b=Math.min(b,r[i+1]); c=Math.max(c,r[i]); d=Math.max(d,r[i+1]); } return [a,b,c,d]; };
-BD.f1plans={plan,legend,BOARD_COL,isCirc,side,energy,energySvg,exploded,storeyLabels,modes,why,shares,icons,secT,massing,BIG};
+BD.f1plans={plan,legend,BOARD_COL,isCirc,isShaft,side,energy,energySvg,exploded,storeyLabels,modes,why,shares,icons,secT,massing,BIG};
 })();
  
 (function(){ const BD=window.BD, C=BD.f1cards, F=BD.f1plans; if(!C) return;
@@ -276,18 +292,33 @@ BD.f1plans={plan,legend,BOARD_COL,isCirc,side,energy,energySvg,exploded,storeyLa
   wrap('The governing principle',(x,P,V)=>`<div class="f1p-set">${F.secT('Two modes, one building')}${F.modes(V.L,people(V.L),exams(V.L))}${F.secT('Why pair them')}${F.why()}${F.secT('The order on the lot')}<div style="display:grid;grid-template-columns:400px 1fr;gap:20px;align-items:center">${F.exploded(V.L)}<div style="display:flex;flex-direction:column;gap:12px">${F.storeyLabels(V.L)}</div></div></div>`);
    
   { const ds=C.get('architecture','Drawing styles'), dsBase=ds&&ds.build;
-    C.add('architecture','Massing',{chip:ds&&ds.chip,async build(x){ const P=await x.arch(); if(!P) return {draw:'<p class="f1v-empty">No lot loaded.</p>'}; const V=C.v1(P); if(!V||!V.L||!V.L.G) return dsBase?dsBase.call(this,x):{draw:''};
+    C.add('architecture','Massing',{chip:ds&&ds.chip,async build(x){ const P=await x.arch(); if(!P) return {draw:'<p class="f1v-empty">No lot loaded.</p>'}; const V0=C.v1(P);
+      { const ch0=x.city==='van'&&BD.f1pick3&&BD.f1pick3.chosen?await BD.f1pick3.chosen(x).catch(()=>null):null, away0=ch0&&BD.f1best&&BD.f1best.away?BD.f1best.away(ch0.id,String(x.sel.id)):false;
+        const PL0=away0&&BD.f1place?await BD.f1place.placedFor(x):null;    
+        if(ch0&&ch0.storeys&&BD.f1mass&&((away0&&!PL0)||!V0||!V0.L||!V0.L.G)){ const who=ch0._best?(BD.f1hc?BD.f1hc(1):'The highest-capacity layout for your filters'):'Your chosen layout', tot=(ch0.shares&&ch0.shares.total)||0;
+          const views=[0,1,2,3].map(k=>BD.f1mass.render(ch0.storeys,{typology:ch0.typology,rot:k*Math.PI/2,k:3,label:`${ch0.typName}, turned ${k} quarter${k===1?'':'s'}`}).replace(/<svg /,'<svg style="display:block;width:100%;height:auto;max-height:520px;margin:0 auto" '));
+          const id='mv'+Math.random().toString(36).slice(2,7), NM=['One side','Turned a quarter','Turned half way','Turned three quarters'];
+          const btn=i=>`<button type="button" aria-pressed="${i===0}" onclick="var w=this.closest('.f1-mviews');w.querySelectorAll('[data-mv]').forEach(function(e){e.hidden=e.getAttribute('data-mv')!=='${i}'});w.querySelectorAll('button').forEach(function(b){b.setAttribute('aria-pressed',b===this)},this)">${NM[i]}</button>`;
+          const draw=`<p class="f1c-note">${who}: ${C.esc(ch0.typName)}, ${(+ch0.MW).toFixed(2)} MW.${away0?' It is a library variant that fits this lot; it is shown on its own, not placed among this lot’s neighbours.':''}</p><div class="f1p-set f1-mviews" id="${id}"><div class="f1-mvbar">${views.map((v,i)=>btn(i)).join('')}</div>${views.map((v,i)=>`<div data-mv="${i}"${i===0?'':' hidden'}>${v}</div>`).join('')}${BD.f1mass.legend?BD.f1mass.legend(ch0.storeys,ch0.typology,ch0.shares):''}</div>`;
+          return {draw,lead:'The building as massing, from four sides, storeys coloured by zone.',hero:[{v:String(ch0.storeys.length),l:'storeys'},{v:Math.round(tot).toLocaleString('en-CA'),u:'m²',l:'of floor'}],
+            rows:[['Massing','Zone colours, one plate per storey'],['Views','the layout turned a quarter at a time']],src:['Massing: the layout from the tool’s layout library (zones per storey), drawn by the tool’s one massing renderer.']}; } }
+      if((!V0||!V0.L||!V0.L.G)&&x.city==='van') return {draw:'<p class="f1v-empty">No layout fits this lot, so there is no building to show.</p>',lead:'The building on its lot, from four sides.'};
+      if(!V0||!V0.L||!V0.L.G) return dsBase?dsBase.call(this,x):{draw:''};
+       
+      let V=V0, chosenName='', chosenBest=false; const PLm=BD.f1place?await BD.f1place.placedFor(x):null, ch=PLm?Object.assign({},PLm.q,{_best:(await BD.f1pick3.chosen(x))._best}):(BD.f1pick3&&BD.f1pick3.chosen?await BD.f1pick3.chosen(x,{raw:true}):null);
+      if(ch&&V0.L.fromUV){ const fu=V0.L.fromUV, S={}; for(const st of ch.storeys) S[st.st]=st.zones.flatMap(z=>(z.rects||[]).map(r=>{ const a=fu(r[0],r[2]), b=fu(r[1],r[3]); return {id:z.zone,zoneKey:z.zone,r:[[Math.min(a[0],b[0]),Math.max(a[0],b[0]),Math.min(a[1],b[1]),Math.max(a[1],b[1])]]}; }));
+        V=Object.assign({},V0,{L:{fromUV:fu,typology:ch.typology,H:ch.storeys.slice().sort((a,b)=>a.st-b.st).map(s=>s.z1-s.z0),G:{S}}}); chosenName=ch.typName; chosenBest=!!ch._best; }
       const views=[]; for(let k=0;k<4;k++){ const m=await F.massing(x,P,V.L,{W:760,H:520,view:k,label:'The building on its lot'}); if(m) views.push(m); }
       let sec=''; try{ BD.f1lastSection=''; if(dsBase) await dsBase.call(this,x); sec=BD.f1lastSection||''; }catch(e){}
       const id='mv'+Math.random().toString(36).slice(2,7), order=['NE','SE','SW','NW'], idx=views.map((m,i)=>i).sort((a,b)=>order.indexOf(views[a].from)-order.indexOf(views[b].from)), first=idx.find(i=>views[i].from==='SW')??idx[0];
       const btn=i=>`<button type="button" aria-pressed="${i===first}" onclick="var w=this.closest('.f1-mviews');w.querySelectorAll('[data-mv]').forEach(function(e){e.hidden=e.getAttribute('data-mv')!=='${i}'});w.querySelectorAll('button').forEach(function(b){b.setAttribute('aria-pressed',b===this)},this)">From the ${views[i].from||'view '+(i+1)}</button>`;
       const draw=`<div class="f1p-set f1-mviews" id="${id}"><div class="f1-mvbar">${idx.map(btn).join('')}</div>${views.map((m,i)=>`<div data-mv="${i}"${i===first?'':' hidden'}>${m.svg}</div>`).join('')}${views[0]?views[0].key:''}${sec?F.secT('Section: height against the zone’s limits')+sec:''}</div>`;
-      return {draw,lead:'The building on its lot among its neighbours, from four sides, and a section against the zone’s height limits.',
-        rows:[['Massing','big-picture colours; neighbours '+(x.city==='van'?'City LiDAR 2022, simplified to blocks':'City footprints')],['Views','north-east, south-east, south-west, north-west (the side the viewer stands on)'],['Section','the blocks cut by one plane across the lot, against the height limits']],
-        src:['Massing: this lot’s layout; the views turn the plan a quarter at a time. Section: the Architecture site model (zone height limits).']}; }}); }
+      return {draw:(chosenName?`<p class="f1c-note">${chosenBest?(BD.f1hc?BD.f1hc(1):'The highest-capacity layout for your filters'):'Your chosen layout'}: ${C.esc(chosenName)}. The section below is still the tool’s own layout.</p>`:'')+draw,lead:'The building on its lot among its neighbours, from four sides, and a section against the zone’s height limits.',
+        rows:[['Massing','Zone colours, one plate per storey; neighbours '+(x.city==='van'?'City LiDAR 2022, simplified to blocks':'City footprints')],['Views','north-east, south-east, south-west, north-west (the side the viewer stands on)'],['Section','the blocks cut by one plane across the lot, against the height limits']],
+        src:['Massing: this lot’s layout; the views turn the layout a quarter at a time. Section: the Architecture site model (zone height limits).']}; }}); }
   wrap('Drawing styles',async(x,P,V)=>{ const m=await F.massing(x,P,V.L,{W:760,H:520,label:'Emergency hub, stacked'}); const p1=F.plan(V.L.G,1,{w:620});
-    const d0=`<div class="f1p-set">${F.secT('3-D massing, seen from the street')}${m?m.svg+m.key:''}${F.secT('The building pulled apart by storey')}<div style="display:grid;grid-template-columns:420px 1fr;gap:20px;align-items:center">${F.exploded(V.L,420,250)}<div style="display:flex;flex-direction:column;gap:12px">${F.storeyLabels(V.L)}</div></div>${p1?F.secT('Plan, storey 1')+p1.svg+F.legend():''}<p class="f1c-note" style="font-size:12px">One drawing style for the cards and the report: big-picture colours for the 3-D views, the board palette for plans.</p></div>`;
-    return {draw:d0,lead:'The same layout in the report’s drawing styles: 3-D massing among the neighbours, the storeys pulled apart, and a plan.',rows:[['3-D massing','big-picture colours, seen from the street; neighbours '+(x.city==='van'?'City LiDAR 2022':'City footprints')],['Exploded','storeys pulled apart, rooms by big-picture program'],['Plan','storey 1, board palette, doors, exits and dimensions']],src:['Graphics: the report’s drawing styles (massing, typology page, fire plans), drawn from this layout.']}; },{replace:true});
+    const d0=`<div class="f1p-set">${F.secT('3-D massing, seen from the street')}${m?m.svg+m.key:''}${F.secT('The building pulled apart by storey')}<div style="display:grid;grid-template-columns:420px 1fr;gap:20px;align-items:center">${F.exploded(V.L,420,250)}<div style="display:flex;flex-direction:column;gap:12px">${F.storeyLabels(V.L)}</div></div>${p1?F.secT('Plan, storey 1')+p1.svg+F.legend():''}<p class="f1c-note" style="font-size:12px">One drawing style for the cards and the report: Zone colours, one plate per storey for the 3-D views, the board palette for plans.</p></div>`;
+    return {draw:d0,lead:'The same layout in the report’s drawing styles: 3-D massing among the neighbours, the storeys pulled apart, and a plan.',rows:[['3-D massing','Zone colours, one plate per storey, seen from the street; neighbours '+(x.city==='van'?'City LiDAR 2022':'City footprints')],['Exploded','storeys pulled apart, rooms by big-picture program'],['Plan','storey 1, board palette, doors, exits and dimensions']],src:['Graphics: the report’s drawing styles (massing, typology page, fire plans), drawn from this layout.']}; },{replace:true});
    
   wrap('Report',async(x,P,V)=>{ const L=V.L, G=L.G, sts=Object.keys(G.S).map(Number).sort((a,b)=>a-b), E=F.energy(L,x.city), m=await F.massing(x,P,L,{W:700,H:420}), esc=C.esc, n0=v=>v==null?'?':Math.round(v).toLocaleString('en-CA');
     const ra=rm=>rm.r.reduce((t,r)=>t+(r[1]-r[0])*(r[3]-r[2]),0), byG={}; for(const st of sts) for(const rm of G.S[st]) byG[rm.g]=(byG[rm.g]||0)+ra(rm);
@@ -296,22 +327,25 @@ BD.f1plans={plan,legend,BOARD_COL,isCirc,side,energy,energySvg,exploded,storeyLa
     const cnt=st=>rows.filter(r=>r[0]===st).length;
      
     const pg=(n,t,body)=>BD.f1reportPage({n,total:'__NP__',title:t,head:`BEYOND DATA · ARCHITECTURE REPORT · ${String(x.addr).toUpperCase()}`,body:n===1?`<h1>${esc(t)}</h1>${body}`:body,cover:n===1});
+     
+    const CK=r=>{ let d=String(r[3]||'').replace(/\s*\[script:[^\]]*\]?/g,'').replace(/,?\s*placed by eh\/\S*/g,''); if(/^Clipped to the storey below/.test(String(r[1]))) d=d.split(';')[0];
+      d=(C.pubFull?C.pubFull(d):C.pub(d)).trim(); if(d.length>160){ const k=d.slice(0,160).lastIndexOf('; '); d=k>40?d.slice(0,k)+'.':d.slice(0,d.slice(0,160).lastIndexOf(' '))+' (more in the details)'; } return d; };
     const lab={fix:['to fix','#A8493F'],fail:['fails','#A8493F'],flag:['flag','#45464A'],tight:['tight','#45464A'],'?':['?','#8A8985']};
     const pages=[
       pg(1,'Architecture report',`${BD.f1variantNote&&BD.f1variantNote(L)?`<p class="ld"><b>Variant</b> ${esc(BD.f1variantNote(L))}</p>`:''}${m?m.svg+m.key:''}<div style="margin-top:8px">${F.icons(320)}</div><p class="ld">An Emergency hub on the street, with the data centre above and behind it: what it holds, why, and how it is arranged. Typology Emergency hub · servers ${L.MW.toFixed(2)} MW · height ${hgt?hgt.toFixed(1):'?'} m · refuge ${ppl??'?'} people.</p>`),
       pg(2,'What it is, and why',`${F.icons(440)}${F.shares(E?`${E.share[0].toFixed(1)}–${E.share[1].toFixed(1)} % of the hall’s heat`:'')}${F.secT('Two modes, one building')}${F.modes(L,ppl,Object.values(G.S).flat().filter(rm=>/^ex\d/.test(rm.id)).length)}${F.secT('Why pair them')}${F.why()}`),
-      pg(3,'The program',`<table class="f1c-res-t">${[['Data hall',byG.hall],['Data-centre support and loading',(byG.sup||0)+(byG.load||0)],['Public programs (refuge, shelter, lobby)',byG.pub],['Clinic',byG.clin],['Circulation',byG.circ],['Programs’ mechanical room',byG.plant],['Unassigned',byG.spare]].filter(r=>r[1]).map(r=>`<tr><th>${r[0]}</th><td>${n0(r[1])} m²</td></tr>`).join('')}<tr><th><b>All rooms</b></th><td><b>${n0(Object.values(byG).reduce((t,v)=>t+v,0))} m²</b></td></tr></table>`),
+      pg(3,'The program',`<table class="f1c-res-t">${[['Data hall',byG.hall],['Data-centre support and loading',(byG.sup||0)+(byG.load||0)+(byG.spare||0)],['Public programs (refuge, shelter, lobby)',byG.pub],['Clinic',byG.clin],['Circulation',byG.circ],['Programs’ mechanical room',byG.plant]].filter(r=>r[1]).map(r=>`<tr><th>${r[0]}</th><td>${n0(r[1])} m²</td></tr>`).join('')}<tr><th><b>All rooms</b></th><td><b>${n0(Object.values(byG).reduce((t,v)=>t+v,0))} m²</b></td></tr></table>`),
       pg(4,'How it is arranged',`${F.exploded(L,420,250)}<div style="display:flex;flex-direction:column;gap:8px;margin-top:8px">${F.storeyLabels(L)}</div>`),
       pg(5,'The energy exchange',E?(()=>{ const g=F.energySvg(E,x.city); return g.svg+(g.seasons||''); })():'<p class="ld">Heat: not computed for this layout (?).</p>'),
       pg(6,'Site plan','__SITE__'),
-      ...sts.map((st,i)=>{ const pr=F.plan(G,st,{w:704}); return pg(7+i,`Plans: storey ${st}`,pr?pr.svg+F.legend():'<p class="ld">?</p>'); }),
+      ...sts.map((st,i)=>{ const pr=F.plan(G,st,{w:704}); return pg(7+i,`Storey plan: storey ${st}`,pr?pr.svg+F.legend():'<p class="ld">?</p>'); }),
       pg(7+sts.length,'Rooms',sts.map(st=>`<div class="lb">Storey ${st}</div><table class="f1c-res-t">${G.S[st].map((rm,i)=>`<tr><th>${i+1}</th><td>${esc(C.pub(C.passName(rm.n)))}</td><td style="text-align:right">${n0(ra(rm))} m²</td></tr>`).join('')}</table>`).join('')),
-      pg(8+sts.length,'Code check',`<p class="ld">Big moves only: every row is a rule that could change size or fit. ${cnt('pass')} pass · ${cnt('tight')} tight · ${cnt('flag')} flag · ${cnt('?')} ? · ${cnt('fail')+cnt('fix')} fail.</p><table class="f1c-res-t">${bad.map(r=>{ const [l,c]=lab[r[0]]||[r[0],'#45464A']; return `<tr><th style="color:${c}">${l}</th><td>${esc(C.pub(r[1]))}<span style="color:#6B6A66"> · ${esc(C.pub(String(r[3]||'')).slice(0,150))}${C.pub(String(r[3]||'')).length>150?'…':''}</span></td></tr>`; }).join('')}</table><div class="lb">Passing (${pass.length})</div><p class="ld">${pass.map(r=>esc(C.pub(r[1]))).join('; ')}</p>`),
+      pg(8+sts.length,'Code check',`<p class="ld">Big moves only: every row is a rule that could change size or fit. ${cnt('pass')} pass · ${cnt('tight')} tight · ${cnt('flag')} flag · ${cnt('?')} ? · ${cnt('fail')+cnt('fix')} fail.</p><table class="f1c-res-t">${bad.map(r=>{ const [l,c]=lab[r[0]]||[r[0],'#45464A']; return `<tr><th style="color:${c}">${l}</th><td>${esc(C.pub(String(r[1]).replace(/\s*\(\d{1,2} Nov rules\)/g,'')))}<span style="color:#6B6A66"> · ${esc(CK(r))}</span></td></tr>`; }).join('')}</table><div class="lb">Passing (${pass.length})</div><p class="ld">${pass.map(r=>esc(C.pub(r[1]))).join('; ')}</p>`),
       pg(9+sts.length,'Plant',`<p class="ld">${L.plant?`Q = ${L.MW.toFixed(2)} × 1.55 = ${L.plant.Q} MW: ${L.plant.nG} generator sets (${(L.plant.setKW||0).toLocaleString('en-CA')} kW), ${L.plant.nT} transformer pads, ${L.plant.nC} chillers, the hub’s own set.`:'?'}</p><table class="f1c-res-t">${((L.plant&&L.plant.items)||[]).map(it=>`<tr><th>${esc(String(it.id||'').toUpperCase())}</th><td>${esc(it.n||'')}</td></tr>`).join('')}</table>`),
       pg(10+sts.length,'What is not known, sources',`<p class="ld" style="font-size:12px">${esc(BD.F1LICENCE||'')}</p><ul class="ld">${(L.flags||[]).filter(f=>/\?/.test(f)).map(f=>`<li>${esc(C.pub(f))}</li>`).join('')||'<li>none flagged</li>'}</ul><p class="ld">Layout and checks: ${V.L&&BD.f1archBasis?BD.f1archBasis(V.L).t+(V.L.frozen&&!V.L.transplant?' ('+(V.L.frozen.addr||'this lot')+')':''):'First pass, not checked: the Emergency layout rules'}. Neighbours: ${x.city==='van'?'City of Vancouver LiDAR 2022':'City of Edmonton footprints'}. Every figure’s source is on its card.</p>`)];
     let html=pages.join('').split('__NP__').join(String(pages.length));
-    try{ const sp=await C.get('architecture','Plant and site').build(x); html=html.replace('__SITE__',sp&&sp.draw?sp.draw:'<p class="ld">?</p>'); }catch(e){ html=html.replace('__SITE__','<p class="ld">Site plan: could not be drawn (?)</p>'); }
-    const titles=['Cover','What it is, and why','The program','How it is arranged','The energy exchange','Site plan',...sts.map(st=>`Plans: storey ${st}`),'Rooms','Code check','Plant','What is not known, sources'];
+    try{ const sp=await C.get('architecture','Plant and site').build(x); html=html.replace('__SITE__',sp&&sp.draw?sp.draw:'<p class="ld">?</p>'); }catch(e){ html=html.replace('__SITE__','<p class="ld">The site plan isn’t available for this lot yet.</p>'); }
+    const titles=['Cover','What it is, and why','The program','How it is arranged','The energy exchange','Site plan',...sts.map(st=>`Storey plan: storey ${st}`),'Rooms','Code check','Plant','What is not known, sources'];
     return {draw:`<div class="f1r-pages">${html}</div><button class="f1c-mua-print" type="button" onclick="window.print()">Print the report</button>`,
       more:[], lead:`The Architecture report: ${pages.length} letter pages from this lot’s layout: cover, typology, program, arrangement, energy exchange, site plan, a plan per storey, rooms, code check (worst first), plant, and what is not known.`,
       hero:[{v:String(titles.length),l:'pages'},{v:String(bad.length),l:`code rows not passing: ${cnt('fail')+cnt('fix')} fail, ${cnt('tight')} tight, ${cnt('flag')} flag, ${cnt('?')} ?`}],

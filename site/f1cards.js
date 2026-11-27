@@ -9,7 +9,7 @@ const add=(tpl,title,spec)=>{ (REG[tpl]=REG[tpl]||{})[title]=spec; };
 const has=(tpl,title)=>!!(REG[tpl]&&REG[tpl][title]);
 const n0=x=>x==null||!isFinite(x)?'?':Math.round(x).toLocaleString('en-CA');
 const n1=x=>x==null||!isFinite(x)?'?':(Math.round(x*10)/10).toLocaleString('en-CA');
-const titleCase=s=>String(s).toLowerCase().replace(/\b([a-z])/g,c=>c.toUpperCase()).replace(/\b(\d+)(St|Nd|Rd|Th)\b/g,(m,n,x)=>n+x.toLowerCase()).replace(/\b(Nw|Ne|Sw|Se|Bc|Ubc|Yvr|Ymca|Ywca)\b/g,m=>m.toUpperCase()).replace(/\(licensed property records (local only); Address Not Shown\)/g,'(licensed property records (local only); address not shown)');
+const titleCase=s=>String(s).toLowerCase().replace(/\bav\b/g,'ave').replace(/\b([a-z])/g,c=>c.toUpperCase()).replace(/\b(\d+)(St|Nd|Rd|Th)\b/g,(m,n,x)=>n+x.toLowerCase()).replace(/\b(Nw|Ne|Sw|Se|Bc|Ubc|Yvr|Ymca|Ywca)\b/g,m=>m.toUpperCase()).replace(/\(licensed property records (local only); Address Not Shown\)/g,'(licensed property records (local only); address not shown)');
  
 const ZR=()=>(BD.data&&BD.data.raw&&BD.data.raw.zones)||{ZV:{},ZE:{}};
 const zoneKey=(city,a)=>city==='van'?String(a[1]||'').trim():String(a[2]||a[1]||'').trim().split(/\s+/)[0].toUpperCase();
@@ -34,7 +34,7 @@ function context(x,P,I,box,o){ o=o||{}; const [X,Y,W,H]=box, a=I(X,Y), b=I(X+W,Y
   const id='f1c-ctx'+(++CTXN);
   return `<g class="f1c-ctx"><defs><clipPath id="${id}"><rect x="${X}" y="${Y}" width="${W}" height="${H}"/></clipPath></defs><g clip-path="url(#${id})"><rect x="${X}" y="${Y}" width="${W}" height="${H}" fill="${K.ground}"/>`+
     `<path d="${lots}" fill="#fff" stroke="${K.hair}" stroke-width="0.6"/>${alw?`<path d="${alw}" fill="${K.fillSup}" stroke="${K.dcSup}" stroke-width="0.6"/>`:''}<path d="${blds}" fill="${K.bld}" stroke="none"/></g></g>`; }
-const CONTEXT_SRC=c=>`Site context (streets as the ground between lots, neighbouring lots and building footprints): ${c==='van'?'City of Vancouver property parcels and building footprints (open data)':(window.BD_PUBLIC?'City of Edmonton parcel points (open data; lot outlines are not in the public version) and building footprints':'City of Edmonton parcels as the tool shows them (lot outlines: licensed lot outlines (not published), academic use only) and building footprints')}, as the "Your parcel" card draws them.`;
+const CONTEXT_SRC=c=>`Site context (streets as the ground between lots, neighbouring lots and building footprints): ${c==='van'?'City of Vancouver property parcels and building footprints (open data)':(window.BD_PUBLIC?'City of Edmonton parcel points (open data; lot outlines are not in the public version) and building footprints':'City of Edmonton parcels as the tool shows them (lot outlines: licensed data, academic use only) and building footprints')}, as the "Your parcel" card draws them.`;
  
 function meter(m){ const max=m.max||(m.lim?m.lim/0.87:Math.max(1,m.v||1)), pct=x=>Math.max(0,Math.min(100,100*x/max)), pass=m.pass!==false, col=pass?K.ink:K.red;    
   return `<div class="f1c-m"><div class="t"><span>${esc(m.l)}</span><span style="color:${col}">${m.v==null?'<b class="f1c-q">?</b>':pass?(m.tight?'tight: check in design':'pass'):'to fix'}</span></div>
@@ -50,14 +50,20 @@ function fitSheets(root){ root.querySelectorAll('.f1r-sheet').forEach(sh=>{ let 
   w.style.zoom=''; const cs=getComputedStyle(sh), avail=sh.clientHeight-parseFloat(cs.paddingTop)-parseFloat(cs.paddingBottom)-24; if(!(avail>0)) return;     let k=1;
   for(let it=0;it<6;it++){ const need=w.getBoundingClientRect().height/(parseFloat(w.style.zoom||'1')||1)*k; if(w.scrollHeight*k<=avail+1&&need<=avail+1) break; k=Math.max(0.4,k*Math.min(0.98,avail/(w.scrollHeight*k))); w.style.zoom=String(k); } }); }
 function render(res,dr,pb,srcEl,tpl){ dr.innerHTML=oneEnd(res.draw||''); try{ if(BD.f1map) BD.f1map.enhance(dr); }catch(e){ console.warn('f1map',e); }     [60,600,2000].forEach(t=>setTimeout(()=>{ try{ fitSheets(dr); }catch(e){} },t));
-  const hero=(res.hero||[]).length?`<div class="f1c-hero">${res.hero.map(h=>`<div data-fig="${esc(h.l||'')}"${h.k?` data-k="${esc(h.k)}"`:''} role="button" tabindex="0" title="Open the interactive logic diagram at this figure"><div class="v${h.red?' red':''}">${h.v&&h.v.q?'<b class="f1c-q">?</b>':esc(h.v)}${h.u?`<span>${esc(h.u)}</span>`:''}</div><div class="l">${esc(h.l)}${h.v&&h.v.q?' · not in the tool yet':''}</div></div>`).join('')}</div>`:'';
-  const rows=(res.rows||[]).length?`<dl class="f1c-rows">${res.rows.map(r=>`<dt>${esc(r[0])}</dt><dd data-fig="${esc(r[0])}"${r[2]?` data-k="${esc(r[2])}"`:''} role="button" tabindex="0" title="Open the interactive logic diagram at this figure">${val(r[1])}</dd>`).join('')}</dl>`:'';
+  const hero=(res.hero||[]).length?`<div class="f1c-hero${res.art?' one':''}">${res.hero.map(h=>`<div data-fig="${esc(h.l||'')}"${h.k?` data-k="${esc(h.k)}"`:''} role="button" tabindex="0" title="See where this number comes from"><div class="v${h.red?' red':''}">${h.v&&h.v.q?'<b class="f1c-q">?</b>':esc(h.v)}${h.u?`<span>${esc(h.u)}</span>`:''}</div><div class="l">${esc(h.l)}${h.v&&h.v.q?' · not in the tool yet':''}</div></div>`).join('')}</div>`:'';
+  const rows=(res.rows||[]).length?`<dl class="f1c-rows">${res.rows.map(r=>`<dt>${esc(r[0])}</dt><dd data-fig="${esc(r[0])}"${r[2]?` data-k="${esc(r[2])}"`:''} role="button" tabindex="0" title="See where this number comes from">${val(r[1])}</dd>`).join('')}</dl>`:'';
   const met=(res.meters||[]).map(meter).join('');
+   
+  const keyH=res.keyHtml?`<div class="f1c-key2"><h4>Key</h4>${res.keyHtml}</div>`:(res.key||[]).length?`<div class="f1c-key2"><h4>Key</h4>${res.key.map(k=>`<span><i style="background:${esc(k[0])}"></i>${esc(k[1])}</span>`).join('')}</div>`:'', footH=res.foot?`<p class="f1c-foot">${esc(res.foot)}</p>`:'';
   const more=(res.more||[]).map(m=>`<details class="f1c-more"><summary>${esc(m[0])}</summary><div>${m[1]}</div></details>`).join('');
   let M0=null; try{ M0=BD.model(); }catch(e){} const first=!(BD.f1cardIndex>0);    
   const mix=first&&tpl==='architecture'&&!res.noZoneFlag&&BD.archTest&&BD.archTest.mixRezone&&BD.archTest.mixRezone(), nz=first&&!mix&&M0&&M0.Z&&M0.Z.notAllowed&&!res.noZoneFlag;    
-  pb.innerHTML=oneEnd((mix?`<p class="f1c-zflag"><span class="f1c-q">?</span> Needs rezoning: no Edmonton zone allows a data centre with public uses (IH and EETC: no Community, Health or Emergency Service; BE: no Major Industrial). Shown as if rezoned: a flagged option, not a prediction.</p>`:nz?`<p class="f1c-zflag"><span class="f1c-q">?</span> Not allowed here; rezoning needed. Shown as if rezoned: a flagged option, not a prediction.</p>`:'')+(res.estimate?`<p class="f1c-est">${esc((res.estimate.basis||{}).t||'First pass, not checked: the engine doesn’t have this lot’s layout yet')}.${res.estimate.transplant?' Its plan is placed on this lot along the street, not re-planned.':''}${(res.estimate.names||[]).length?` Layout this lot needs: ${esc(res.estimate.names.join('; '))}.`:''}</p>`:'')+(res.lead?`<p class="lead">${esc(res.lead)}</p>`:'')+hero+rows+met+more);
-  if(srcEl) srcEl.innerHTML=`<summary>Sources and assumptions</summary><ul>${(res.src||[]).map(s=>`<li>${pubSrc(s)}</li>`).join('')}${(res.missing||[]).length?`<li class="f1c-miss">Not in the tool yet: ${esc(res.missing.join('; '))}</li>`:''}</ul>`; }
+  const szH=tpl==='engineering'&&BD.f1best&&BD.f1best.sizedLine?`<p class="f1c-sized" data-sized></p>`:'';    
+  const flH=first&&/^(architecture|engineering)$/.test(tpl)&&BD.f1flood&&BD.S.sel&&BD.S.sel.city==='van'?'<div data-flood></div>':'';    
+  pb.innerHTML=oneEnd(szH+(mix?`<p class="f1c-zflag"><span class="f1c-q">?</span> Needs rezoning: no Edmonton zone allows a data centre with public uses (IH and EETC: no Community, Health or Emergency Service; BE: no Major Industrial). Shown as if rezoned: a flagged option, not a prediction.</p>`:nz?`<p class="f1c-zflag"><span class="f1c-q">?</span> Not allowed here; rezoning needed. Shown as if rezoned: a flagged option, not a prediction.</p>`:'')+(res.estimate?`<p class="f1c-est">${esc((res.estimate.basis||{}).t||'First pass, not checked: the engine doesn’t have this lot’s layout yet')}.${res.estimate.transplant?' Its plan is placed on this lot along the street, not re-planned.':''}${(res.estimate.names||[]).length?` Layout this lot needs: ${esc(res.estimate.names.join('; '))}.`:''}</p>`:'')+(res.lead?String(res.lead).split('\n').filter(t=>t.trim()).map(t=>`<p class="lead">${esc(t.trim())}</p>`).join(''):'')    +flH+hero+keyH+rows+met+more+footH);
+  if(szH){ const el=pb.querySelector('[data-sized]'), s0=BD.S.sel; if(el&&s0) BD.f1best.sizedLine({sel:s0,city:s0.city}).then(async t=>{ if(!el.isConnected||!t) return; const pk=s0.city==='van'||(s0.city==='edm'&&BD.f1best.hasEdm&&await BD.f1best.hasEdm()); if(!el.isConnected) return; el.innerHTML=pk?`${esc(t)} · <button type="button" class="f1c-sized-ch" onclick="BD.f1best.change()">change</button>`:esc(t);     }).catch(()=>{}); }
+  if(flH){ const el=pb.querySelector('[data-flood]'), s0=BD.S.sel; BD.f1flood.forLot(s0).then(F=>{ if(el.isConnected&&BD.S.sel===s0) el.outerHTML=BD.f1flood.html(F); }).catch(()=>{}); }
+  if(srcEl) srcEl.innerHTML=`<summary>Sources and assumptions</summary><ul>${[...new Set((res.src||[]).map(t=>cityOnly(t,(BD.S.sel&&BD.S.sel.city)||'van')).filter(Boolean).map(pubSrc))].filter(Boolean).map(s=>`<li>${s}</li>`).join('')}${(res.missing||[]).length?`<li class="f1c-miss">Not in the tool yet: ${esc(res.missing.join('; '))}</li>`:''}</ul>`; }
  
 const AR={key:null,P:null,busy:null};
 const EXAMPLE_PICKS=['refuge','warming_shelter','clinic'];
@@ -66,7 +72,7 @@ function frontFlag(dflt){ try{ const q=new URLSearchParams(location.search).get(
 BD.frontFlag=frontFlag;
 async function arch(){ const s=BD.S.sel; if(!s) return null; const key=s.city+':'+s.id; if(AR.key===key&&AR.P&&AR.gen===GEN) return AR.P;   if(AR.busy&&AR.bkey===key) return AR.busy;
   AR.bkey=key; AR.busy=(async()=>{ const keepT=BD.tier&&BD.tier(), wait=ms=>new Promise(r=>setTimeout(r,ms));
-    try{ if(BD.setTier) BD.setTier('arch'); await BD.arch.ready; const An=BD.S.answers; for(const k of Object.keys(An)) delete An[k]; Object.assign(An,{built:'new',extent:'whole',floor:'',mw:null});
+    try{ if(BD.setTier) BD.setTier('arch'); await BD.arch.ready; BD.S.noisePlan=null;     const An=BD.S.answers; for(const k of Object.keys(An)) delete An[k]; Object.assign(An,{built:'new',extent:'whole',floor:'',mw:null});
       BD.modelReset(); if(BD.flow.findFit) BD.flow.findFit();  
       BD.arch.ratio=null; BD.arch.picks=[]; BD.arch.rezone=BD.arch.rezone||{}; BD.arch.rezone[key]=true;   BD.modelReset(); await BD.views.arat(); await wait(300);
        
@@ -79,13 +85,21 @@ async function arch(){ const s=BD.S.sel; if(!s) return null; const key=s.city+':
 const EG={key:null,gen:-1,M:null,busy:null}; let GEN=0;
 async function eng(){ const s=BD.S.sel; if(!s) return null; const key=s.city+':'+s.id; if(EG.key===key&&EG.gen===GEN&&EG.M) return EG.M; if(EG.busy&&EG.bkey===key) return EG.busy;
   EG.bkey=key; EG.busy=(async()=>{ try{ if(BD.setTier) BD.setTier('full'); const An=BD.S.answers; for(const k of Object.keys(An)) delete An[k]; Object.assign(An,{built:'new',extent:'whole',floor:'',mw:null},frontFlag(false)?{front:'yard'}:{});    
-      BD.modelReset(); if(BD.flow.findFit) BD.flow.findFit(); BD.modelReset(); GEN++; EG.key=key; EG.gen=GEN; EG.M=BD.model(); EG.A=Object.assign({},An); return EG.M; }
+      BD.modelReset(); if(BD.flow.findFit) BD.flow.findFit();
+       
+      let B=null; try{ B=BD.f1best&&await BD.f1best.forLot({sel:s,city:s.city}); }catch(e){}
+      const now=BD.S.sel; if(!now||now.city+':'+now.id!==key) return null;    
+      if(B&&B.source!=='rough'&&+B.MW>0) An.mw=+B.MW;
+      let NP=null; try{ NP=BD.f1best.noisePlan?await BD.f1best.noisePlan(B,s.id):null; }catch(e){} if(BD.S.sel!==now) return null; BD.S.noisePlan=NP;    
+      BD.modelReset(); GEN++; EG.key=key; EG.gen=GEN; EG.M=BD.model(); EG.A=Object.assign({},An); return EG.M; }
     finally{ EG.busy=null; } })();
   return EG.busy; }
  
 async function withAnswers(over,fn){ await eng(); const A=BD.S.answers, keep={}; for(const k in over) keep[k]=A[k];
-  try{ Object.assign(A,over); BD.modelReset(); return await fn(BD.model()); }
-  finally{ for(const k in keep){ if(keep[k]===undefined) delete A[k]; else A[k]=keep[k]; } BD.modelReset(); EG.M=BD.model(); } }
+   
+  const NP=BD.S.noisePlan, other=('inside' in over&&over.inside!==(A.inside||'air'))||('outside' in over&&over.outside!==(A.outside||'dry'));
+  try{ Object.assign(A,over); if(other) BD.S.noisePlan=null; BD.modelReset(); return await fn(BD.model()); }
+  finally{ BD.S.noisePlan=NP; for(const k in keep){ if(keep[k]===undefined) delete A[k]; else A[k]=keep[k]; } BD.modelReset(); EG.M=BD.model(); } }
  
 function ctx(city){ const M=BD.model(), sel=BD.S.sel||{}, a=sel.a||[], key=zoneKey(city,a);
   return {city,M,sel,a,key,addr:a[0]?titleCase(a[0]):'?',zone:key,status:dcStatus(city,key),arch,eng,withAnswers,K,n0,n1,q,esc,frame,pathOf,bbox,hit,scaleBar,allowed,zoneKey,titleCase}; }
@@ -114,9 +128,20 @@ let RIDS=null; const rids=()=>{ if(RIDS) return RIDS; RIDS=new Set(); try{ const
 const IDLIKE=/\b(?:[a-z][a-z0-9]*_[A-Za-z0-9_*]+|[a-z][a-z0-9]*[A-Z][A-Za-z0-9]*)\b/g;
 const UNITS=/^(?:kW|kWh|kWe|kWth|kVA|kV|dB|dBA|mW|mWh|mL|pH|eCO2|kPa|mJ|kJ|kN|kg|kgCO2e|tCO2e|gCO2e)$/;
 const isRid=m=>rids().has(m)||/\d/.test(m)||/_/.test(m)||/^(?:van|edm|bc|bch|ab|arch|metro|nrcan|statcan|cov|coe|od|eh)[A-Z]/.test(m);    
-const keepTok=m=>UNITS.test(m)||isRid(m);
-function pub(t){ let s=String(t==null?'':t).replace(/&quot;/g,'"').replace(/&amp;/g,'&');
-  s=s.replace(/\bOBS\s+fieldJB\b/g,'site visit (author)').replace(/\bfieldJB\b/g,'site visit (author)').replace(/J\.B\.[’']s (?:own )?site visit/g,'site visit (author)');
+const keepTok=m=>UNITS.test(m)||/^nPro$/.test(m)||isRid(m);
+const WORKN=/project decision|\bupload(?:ed)?\b|\bneed\b[^;()—]*\bbefore use\b|\bin hand\b|\bCHECK \d|\bOPEN for\b|\bregister says\b|\bopen item\b|\bmain chat\b|^\/|\.claude\//i;    
+function noWork(s){ s=s.split(/\s*‖\s*/)[0];
+   
+  const top=(str,re)=>{ const out=[]; let d=0, last=0; for(let i=0;i<str.length;i++){ const c=str[i]; if(c==='(') d++; else if(c===')') d=Math.max(0,d-1); else if(d===0){ const m=re.exec(str.slice(i)); if(m&&m.index===0){ out.push(str.slice(last,i),m[0]); i+=m[0].length-1; last=i+1; } } } out.push(str.slice(last)); return out; };
+  const drop=(str,re)=>{ const P=top(str,re); let o=P[0]; for(let i=2;i<P.length;i+=2) if(/^https?:\/\//.test(P[i])||!WORKN.test(P[i])) o+=P[i-1]+P[i]; return o; };
+  s=drop(s,/^\s+[—–]\s+/); s=drop(s,/^;\s+/);
+  s=s.replace(/\(([^()]*)\)/g,(m,inner)=>{ const parts=inner.split(/;\s*/).filter(p=>!WORKN.test(p)); return parts.length?'('+parts.join('; ')+')':''; });
+  return s.replace(/,\s*(?=[—–]|$)/g,'').replace(/\s{2,}/g,' ').trim(); }
+function pub(t){ let s=noWork(String(t==null?'':t).replace(/&quot;/g,'"').replace(/&amp;/g,'&'));
+  s=s.replace(/\bH1 Hub generator, KD\d+ in its enclosure/g,'Refuge generator (72 h), 80 kW, in its enclosure').replace(/\s*\(KD\d+, row 'Hub generator \(72 h\)'\)/g,'').replace(/\bHub generator \(72 h\)/g,'Refuge generator (72 h)').replace(/\bKD\d{2,4}\b/g,'diesel set');
+  s=s.replace(/\bBylaw 14600\b/g,'Bylaw C14600').replace(/\b(the|this|a zone) plan\b(?! of the lot)/g,'$1 layout').replace(/\bThis plan\b/g,'This layout').replace(/\bCode’s public source list\b/g,'The tool’s public source list').replace(/\bevery plan\b/g,'every layout').replace(/\bthe plan record\b/g,'the layout record');
+  s=s.replace(/\bLeftover floor\b/g,'Flexible shell (data-centre side)').replace(/\bleftover floor\b/g,'flexible shell (data-centre side)').replace(/\bDC support\b/g,'Data-centre support').replace(/\bseparate entries\b/g,'separate entrances').replace(/\bshared entry\b/g,'shared entrance');    
+  s=s.replace(/[;,]?\s*\bOBS\s+note_field_01\b(?:,?\s*\d{1,2}\s+[A-Z][a-z]{2}(?:\s+\d{4})?)?/g,'').replace(/[;,]?\s*\bnote_field_01\b(?:,?\s*\d{1,2}\s+[A-Z][a-z]{2}(?:\s+\d{4})?)?/g,'').replace(/[;,]?\s*J\.B\.[’']s (?:own )?site\svisit[^;,)]*/g,'').replace(/[;,]?\s*\bsite\svisit \(author\)[^;,)]*/gi,'');    
   s=s.replace(/J\.B\.[’']s (?:final )?gate/g,'the author’s review').replace(/\bJ\.B\.,?\s+(\d{1,2}\s+[A-Z][a-z]{2}(?:\s+\d{4})?)/g,'decision of the author, $1').replace(/\bJ\.B\.[’']s\b/g,'the author’s').replace(/\bJ\.B\.(?=[\s,;:)])/g,'the author');
   s=s.replace(/\(?\bEH-FREEZE-2026-11-11[a-z]\)?/g,'the checked hub test fits');    
   s=s.replace(/\s*\bvia\s+sources\/\d+\s*§\s*[\w.]+/g,'').replace(/\bsources\/\d+(?:\s*§\s*[\w.]+)?/g,'the source file');    
@@ -135,9 +160,32 @@ function pub(t){ let s=String(t==null?'':t).replace(/&quot;/g,'"').replace(/&amp
  
 const passName=n=>{ const t=String(n==null?'':n); if(!/exit passage/i.test(t)||/rated/i.test(t)) return t; const two=/\b2 h\b/.test(t);
   return t.replace(/\s*\(2 h\)/,'').replace(/,\s*2 h\b/,'')+(two?', rated 2 h (VBBL 3.4.4.1)':', rated min. 45 min (VBBL 3.4.4.1)'); };
-const pubSrc=t=>esc(pub(t)).replace(IDLIKE,m=>!UNITS.test(m)&&isRid(m)?`<span class="f1c-rid">${m}</span>`:m);
  
-function words(t){ let s=pub(t).replace(/\barch_inv_\w+:?/g,'').replace(/\b(OC|GOV|BRK|OBS|PR|DIR|ENG)\b(?=[\s:;,)])/g,(m,k)=>CODEW[k]).replace(/\s\?(?=[\s;,)]|$)/g,'; not confirmed');
-  return s.replace(/\(\s*(?:[,;:]\s*)*\)/g,'').replace(/\(\s*[,;:]\s*/g,'(').replace(/\s*[,;:]\s*\)/g,')').replace(/\s+([,.;:)])/g,'$1').replace(/\s{2,}/g,' ').replace(/(operator|government record|broker|observed)\s+(?=[;)])/g,'$1').trim(); }
-BD.f1cards={pub,pubSrc,passName,words,context,CONTEXT_SRC,arch,eng,withAnswers,v1,budgetsV1,V1CHIP,EXAMPLE_PICKS,add,has,get:(tpl,title)=>REG[tpl]&&REG[tpl][title],render,ctx,K,meter,frame,pathOf,bbox,hit,scaleBar,allowed,zoneKey,dcStatus,q,n0,n1,esc,titleCase};
+let SPUB=null; const spub=()=>{ if(SPUB) return SPUB; SPUB=new Map(); try{ const x=new XMLHttpRequest(); x.open('GET',(BD.ASSET_BASE||'')+'data/sources_public.json',false); x.send(null); if(x.status===200) for(const q of (JSON.parse(x.responseText).sources||[])) SPUB.set(q.id,q); }catch(e){} return SPUB; };
+function tidy(s){ for(let k=0;k<3;k++) s=s.replace(/\s+(?:from|via|by|of|in)\s*(?=[;,.)]|$)/g,'').replace(/\(\s*(?:[,;:·\/]\s*)*\)/g,'').replace(/\(\s*[,;:]\s*/g,'(').replace(/\s*[,;:]\s*\)/g,')').replace(/:\s*[,;.]/g,':').replace(/([,;])\s*[,;.]+/g,'$1').replace(/\s+([,.;:)])/g,'$1').replace(/\(\s+/g,'(').replace(/\s{2,}/g,' ');
+  return s.replace(/:\s*\./g,'.').replace(/^[\s,;:]+|[\s,;:]+$/g,'').replace(/\s+\./g,'.'); }
+function pubFull(t){ let s=pub(t); if(/^Register ids for the figures/i.test(s)) return '';
+  const PART={water_supply:'water and sewer rates',ups_flex:'UPS runtime figures',ups_modules:'UPS modules',battery_cabinets:'battery cabinets',fuel_on_site:'fuel',load_factor:'load factor',liquid_capture:'capture share'};
+  s=s.replace(/\bregister\s*:?\s*([a-z_]+)(?:,\s*([a-z_]+))?/g,(m,p,q)=>PART[p]?PART[p]+(q&&PART[q]?', '+PART[q]:''):m);
+  const M=spub(); const ID2=/\b(?:van|edm|bc|bch|ab|cov|coe)\d{3,}[a-z0-9]*\b|\b[a-z][a-z0-9]*[A-Z][A-Za-z0-9]*_[A-Za-z0-9_]+\b/g;    
+  s=s.replace(new RegExp(IDLIKE.source+'|'+ID2.source,'g'),m=>{ if(UNITS.test(m)||/^nPro$/.test(m)) return m; const q=M.get(m); if(!q) return isRid(m)?'':m; const key=String(q.publisher||q.title||'').split(/[ ,]/)[0]; return key&&s.includes(key)?'':(q.title||'')+(q.year?' '+q.year:''); });
+  s=s.replace(/\bregister\s*:?\s*([a-z][a-z0-9]*)\b(?!\s+[a-z])/g,(m,w)=>rids().has(w)||/^(?:cop|pue)$/.test(w)?'':m);
+  s=s.replace(/\b(?:physics|public record|research or government lab|engineering|code|standard)\s+register\s*:\s*/gi,'').replace(/\bno register id\b/gi,'').replace(/\bregister\s*:?\s*/gi,'');
+  s=tidy(s).replace(/\s*\(Code\)/g,'').replace(/\bCode’s\b/g,'the tool’s');    
+  s=s.replace(/\bthe engine’s calc\b/g,'the tool’s calculation').replace(/\bthe engine’s\b/g,'the tool’s').replace(/\bthe engine\b/g,'the tool')
+     .replace(/^Public record\s+/,'').replace(/\b(research or government lab|public record|physics)\s+(?=[a-z])/g,'')
+     .replace(/:\s*\(([^()]*)\)\.?$/,': $1.')             
+     .replace(/\(\(/g,'(').replace(/\)\s*…\s*\)/g,')').replace(/…\)\)/g,')').replace(/\)\)\.?$/,').');    
+  { let o=(s.match(/\(/g)||[]).length, c=(s.match(/\)/g)||[]).length; while(c>o&&/\)\.?$/.test(s)){ s=s.replace(/\)(\.?)$/,'$1'); c--; } if(o>c) s=s.replace(/\.?$/,')'.repeat(o-c)+'.'); }    
+  if(/^\(([^()]*)\)\.?$/.test(s)) s='Source: '+s.slice(1).replace(/\)\.?$/,'')+'.';    
+  s=s.replace(/:\s*\((operator|vendor|maker|manufacturer) claims?\)/g,': $1 claims');
+  return s.replace(/^[a-z]/,c=>c.toUpperCase()).replace(/\.\s+([a-z])/g,(m,c)=>'. '+c.toUpperCase()); }
+const pubSrc=t=>esc(pubFull(t));
+function cityOnly(t,city){ const OTHER=city==='van'?/Edmonton|Blatchford|C?14600|EPCOR|AESO|Alberta|NBC\(AE\)/:/Vancouver|BC Hydro|By-law 6555|VBBL|BCBC|False Creek|Metro Vancouver/, MINE=city==='van'?/Vancouver|BC Hydro|British Columbia|\bBC\b|6555|VBBL|BCBC/:/Edmonton|Alberta|EPCOR|AESO|C?14600|20001|NBC\(AE\)/;
+  const u=pubFull(t); if(OTHER.test(u)&&!MINE.test(u)) return ''; if(!OTHER.test(u)) return t;    
+  const out=[]; for(const g of u.split(/;\s*/)){ if(OTHER.test(g)&&!MINE.test(g)){ if(/\)\s*\.?$/.test(g)&&out.length) out[out.length-1]+=g.match(/\)+\s*\.?$/)[0]; continue; } out.push(g); } return out.join('; '); }    
+ 
+function words(t){ let s=pub(t).replace(/\barch_inv\d*_\w+:?/g,'').replace(/\b(OC|GOV|BRK|OBS|PR|DIR|ENG)\b(?=[\s:;,)])/g,(m,k)=>CODEW[k]).replace(/\s\?(?=[\s;,)]|$)/g,'; not confirmed');
+  return s.replace(/\b(directory listing):\s*\1\b/g,'$1').replace(/\(\s*(?:[,;:]\s*)*\)/g,'').replace(/\(\s*[,;:]\s*/g,'(').replace(/\s*[,;:]\s*\)/g,')').replace(/\s+([,.;:)])/g,'$1').replace(/\s{2,}/g,' ').replace(/(operator|government record|broker|observed)\s+(?=[;)])/g,'$1').trim(); }
+BD.f1cards={pubFull,engReset:()=>{ EG.key=null; EG.M=null; EG.busy=null; EG.bkey=null; },pub,pubSrc,passName,words,context,CONTEXT_SRC,arch,eng,withAnswers,v1,budgetsV1,V1CHIP,EXAMPLE_PICKS,add,has,get:(tpl,title)=>REG[tpl]&&REG[tpl][title],render,ctx,K,meter,frame,pathOf,bbox,hit,scaleBar,allowed,zoneKey,dcStatus,q,n0,n1,esc,titleCase};
 })();

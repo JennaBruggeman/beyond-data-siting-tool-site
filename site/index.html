@@ -437,9 +437,9 @@ const SRC={
  edm_bl:['Zoning Bylaw 20001','https://www.edmonton.ca/sites/default/files/public-files/assets/Bylaws/Bylaw20001.pdf'],
  edm_dc:['City of Edmonton: Data Centre Development','https://www.edmonton.ca/business_economy/economic_investment/data-centre-development'],
  edm_data:['City of Edmonton Open Data: property assessment 2026, parcel points, zoning, rooflines','https://data.edmonton.ca/'],
- edm_lots:['Lot outlines: Alberta title mapping, licensed lot outlines (not published), via Edmonton Public Schools GIS (current to 1 Sep 2025); academic use','https://azimuth.epsb.ca/server/rest/services/Hosted/Titled_Lots_Current/FeatureServer/info/iteminfo?f=pjson'],
+ edm_lots:['Lot outlines: licensed lot data, academic use (current to 1 Sep 2025)',''],
 };
-const srcs=ids=>'<div class="src">Sources: '+ids.filter(i=>!(window.BD_PUBLIC&&i==='edm_lots')).map(i=>`<a href="${SRC[i][1]}" target="_blank" rel="noopener">${esc(SRC[i][0])}</a>`).join(' · ')+'</div>';
+const srcs=ids=>'<div class="src">Sources: '+ids.filter(i=>!(window.BD_PUBLIC&&i==='edm_lots')).map(i=>SRC[i][1]?`<a href="${SRC[i][1]}" target="_blank" rel="noopener">${esc(SRC[i][0])}</a>`:esc(SRC[i][0])).join(' · ')+'</div>';
 
  
 const VAN_ENV={
@@ -509,10 +509,10 @@ async function loadMeta(city){
   m.zstat=m.zones.map(z=>{ const k=(city==='van'?vanStatus(z):edmStatus(z)).k; return k==='no'&&lowD(city,z)?'low':k; });
   const by={yes:[],case:[],site:[],low:[],no:[]};
   for(const [zi,a] of m.overview){ by[m.zstat[zi]].push(decodeRing(a,0,0,m.Q)); }
-  m.ov={}; for(const k in by) m.ov[k]=pathOf(by[k]);
+  { const ov={}; let built=false; Object.defineProperty(m,'ov',{configurable:true,enumerable:true,get(){ if(!built){ built=true; for(const k in by) ov[k]=pathOf(by[k]); } return ov; }}); }    
   m.ovRaw=m.overview.map(([zi,a])=>{const r=decodeRing(a,0,0,m.Q);return {zi,r,bb:bbox(r)};}); delete m.overview;
   m.tileset=new Set(m.tiles.map(t=>t[0]+'_'+t[1]));
-  m.fl=(m.flood||[]).map(([cat,rs])=>{const rings=rs.map(a=>decodeRing(a,0,0,m.Q)); return {cat,rings,bb:bbox(rings[0]),path:pathOf(rings)};}); delete m.flood;
+  m.fl=(m.flood||[]).map(([cat,rs])=>{const rings=rs.map(a=>decodeRing(a,0,0,m.Q)); const o={cat,rings,bb:bbox(rings[0])}; let p=null; Object.defineProperty(o,'path',{enumerable:true,get(){ return p||(p=pathOf(rings)); }}); return o;}); delete m.flood;
   S.meta[city]=m; if(window.BD&&BD.loadRecv) BD.loadRecv(city); return m;
 }
 async function loadTile(city,key){
@@ -527,7 +527,8 @@ async function loadTile(city,key){
     try{ T.G=window.BD_PUBLIC&&city==='edm'?{}:(await getJSON(`tiles/${city}/g_${key}.json`)).G||{}; }catch(e){ T.G={}; }    
     if(t.E) for(const [pid,x,y] of t.E) T.pts.push({id:pid,x:ox+x/q,y:oy+y/q});
     for(const [h,a,f] of t.B){ const r=decodeRing(a,ox,oy,q); let hh=h, ff=f||0; if(city==='edm'&&ff===0&&h>40){ ff=6; hh=4; }   T.bld.push({h:hh,r,f:ff,c:centroid(r),a:area(r),hEst:ff===6?h:undefined}); }
-    T.pPath=pathOf(T.par.map(p=>p.r)); T.bPath=pathOf(T.bld.filter(b=>b.f!==3).map(b=>b.r)); T.gPath=pathOf(T.bld.filter(b=>b.f===3).map(b=>b.r));
+    const lazy=(k,f)=>Object.defineProperty(T,k,{configurable:true,enumerable:true,get(){ const v=f(); Object.defineProperty(T,k,{value:v,writable:true,configurable:true,enumerable:true}); return v; }});    
+    lazy('pPath',()=>pathOf(T.par.map(p=>p.r))); lazy('bPath',()=>pathOf(T.bld.filter(b=>b.f!==3).map(b=>b.r))); lazy('gPath',()=>pathOf(T.bld.filter(b=>b.f===3).map(b=>b.r)));
     S.tiles[id]=T; delete S.loading[id]; draw(); return T;
   }).catch(e=>{ delete S.loading[id]; console.warn(e); });
   return S.loading[id];
@@ -545,15 +546,19 @@ const DETAIL={van:0.12,edm:0.2};
 function visibleTiles(){ const m=S.meta[S.city], T=m.T; const [x0,y1]=toWorld(0,0),[x1,y0]=toWorld(W,H); const out=[];
   for(let i=Math.floor(x0/T);i<=Math.floor(x1/T);i++) for(let j=Math.floor(y0/T);j<=Math.floor(y1/T);j++){ const k=i+'_'+j; if(m.tileset.has(k)) out.push(k); } return out; }
 let raf=0; function draw(){ if(!raf) raf=requestAnimationFrame(()=>{raf=0; paint();}); }
+ 
+const covered=()=>!!(document.getElementById('f1v')||document.getElementById('f1')); let paintLate=false, cardLate=false;
+new MutationObserver(()=>{ if(!covered()){ if(cardLate&&S.sel){ cardLate=false; card(); } if(paintLate){ paintLate=false; draw(); } } }).observe(document.body,{childList:true});
 function paint(){
-  const m=S.meta[S.city]; if(!m||!S.view) return;
+  if(covered()){ paintLate=true; return; }
+  const m=S.meta[S.city]; if(!m||!S.view) return; if(!m.tileset){ setTimeout(draw,150); return; }    
   if(!syncSize()){ setTimeout(draw,100); return; }
   const {cx,cy,s}=S.view;
   ctx.setTransform(DPR,0,0,DPR,0,0); ctx.fillStyle='#FFFFFF'; ctx.fillRect(0,0,W,H);
   ctx.setTransform(s*DPR,0,0,-s*DPR,(W/2-cx*s)*DPR,(H/2+cy*s)*DPR);
   const lw=px=>px/s;
   const fa=s>=DETAIL[S.city]?0.4:1;
-  for(const k of ['no','low','site','case','yes']){ const [f,st]=COL[k]; if(f){ ctx.globalAlpha=fa; ctx.fillStyle=f; ctx.fill(m.ov[k],'evenodd'); ctx.globalAlpha=1; } if(S.city==='edm'||s<DETAIL[S.city]){ ctx.strokeStyle=k==='no'?'#E4E4E2':st; ctx.lineWidth=lw(k==='no'?.5:.8); ctx.stroke(m.ov[k]); } }
+  for(const k of ['no','low','site','case','yes']){ if(!m.ov||!m.ov[k]) continue;     const [f,st]=COL[k]; if(f){ ctx.globalAlpha=fa; ctx.fillStyle=f; ctx.fill(m.ov[k],'evenodd'); ctx.globalAlpha=1; } if(S.city==='edm'||s<DETAIL[S.city]){ ctx.strokeStyle=k==='no'?'#E4E4E2':st; ctx.lineWidth=lw(k==='no'?.5:.8); ctx.stroke(m.ov[k]); } }
   const detail=s>=DETAIL[S.city];
   if(detail){
     const keys=visibleTiles(); let waiting=0;
@@ -643,11 +648,11 @@ async function select(sel){
     
     
     { const meas=mine.reduce((t,p)=>t+p.a,0)||(sel.ring?area(sel.ring):0); sel.lotArea=Math.round(meas); sel.lotSrc='measured'; sel.lotRec=+(sel.a&&sel.a[8])||0; sel.lotParts=mine.length; sel.rings=mine.map(p=>p.r); }
-    { const R=sel.rings&&sel.rings.length?sel.rings:sel.ring?[sel.ring]:[]; sel.blds=[]; for(const id in S.tiles){ if(!id.startsWith('van:')) continue; for(const b of S.tiles[id].bld) if(R.some(r=>pip(b.c[0],b.c[1],r))&&!sel.blds.includes(b)) sel.blds.push(b); } }
+    { const R=sel.rings&&sel.rings.length?sel.rings:sel.ring?[sel.ring]:[]; sel.blds=[]; const RB=R.map(bbox), inB=(c,k)=>c[0]>=RB[k][0]&&c[0]<=RB[k][2]&&c[1]>=RB[k][1]&&c[1]<=RB[k][3]; for(const id in S.tiles){ if(!id.startsWith('van:')) continue; for(const b of S.tiles[id].bld) if(R.some((r,k)=>inB(b.c,k)&&pip(b.c[0],b.c[1],r))&&!sel.blds.includes(b)) sel.blds.push(b); } }    
   } else { if(!sel.pt){ const p=T.pts.find(p=>p.id===sel.id); if(p) sel.pt=[p.x,p.y]; }
     if(!sel.ring){ const l=T.par.find(l=>l.ids&&l.ids.includes(sel.id)); if(l){ sel.ring=l.r; sel.lotIds=l.ids; } }
     { const rec=+(sel.a&&sel.a[4])||0, meas=sel.ring?area(sel.ring):0, big=meas>10&&rec>1.2*meas, use=meas>10;   sel.lotArea=use?Math.round(meas):rec; sel.lotSrc=use?'measured':'record'; sel.lotRec=rec; sel.lotPart=big; } 
-    sel.blds=sel.ring?NBB.filter(b=>pip(b.c[0],b.c[1],sel.ring)):sel.pt?NBB.filter(b=>pip(sel.pt[0],sel.pt[1],b.r)):[];
+    sel.blds=sel.ring?(RB=>NBB.filter(b=>b.c[0]>=RB[0]&&b.c[0]<=RB[2]&&b.c[1]>=RB[1]&&b.c[1]<=RB[3]&&pip(b.c[0],b.c[1],sel.ring)))(bbox(sel.ring)):sel.pt?NBB.filter(b=>pip(sel.pt[0],sel.pt[1],b.r)):[];
     if(!sel.blds.length&&sel.pt&&!sel.ring){ const n=NBB.map(b=>[b,Math.hypot(b.c[0]-sel.pt[0],b.c[1]-sel.pt[1])]).filter(v=>v[1]<25).sort((a,b)=>a[1]-b[1]); if(n.length) sel.blds=[n[0][0]]; }
   }
    
@@ -665,7 +670,7 @@ async function select(sel){
   S.sel=sel; S.view2=null; window.BD&&BD.scene3d&&BD.scene3d.hide(); document.body.classList.remove('wide'); if(sel.city!==S.city) await setCity(sel.city,true);
   const c=sel.ring?centroid(sel.ring):sel.pt; if(c&&(S.view.s<1.2||Math.abs(c[0]-S.view.cx)*S.view.s>W/2||Math.abs(c[1]-S.view.cy)*S.view.s>H/2)) flyTo(c[0],c[1],Math.max(S.view.s,2));
   try{ const tk=sel.tile.replace(/-/g,'m'); history.replaceState(null,'','#'+sel.city+'-'+tk+'-'+sel.id); }catch(e){}
-  card(); draw();
+  if(covered()){ const s0=S.sel; (window.requestIdleCallback||(f=>setTimeout(f,1500)))(()=>{ if(S.sel===s0) card(); },{timeout:4000}); } else card(); draw();    
   if(window.BD&&BD.setup&&!sel.quiet) BD.setup.start();
 }
 function card(){
@@ -689,7 +694,7 @@ function card(){
     <h3>Data centre here?</h3><p><span class="pill ${st.k}">${esc(st.t)}</span> <span class="sub">zone ${esc(z)}${zone&&zmap&&zone.split(' ')[0]!==zmap.split(' ')[0]?` (record says ${esc(zone)})`:''}</span></p><p class="draft">${st.d}</p>${st.env?`<p class="sub">${esc(st.env)}</p>`:''}${srcs(st.src)}
     <h3>The lot</h3><dl><dt>Lot area</dt><dd>${fmt(s.lotArea||lot)} m²${s.lotSrc==='measured'?` <span class="sub">(measured from the lot outline; the assessment record says ${s.lotRec?fmt(s.lotRec)+' m²':'nothing'}${s.lotPart?': the record covers more land than this outline, probably several titled lots or a strata property, so the tool sizes on the outline only':''})</span>`:` <span class="sub">(assessment record; no lot outline found)</span>`}</dd><dt>Floor area</dt><dd>${gross?fmt(gross)+' m² (assessment)':'—'}</dd><dt>Assessed value</dt><dd>${money(val)}</dd>
     <dt>Year built</dt><dd>${y0?(y0===y1?y0:y0+'–'+y1):'—'}</dd><dt>Use</dt><dd>${esc((cls||[]).join(', ')||'—')}</dd><dt>Floodplain</dt><dd class="gap">not yet looked at for Edmonton</dd></dl>
-    <div class="src">${s.ring?`Lot outline ${fmt(area(s.ring))} m² measured: Alberta title mapping, licensed lot outlines (not published), via Edmonton Public Schools GIS (current to 1 Sep 2025); academic use.${s.lotIds&&s.lotIds.length>1?` ${s.lotIds.length} assessment records on this lot; showing the one that best fits the outline.`:''}`:'No lot outline found for this record: the lot is drawn as an assumed square of the record area (900 m² when the record gives none), not its real shape.'} Lot area ${s.lotSrc==='measured'?'measured from the outline (the record is shown beside it)':'from the assessment record'}. Zone ${zmap?'read from the zoning map':'from the assessment record (no zoning-map zone here)'}.</div>
+    <div class="src">${s.ring?`Lot outline ${fmt(area(s.ring))} m² measured: licensed lot data, academic use (current to 1 Sep 2025).${s.lotIds&&s.lotIds.length>1?` ${s.lotIds.length} assessment records on this lot; showing the one that best fits the outline.`:''}`:'No lot outline found for this record: the lot is drawn as an assumed square of the record area (900 m² when the record gives none), not its real shape.'} Lot area ${s.lotSrc==='measured'?'measured from the outline (the record is shown beside it)':'from the assessment record'}. Zone ${zmap?'read from the zoning map':'from the assessment record (no zoning-map zone here)'}.</div>
     <h3>What stands on it</h3>${bl.length?`<dl><dt>Buildings</dt><dd>${bl.length} footprint${bl.length>1?'s':''}, ${fmt(bl.reduce((t,b)=>t+b.a,0))} m² in plan</dd><dt>Height</dt><dd>${he.length?(()=>{ const hm=bl.filter(b=>b.f===5).map(b=>b.h), hx=bl.filter(b=>b.f!==5&&b.f!==6&&b.f!==7&&b.h>0).map(b=>b.h), hu=bl.filter(b=>b.f===6).length, h7=bl.filter(b=>b.f===7).map(b=>b.h);   return ((hm.length?Math.max(...hm).toFixed(1)+' m — tallest measured part, City 3D buildings (highest point − ground)':'')+(hx.length?(hm.length?'; ':'')+'≈'+Math.max(...hx).toFixed(0)+' m — ESTIMATE for '+(hm.length?'the other parts':'this building')+' (floor area ÷ footprint × 4 m)':'')+(h7.length?'; '+Math.max(...h7).toFixed(1)+' m — measured, City 3D buildings (outline from the 3D model; no roofline outline)':'')+(hu.length?'; '+hu+' part'+(hu>1?'s':'')+' of height not known (the floor-area estimate was over 40 m with no 3D measurement; drawn as one storey)':'')).replace(/^; /,''); })():'—'}</dd></dl>`:`<p class="sub">${s.ring?'No building on this lot.':'No footprint at this point.'}</p>`}
     ${srcs(s.ring?['edm_data','edm_lots']:['edm_data'])}`;
   }
@@ -855,6 +860,7 @@ window.BD={S,$,esc,fmt,getJSON,addrHits,pathOf,draw,centroid,pip,area,statusOf,l
 <script src="sheet.js"></script>
 <script src="report3.js"></script>
 <script src="restyle.js"></script>
+<script src="f1flood.js"></script>
 <script src="f1cards.js"></script>
 <script src="f1map.js"></script>
 <script src="f1arch.js"></script>
@@ -866,14 +872,45 @@ window.BD={S,$,esc,fmt,getJSON,addrHits,pathOf,draw,centroid,pip,area,statusOf,l
 <script src="f1muni_b.js"></script>
 <script src="f1eng_a.js"></script>
 <script src="f1res.js"></script>
+<script src="f1dcmap.js"></script>
+<script src="f1dcpanel.js"></script>
+<script src="f1dcpage.js"></script>
+<script src="f1approvals.js"></script>
+<script src="f1edmlive.js"></script>
+<script src="f1rooms.js"></script>
 <script src="f1plans.js"></script>
 <script src="f1eng_b.js"></script>
 <script src="f1eng_district.js"></script>
 <script src="f1found.js"></script>
+<script src="f1tokens.js"></script>
+<script src="f1massing.js"></script>
+<script src="f1zones.js"></script>
 <script src="f1lib.js"></script>
 <script src="f1logic.js"></script>
 <script src="f1typ.js"></script>
+<script src="f1decides.js"></script>
+<script src="f1funnel.js"></script>
+<script src="f1logicmap.js"></script>
 <script src="f1land2.js"></script>
+<script src="f1land3.js"></script>
+<script src="f1eng2.js"></script>
+<script src="f1siteplan.js"></script>
+<script src="f1place.js"></script>
+<script src="f1card7.js"></script>
+<script src="f1report8.js"></script>
+<script src="f1pick3.js"></script>
+<script src="f1streets.js"></script>
+<script src="f1site2.js"></script>
+<script src="f1arch2.js"></script>
+<script src="f1deeplink.js"></script>
+<script src="f1scrub.js"></script>
+<script src="f1noq.js"></script>
+<script src="f1heatnear.js"></script>
+<script src="f1heatintro.js"></script>
+<script src="f1best.js"></script>
+<script src="f1reportA3.js"></script>
+<script src="f1reportA3v5.js"></script>
+<script src="f1logicplain.js"></script>
 <script src="f1.js"></script>
 <script src="f1intro.js"></script>
 
