@@ -23,6 +23,7 @@ function onLot(raw,pl,site){ if(!raw||!pl||!pl.place||!site) return null; const 
     for(const k of ['circulation','separations']) for(const c of (Array.isArray(s[k])?s[k]:[])){ if(Array.isArray(c.rects)) c.rects.forEach(rect); if(Array.isArray(c.rect)) rect(c.rect); rings(c.rings); if(Array.isArray(c.a)) pt(c.a); if(Array.isArray(c.b)) pt(c.b); if(Array.isArray(c.line)) c.line.forEach(pt); } }
   if(q.yard){ rings(q.yard.rings); if(q.yard.truckCourt&&Array.isArray(q.yard.truckCourt.rect)) rect(q.yard.truckCourt.rect); }
   if(Array.isArray(q.court)) rect(q.court);
+  if(q.farm&&Array.isArray(q.farm.rects)) q.farm=Object.assign({},q.farm,{rects:q.farm.rects.map(r=>{ const c=r.slice(); rect(c); return c; })});    
   if(q.truckAccess&&Array.isArray(q.truckAccess.path)) q.truckAccess.path.forEach(pt);
   for(const d of q.doors||[]) if(Array.isArray(d.at)) pt(d.at);
   if(q.street&&Array.isArray(q.street.door)) pt(q.street.door);
@@ -46,7 +47,7 @@ function outside(q,tol){ tol=tol==null?0.05:tol; const R=q&&q.site&&q.site.lot; 
 const WORDS={default:'',shifted:'moved along the lot to fit',mirrored:'mirrored to fit','mirrored+shifted':'mirrored and moved to fit'};
 async function placedFor(x){ try{ if(!x||x.city!=='van'||!x.sel||!BD.f1pick3||!BD.f1pick3.chosen) return null; const raw=await BD.f1pick3.chosen(x,{raw:true}); if(!raw||!raw.id) return null;
   const away=BD.f1best&&BD.f1best.away?BD.f1best.away(raw.id,String(x.sel.id)):false; if(!away) return null;
-  const pl=await placeOf(x.sel.id,raw.id,'van'); if(!pl) return null; const site=await siteHere(x); const q=onLot(raw,pl,site); if(!q) return null;
+  const pl=await placeOf(x.sel.id,raw.id,'van'); if(!pl) return null; try{ const fm=BD.f1siteplan&&BD.f1siteplan.farmFor?await BD.f1siteplan.farmFor(x.sel.id,raw.id):null; if(fm) raw.farm=fm; }catch(e){} const site=await siteHere(x); const q=onLot(raw,pl,site); if(!q) return null;
   return {q,pl,out:outside(q),words:WORDS[pl.placement]||''}; }catch(e){ console.warn('f1place',e); return null; } }
  
 const note=P=>P?`A library layout drawn where it fits on this lot${P.words?' ('+P.words+')':''}; not re-planned for it.${P.out?` One corner sits ${P.out.toFixed(2)} m past the lot line in the stored placement: being checked.`:''}`:'';

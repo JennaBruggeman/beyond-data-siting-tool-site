@@ -20,27 +20,30 @@ const ZONES=[['public-program','Public program',true],['public-support','Public 
 function chart(P,o){ o=o||{}; const W=o.W||920, ZB={}; for(const z of P.zones||[]) ZB[z.zone]=z;
   const tot=Math.max(...ZONES.map(([z])=>+(ZB[z]&&ZB[z].area)||0),1), sc=W/tot; let out='';
   for(const [z,lab,sized] of ZONES){ const Z=ZB[z]; if(!Z) continue; const area=+Z.area||0;
-    out+=`<div class="rm-z"><div class="rm-h"><b>${esc(lab)}</b>${sized?`<b>${n0(area)} m²</b>`:''}</div>`;
+    out+=`<div class="rm-z"><div class="rm-h"><b>${esc(lab)}</b>${sized?`<b>${n0(area)} m²<span class="rm-all"> all storeys</span></b>`:''}</div>`;
     const noA=sized?(Z.rooms||[]).filter(r=>!(+r.m2>0)):[];
+     
+    const PR=(Z.planRooms||[]).filter(r=>r&&r.name&&+r.m2>0&&r.name.trim().toLowerCase()!==String(lab).toLowerCase()), stl=a=>a&&a.length?(a.length>1?'storeys ':'storey ')+a.join(', '):'';
+    const plan=PR.length?`<div class="rm-plan"><b>Drawn in this layout</b><ul>${PR.map(r=>`<li>${esc(r.name)}, ${n0(r.m2)} m²${r.storeys&&r.storeys.length?', '+stl(r.storeys):''}</li>`).join('')}</ul><p>Rooms as the layout draws them, inside the ${esc(String(lab).toLowerCase())} area above.</p></div>`:'';
     if(sized&&sizedRooms(Z).length){ const rooms=sizedRooms(Z), sum=rooms.reduce((a,r)=>a+(+r.m2||0),0), big=rooms.reduce((m,r,i)=>(+r.m2>(+rooms[m].m2))?i:m,0);
       let bar='', num=0; const listed=[];
       rooms.forEach((r,i)=>{ const w=(+r.m2||0)*sc; if(i===big&&w>160){ bar+=`<div class="rm-s rm-big" style="width:${w.toFixed(1)}px;background:${col(z)}"><b>${esc(r.name)}</b><span>${n0(r.m2)} m²${r.grows?', the rest of the zone':''}</span></div>`; }
         else { num++; listed.push([num,r]); bar+=`<div class="rm-s" style="width:${Math.max(3,w).toFixed(1)}px;background:${col(z)}" title="${esc(r.name)}: ${n0(r.m2)} m²">${w>16?num:''}</div>`; } });
       const rest=area-sum; if(rest>1) bar+=`<div class="rm-s rm-rest" style="width:${(rest*sc).toFixed(1)}px"></div><span class="rm-rl">not split into rooms, ${n0(rest)} m²</span>`;
       out+=`<div class="rm-bar">${bar}</div>${listed.length?`<ol class="rm-l">${listed.map(([k,r])=>`<li><b>${k}</b> ${esc(r.name)}, ${n0(r.m2)} m²</li>`).join('')}</ol>`:''}`;
-      if(noA.length) out+=`<p class="rm-hold">Also in this zone, not sized: ${noA.map(r=>esc(cite(pub(r.name),P.city))).join('; ')}.</p>`;
+      out+=plan; if(noA.length) out+=`<p class="rm-hold">Also in this zone, not sized: ${noA.map(r=>esc(cite(pub(r.name),P.city))).join('; ')}.</p>`;
       const srcs=rooms.filter(r=>r.src).map(r=>`${esc(r.name)}: ${esc(cite(pub(r.src),P.city))}`); if(srcs.length) out+=`<p class="rm-src">${srcs.join('<br>')}</p>`; }
-    else if(sized){ out+=`<div class="rm-bar"><div class="rm-s" style="width:${(area*sc).toFixed(1)}px;background:${col(z)}"></div></div><p class="rm-src">${esc(Z.note||'Not split into rooms in this layout.')}</p>`; }
+    else if(sized){ out+=`<div class="rm-bar"><div class="rm-s" style="width:${(area*sc).toFixed(1)}px;background:${col(z)}"></div></div><p class="rm-src">${esc(Z.note||'Not split into rooms in this layout.')}</p>${plan}`; }
     else { out+=(Z.holds||[]).length?`<p class="rm-hold">The data-centre rooms sit on the data-centre floors with the data hall; they are named here, not sized: ${Z.holds.map(h=>esc(cite(pub(h.name),P.city))).join('; ')}.</p>`:''; }
     out+='</div>'; }
   return `<div class="rm" style="max-width:${W}px"><h3 class="rm-t">Suggested room breakdown (schematic, from research)</h3>${out}</div>`; }
-const CSS=`.rm{font-size:13px;color:#1E2A47}.rm-t{font-size:18px;margin:0 0 14px}.rm-z{margin:0 0 22px}.rm-h{display:flex;justify-content:space-between;font-size:15px;margin:0 0 6px}
+const CSS=`.rm{font-size:13px;color:#1E2A47}.rm-t{font-size:18px;margin:0 0 14px}.rm-z{margin:0 0 22px}.rm-all{font-weight:400;font-size:12px;color:#5E6782;margin-left:4px}.rm-h{display:flex;justify-content:space-between;font-size:15px;margin:0 0 6px}
 .rm-bar{display:flex;align-items:center;flex-wrap:nowrap}.rm-s{height:34px;border-right:2px solid #fff;display:flex;align-items:center;justify-content:center;font-weight:600;font-size:12px;box-sizing:border-box;overflow:hidden;flex:0 0 auto}
 .rm-big{flex-direction:column;align-items:flex-start;justify-content:center;padding:0 8px;font-weight:400}.rm-big b{font-size:12.5px}.rm-big span{font-size:12px}
 .rm-rest{border:1.4px dashed #8A94AA;background:#fff;height:34px}.rm-rl{margin-left:10px;font-size:12px;color:#4A5672}
 .rm-l{list-style:none;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:2px 20px;margin:8px 0 0;padding:0;font-size:12.5px;color:#4A5672}.rm-l b{color:#1E2A47;margin-right:4px}
 .rm-via{font-size:13px;color:#4A5672;margin:0 0 14px;max-width:920px;text-align:left}.rm-chg{font:inherit;font-size:13px;background:none;border:0;padding:0;margin-left:6px;color:#1E2A47;text-decoration:underline;text-underline-offset:3px;cursor:pointer}
-.rm-src{font-size:12px;color:#6B7590;margin:8px 0 0;line-height:1.5}.rm-hold{font-size:12.5px;color:#1E2A47;margin:8px 0 0;line-height:1.5}
+.rm-plan{margin:12px 0 0;padding:10px 12px;border-left:2px solid #D6DEEB;font-size:12.5px;line-height:1.5}.rm-plan ul{margin:4px 0 4px;padding-left:1.2em}.rm-plan p{margin:0;color:#6B7590;font-size:12px}.rm-src{font-size:12px;color:#6B7590;margin:8px 0 0;line-height:1.5}.rm-hold{font-size:12.5px;color:#1E2A47;margin:8px 0 0;line-height:1.5}
 @media (max-width:700px){ .rm-l{grid-template-columns:1fr} }`;
 function css(){ if(document.getElementById('rm-css')) return; const s=document.createElement('style'); s.id='rm-css'; s.textContent=CSS; document.head.appendChild(s); }
 async function resolve(x,b){ let P=b?await record(b.plan):null, via=null, ref=false;
@@ -57,7 +60,7 @@ async function build(x){ css(); let b=null; try{ b=BD.f1best?await BD.f1best.for
   const TNm=t=>String(t||'').replace(/_/g,' ').replace(/^./,c=>c.toUpperCase());
   const note=ref?`<p class="rm-via">Rooms for the reference layout.</p>`:via?`<p class="rm-via">These are the rooms of the highest-capacity ${esc(TNm(via.typology))} layout for your filters (${(+via.MW||0).toFixed(2)} MW); the reference layout has no room list. <button type="button" class="rm-chg" onclick="(function(){ const B=[...document.querySelectorAll('#f1v .f1v-strip button')].find(b=>/Available layouts/.test(b.textContent)); if(B) B.click(); })()">Change layout</button></p>`:'';
   return {draw:note+chart(P),lead:'What each public zone could hold, room by room, as a starting brief. The data-centre rooms are named, not sized.',
-    hero:[...(pp?[{v:n0(pp.area),u:' m²',l:`public program, in ${sizedRooms(pp).length} rooms`}]:[]),...(ps?[{v:n0(ps.area),u:' m²',l:`public support, in ${sizedRooms(ps).length} rooms`}]:[])],
+    hero:[...(pp?[{v:n0(pp.area),u:' m²',l:`public program, all storeys, in ${sizedRooms(pp).length} rooms`}]:[]),...(ps?[{v:n0(ps.area),u:' m²',l:`public support, all storeys, in ${sizedRooms(ps).length} rooms`}]:[])],
     foot:'Rooms are suggestions for the next design stage; none has been designed. Public rooms sized from the layout; data-centre rooms named, not sized.',
     src:['Room breakdown: the tool’s merged library (25 Nov 2026), rooms scaled from the typology definitions with their sources; schematic.']}; }
 (function wire(n){ const C=BD.f1cards; if(!C||!C.add){ if((n||0)<100) setTimeout(()=>wire((n||0)+1),100); return; } C.add('architecture','Rooms in each zone',{build}); })();

@@ -104,7 +104,9 @@ async function build(x,o){ PRINT=!!(o&&o.print);
   if(!document.getElementById('s2-css')){ const st=document.createElement('style'); st.id='s2-css'; st.textContent=CSS; document.head.appendChild(st); }
   if(x.city!=='van') return {draw:'<p class="f1v-empty">Around the lot covers Vancouver lots only.</p>',lead:'The lot’s surroundings: shown for Vancouver lots.'};
   const id=x.sel&&String(x.sel.id); let S=null; try{ const r=await fetch(`${AB()}f1/site/van_${id}.json`); S=r.ok?await r.json():null; }catch(e){}
-  if(!S) return {draw:'<p class="f1v-empty">No site data for this lot yet.</p>',lead:'The lot’s surroundings on four maps.'};
+  if(!S){ let why='', zn=''; try{ zn=BD.f1cards.zoneKey('van',(x.sel&&x.sel.a)||[]); const C=await fetch('data/coverage_public.json').then(r=>r.ok?r.json():null), v=C&&C.van, tested=v&&v.lots&&v.lots[id], zs=Object.keys((v&&v.base&&v.base.zones)||{});
+      why=tested?'its maps are not built yet.':zn&&zs.length&&!zs.includes(zn)?`its zone, ${zn}, is not one where a data centre is allowed (${zs.join(', ')}), and it is not among the lots tested as if rezoned to I-2.`:'it was judged not a site in the tool’s lot table (for example, too small or not one parcel), or its site model could not be built.'; }catch(e){ why='it is not in the tool’s list of tested lots.'; }
+    return {draw:`<div class="f1v-empty"><p>Around-the-lot maps are made only for the lots the tool tested. This lot isn’t one of them: ${esc(why)}</p><p><button type="button" class="f1v-how" data-relot>Pick a tested lot</button></p></div>`,lead:'The lot’s surroundings on four maps, for the lots the tool tested.',rows:zn?[['Zone',zn]]:[]}; }    
   if(!ABOUT){ try{ ABOUT=await (await fetch(AB()+'f1/site/about_van.json')).json(); }catch(e){ ABOUT={}; } }
   if(!USES){ try{ USES=await (await fetch(AB()+'data/uses_van.json')).json(); }catch(e){ USES={}; } }    
   if(!SHARE){ try{ SHARE=(await (await fetch(AB()+'data/uses_share_van.json')).json()).share||{}; }catch(e){ SHARE={}; } }

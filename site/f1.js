@@ -107,7 +107,7 @@ function viewer(id,opt){ if(id==='resident'||id==='municipal'){ if(id==='residen
       if(d.relot!=null){ V.pick=true; V.hits=[]; V.cand=null; V.pcity=V.city; draw(); return; } if(d.pcity){ V.pcity=d.pcity; V.hits=[]; V.cand=null; if(V.t.id==='resident'){ V.city=d.pcity; V.pick=false; V.own=null; V.i=0; draw(); loadLot(V.city); return; } draw(); return; }    
       if(d.hit!=null){ const h=V.hits[+d.hit]; if(!h) return; candidate({city:V.pcity,tile:h[1],id:String(h[2]),label:h[0]},true); return; }    
       if(d.usecand!=null){ const c=V.cand; if(!c) return; V.own={city:c.city,tile:c.tile,id:c.id,label:c.label}; V.city=c.city; V.pick=false; V.i=Math.min(V.i||0,V.t.cards.length-1); draw();     loadLot(V.city); return; }
-      if(d.to!=null){ V.i=+d.to; draw(); return; } if(d.chap!=null){ V.i=V.t.cards.findIndex(c=>c.chap===d.chap); draw(); return; }
+      if(d.to!=null){ V.i=+d.to; draw(); return; } if(d.chap!=null){ const k=V.t.cards.findIndex(c=>c.chap===d.chap); if(k>=0){ V.i=k; draw(); } return; }    
       if(d.step==='back'&&V.i>0){ V.i--; draw(); } if(d.step==='next'&&V.i<V.t.cards.length-1){ V.i++; draw(); } });
     document.addEventListener('keydown',e=>{ if(!document.getElementById('f1v')) return; if(document.getElementById('f1l')) return;    
       if(e.key==='Escape') document.getElementById('f1v').remove(); if(e.key==='ArrowRight'&&V.i<V.t.cards.length-1){ V.i++; draw(); } if(e.key==='ArrowLeft'&&V.i>0){ V.i--; draw(); } }); }
@@ -155,6 +155,7 @@ function resWhere(){ const cn=(LOTS[V.city]||{}).name||'', pk=BD.f1res&&BD.f1res
   return `<button class="f1v-cityname" data-to="0" title="Change the city: back to Find">${esc(cn)}</button>${f&&V.i>=1?' / '+esc(f.name):''}`; }
 function draw(){ const W=document.getElementById('f1v'); if(!W||!V.t) return;
   if(V.pick){ W.innerHTML=`<header class="f1v-head"><span class="f1-app">Beyond Data</span><span class="tpl">${V.t.name}</span><span class="f1v-where"></span><button class="f1v-x" data-x aria-label="Close">Close</button></header><div class="f1v-body">${pickHtml()}</div>`; wirePick(W); return; }
+  if(!(V.i>=0&&V.i<V.t.cards.length)) V.i=Math.max(0,Math.min(V.t.cards.length-1,V.i|0));    
   const t=V.t, c=t.cards[V.i], n=t.cards.length, ci=t.chaps.indexOf(c.chap), spec=BD.f1cards&&BD.f1cards.get(t.id,c.t);
   W.innerHTML=`<header class="f1v-head"><span class="f1-app">Beyond Data</span><span class="tpl">${t.name}</span>
      <nav class="f1v-chap" aria-label="Chapters">${t.chaps.map((h,k)=>`<button data-chap="${esc(h)}" class="${k<ci?'past':k===ci?'now':''}"${k===ci?' aria-current="step"':''}>${esc(h)}</button>`).join('')}</nav>
@@ -170,7 +171,7 @@ function draw(){ const W=document.getElementById('f1v'); if(!W||!V.t) return;
   const cur=W.querySelector('.f1v-strip [aria-current="true"]'), sp=W.querySelector('.f1v-strip'); if(cur&&sp) sp.scrollLeft=Math.max(0,cur.offsetLeft-sp.clientWidth/2+cur.offsetWidth/2);  
    
   if(spec&&V.ready){ const tok=V.tok=(V.tok||0)+1, dr=W.querySelector('.f1v-draw'), pb=W.querySelector('.f1c-body'), se=W.querySelector('.f1v-src');
-    Promise.resolve().then(async()=>{ const x=BD.f1cards.ctx(V.city);  
+    new Promise(r=>requestAnimationFrame(()=>setTimeout(r,0))).then(async()=>{ if(tok!==V.tok) return; const x=BD.f1cards.ctx(V.city);      
        
       if(window.BD_PUBLIC&&V.city==='edm'){ const need={municipal:['Yards by edge','Noise limits around the lot'],engineering:['What fits','Backup power','Noise','Heat offered','Who could take it','Water','What fits here','Cooling and water','When the power fails','Noise next door','Heat for the neighbours']}, ip=V.t.cards.findIndex(k=>k.t==='Pick a typology');
         if((need[V.t.id]||[]).includes(c.t)||(V.t.id==='architecture'&&ip>=0&&V.i>=ip&&c.t!=='Report')) return {lead:'Edmonton lot outlines aren’t published as open data (the City stopped in Nov 2021); shown in the full version.',
@@ -181,8 +182,8 @@ function draw(){ const W=document.getElementById('f1v'); if(!W||!V.t) return;
         if(nf){     let lb=null; try{ lb=BD.f1best?await BD.f1best.forLot(x):null; }catch(e){} if(lb&&lb.source!=='rough') nf=null; }
         if(nf&&V.t.cards[V.i].t==='Who approves it') nf=null;    
         if(nf) return nf;
-        const es=BD.f1archEstimate&&await BD.f1archEstimate(x); if(es){ const r=await spec.build(x); if(r){ r.hero=(r.hero||[]).map(h=>Object.assign({},h,{v:h.u&&/MW/.test(h.u)&&/^[\d.]+$/.test(String(h.v))?(+h.v).toFixed(1):h.v,l:(h.l||'')+(es.basis&&es.basis.k==='borrowed'?' (borrowed, not checked here)':' (first pass, not checked)')}));     r.estimate=es; } return r; } }    
-      const r0=await spec.build(x); if(r0&&window.BD_PUBLIC&&V.city==='van'&&['Heat receivers nearby','Who could take it'].includes(c.t)) r0.lead=(r0.lead||'')+' The full version also counts commercial and apartment buildings from a licensed assessment list.'; return r0; }).then(res=>{ if(tok!==V.tok||!res) return; BD.f1cardIndex=V.i; BD.f1cards.render(res,dr,pb,se,V.t.id); svgLabels(dr,c.t); svgMin(dr); trustTags(pb,c.t,V.t.tab,res); if(V.t.id==='architecture'&&/^(Rooms|Separations|Exits|Plant and site)$/.test(c.t)) planViews(dr);    
+        let lbE=null; try{ lbE=BD.f1best?await BD.f1best.forLot(x):null; }catch(e){} const es=!(lbE&&lbE.source!=='rough')&&BD.f1archEstimate&&await BD.f1archEstimate(x); if(es){     const r=await spec.build(x); if(r){ r.hero=(r.hero||[]).map(h=>Object.assign({},h,{v:h.u&&/MW/.test(h.u)&&/^[\d.]+$/.test(String(h.v))?(+h.v).toFixed(1):h.v,l:(h.l||'')+(es.basis&&es.basis.k==='borrowed'?' (borrowed, not checked here)':' (first pass, not checked)')}));     r.estimate=es; } return r; } }    
+      const r0=await spec.build(x); if(r0&&window.BD_PUBLIC&&V.city==='van'&&['Heat receivers nearby','Who could take it'].includes(c.t)) r0.lead=(r0.lead||'')+' The full version also counts commercial and apartment buildings from a licensed assessment list.'; return r0; }).then(res=>{ if(tok!==V.tok||!res) return; BD.f1cardIndex=V.i; BD.f1cards.render(res,dr,pb,se,V.t.id); if(V.t.id==='engineering'&&c.t==='Cooling and water'&&BD.f1best&&BD.f1best.basisBlock){ const tk=tok; BD.f1best.basisBlock(BD.f1cards.ctx(V.city)).then(h=>{ if(h&&dr.isConnected&&tk===V.tok&&!dr.querySelector('.f1-basis')) dr.insertAdjacentHTML('afterbegin',h); }).catch(()=>{}); }     svgLabels(dr,c.t); svgMin(dr); trustTags(pb,c.t,V.t.tab,res); if(V.t.id==='architecture'&&/^(Rooms|Separations|Exits|Plant and site)$/.test(c.t)) planViews(dr);    
       if(V.t.id==='architecture'&&V.i>V.t.cards.findIndex(k=>k.t==='Pick a typology')&&c.t!=='Report') needsLayout(V).then(no=>{ if(!no) variantBadge(pb,V.city); });         W.dataset.built=c.t; })
       .catch(e=>{ if(tok!==V.tok) return; dr.innerHTML=`<p class="f1v-empty">This card isn’t available for this lot yet: some of the figures it needs are missing. The other cards still apply.</p>`; console.error('f1 card',c.t,e); }); } }
 

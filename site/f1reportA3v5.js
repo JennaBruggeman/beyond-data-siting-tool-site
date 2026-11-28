@@ -142,6 +142,9 @@ async function withSimplifications(city){ const pages=await assumptions(city), P
   const PW=t=>(BD.f1cards&&BD.f1cards.pub?BD.f1cards.pub(String(t||'')):String(t||''));
   const srcT=v=>Array.isArray(v)?v.map(c=>typeof c==='string'?(/^our reading.?$/i.test(c.trim())?'Our reading.':c):(c&&c.citation)||'').filter(Boolean).join(' '):String(v||'').replace(/^our reading$/i,'Our reading.');
   const SIM=((A&&A.simplifications)||[]).map(x=>typeof x==='string'?{t:x}:{w:x.what||'',t:x.text||x.line||'',src:srcT(x.source||x.src),city:x.city}).filter(x=>x.t&&(!x.city||!city||x.city===city));
+   
+  const FARM=((A&&A.farm)||[]).map(x=>({w:x.what||'',t:x.text||'',src:srcT(x.source||x.src),city:x.city})).filter(x=>x.t&&(!x.city||!city||x.city===city));
+  if(FARM.length) SIM.push(...FARM.map(x=>Object.assign({},x,{w:x.w.replace(/^Urban farm:\s*/i,'Urban farm, ')})));
   if(SIM.length) P.push(`<div style="width:100%;align-self:flex-start"><h3 style="font-size:20px;font-weight:600;margin:0 0 12px">What the tool simplifies</h3><ul style="margin:0;padding-left:1.2em;font-size:15px;line-height:1.5">${SIM.map(x=>`<li style="margin:0 0 10px">${x.w?`<b>${esc(PW(x.w))}.</b> `:''}${esc(PW(x.t))}${x.src?` <span style="color:${MUTE};font-size:13px">${esc(PW(x.src))}</span>`:''}</li>`).join('')}</ul></div>`);
   return P; }
 BD.f1a3v5={definitions,mapPages,checks,sources,assumptions:withSimplifications};

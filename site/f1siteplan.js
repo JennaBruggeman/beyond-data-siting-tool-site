@@ -21,9 +21,13 @@ function render(S,o){ o=o||{}; const lot=S.lot, us=lot.map(p=>p[0]), vs=lot.map(
   let front=lot.filter(p=>p[0]<=U0+1.5).sort((a,b)=>a[1]-b[1]); if(front.length<2) front=lot.slice().sort((a,b)=>a[0]-b[0]).slice(0,2).sort((a,b)=>a[1]-b[1]);     if(front.length>1) out.push(`<path d="M${P(front[0])}L${P(front[front.length-1])}" stroke="${INK}" stroke-width="2.2" fill="none"/>`);
    
   const crt=Array.isArray(S.court)&&typeof S.court[0]==='number'?[[[S.court[0],S.court[2]],[S.court[1],S.court[2]],[S.court[1],S.court[3]],[S.court[0],S.court[3]]]]:(S.court||[]);
+  if(S.farm&&(S.farm.rects||[]).length){ out.push(`<path d="${S.farm.rects.map(r=>`M${X(r[2])},${Y(r[0])}H${X(r[3])}V${Y(r[1])}H${X(r[2])}Z`).join('')}" fill="#D6E9C6"/>`); }    
   for(const R of crt) out.push(`<path d="${ring(R)}" fill="${COURT}" stroke="${INK3}" stroke-width="0.7"/>`);
   if(S.yard&&S.yard.rings) for(const R of S.yard.rings) out.push(`<path d="${ring(R)}" fill="${YARD}" stroke="${INK3}" stroke-width="0.7"/>`);
   const KX=[];    
+  if(o.key&&S.farm&&(S.farm.rects||[]).length){ const R=S.farm.rects, big=R.slice().sort((a,b)=>(b[1]-b[0])*(b[3]-b[2])-(a[1]-a[0])*(a[3]-a[2]))[0];
+    if(o.sideLabels) SIDE.push({u:(big[0]+big[1])/2,v:(big[2]+big[3])/2,box:[big[0],big[1],big[2],big[3]],t:esc(S.farm.label||'Suggested: urban farm')}); else KX.push(`Light green: ${esc(S.farm.label||'suggested urban farm')}`); if(S.farm.tag) KX.push(`Urban farm: ${esc(S.farm.tag)}`); }
+  if(o.key&&S.driveOffStreet) KX.push('Truck route: drawn as the layout gives it; its street end does not meet a street or lane edge on this lot');
   if(o.key&&S.driveCrosses){ KX.push(esc((S.driveLabel||'Truck route').replace(/^Truck drive/,'Truck route'))+': not drawn (a straight line from the court would cross the building)'); }
   else if(S.drive&&S.drive.length>1){ if(S.driveW) out.push(`<path d="M${S.drive.map(P).join('L')}" fill="none" stroke="${COURT}" stroke-opacity=".85" stroke-width="${(S.driveW*k).toFixed(1)}" stroke-linejoin="round"/>`);    
     out.push(`<path d="M${S.drive.map(P).join('L')}" fill="none" stroke="${INK2}" stroke-width="1.6" stroke-dasharray="6 4" marker-end="url(#${id}a)"/>`);
@@ -60,7 +64,7 @@ function render(S,o){ o=o||{}; const lot=S.lot, us=lot.map(p=>p[0]), vs=lot.map(
       const outw=nv>0?'R':nv<0?'L':nu<0?'B':'T', opts=[outw,'R','L'].filter((x,i,a)=>a.indexOf(x)===i).map(sd=>[sd,run(sd)]).filter(x=>x[1]!=null).sort((a,b)=>a[1]-b[1]);
       const side=opts.length?opts[0][0]:outw; const ox=side==='R'||side==='L'?X(v1):tx, oy=side==='R'||side==='L'?Y(u1):ty;
        
-      let mx=side==='R'?X(V1)+r+6:side==='L'?X(V0)-r-6:ox, my=side==='B'?Y(U0)+5*k:side==='T'?Y(U1)-r-6:oy;
+      let mx=side==='R'?X(V1)+r+10:side==='L'?X(V0)-r-10:ox, my=side==='B'?Y(U0)+5*k:side==='T'?Y(U1)-r-10:oy;
       if(PLACED.some(q=>q.n===n&&q.side===side&&Math.hypot(q.x-mx,q.y-my)<r*4)) continue;
       for(let t=0;t<5&&PLACED.some(q=>Math.hypot(q.x-mx,q.y-my)<r*2.3);t++){ if(side==='R') mx+=r*2.4; else if(side==='L') mx-=r*2.4; else if(side==='B') my+=r*2.4; else my-=r*2.4; }    
       PLACED.push({n,x:mx,y:my,side}); MARG[side]=Math.max(MARG[side]||0,side==='R'?mx+r-X(V1):side==='L'?X(V0)-(mx-r):side==='B'?my+r-Y(U0):Y(U1)-(my-r));
@@ -84,7 +88,7 @@ function render(S,o){ o=o||{}; const lot=S.lot, us=lot.map(p=>p[0]), vs=lot.map(
   const dimVp=(u0,u1,x,lab,xa)=>{ const a=Y(u0), b=Y(u1), m=(a+b)/2; return `<g><line x1="${xa}" y1="${a}" x2="${x-3}" y2="${a}" stroke="${INK3}" stroke-width="0.6"/><line x1="${xa}" y1="${b}" x2="${x-3}" y2="${b}" stroke="${INK3}" stroke-width="0.6"/><line x1="${x}" y1="${a}" x2="${x}" y2="${b}" stroke="${INK}" stroke-width="0.7"/><path d="M${x-3},${a+3}L${x+3},${a-3}M${x-3},${b+3}L${x+3},${b-3}" stroke="${INK}" stroke-width="1.2"/><text x="${x-5}" y="${m}" text-anchor="middle" font-size="${fs}" font-weight="600" fill="${INK}" stroke="#fff" stroke-width="3" paint-order="stroke" transform="rotate(-90 ${x-5} ${m})">${lab}</text></g>`; };
   const fd=fs*0.85, tw=t=>String(t).length*fd*0.56;
   const dimHk=(v0,v1,y,lab,y0a,y0b)=>{ const a=X(v0), b=X(v1), fit=tw(lab)<(b-a)-8; return `<g><line x1="${a}" y1="${y0a}" x2="${a}" y2="${y+3}" stroke="${INK3}" stroke-width="0.5"/><line x1="${b}" y1="${y0b}" x2="${b}" y2="${y+3}" stroke="${INK3}" stroke-width="0.5"/><line x1="${a}" y1="${y}" x2="${b}" y2="${y}" stroke="${INK}" stroke-width="0.6"/><path d="M${a-2.5},${y+2.5}L${a+2.5},${y-2.5}M${b-2.5},${y+2.5}L${b+2.5},${y-2.5}" stroke="${INK}" stroke-width="1"/><text x="${fit?(a+b)/2:b+6}" y="${fit?y-4:y+fd*0.35}" text-anchor="${fit?'middle':'start'}" font-size="${fd.toFixed(1)}" fill="${INK}">${lab}</text></g>`; };
-  const dimVk=(u0,u1,x,lab,xa,top)=>{ const a=Y(u0), b=Y(u1), m=(a+b)/2, fit=!top&&tw(lab)<(a-b)-8; return `<g>${xa!=null?`<line x1="${xa}" y1="${a}" x2="${x-3}" y2="${a}" stroke="${INK3}" stroke-width="0.5"/><line x1="${xa}" y1="${b}" x2="${x-3}" y2="${b}" stroke="${INK3}" stroke-width="0.5"/>`:''}<line x1="${x}" y1="${a}" x2="${x}" y2="${b}" stroke="${INK}" stroke-width="0.6"/><path d="M${x-2.5},${a+2.5}L${x+2.5},${a-2.5}M${x-2.5},${b+2.5}L${x+2.5},${b-2.5}" stroke="${INK}" stroke-width="1"/>${fit?`<text x="${x-4}" y="${m}" text-anchor="middle" font-size="${fd.toFixed(1)}" fill="${INK}" transform="rotate(-90 ${x-4} ${m})">${lab}</text>`:`<text x="${x}" y="${b-6}" text-anchor="middle" font-size="${fd.toFixed(1)}" fill="${INK}">${lab}</text>`}</g>`; };
+  const dimVk=(u0,u1,x,lab,xa,top)=>{ const a=Y(u0), b=Y(u1), m=(a+b)/2, fit=!top&&tw(lab)<(a-b)+40;     return `<g>${xa!=null?`<line x1="${xa}" y1="${a}" x2="${x-3}" y2="${a}" stroke="${INK3}" stroke-width="0.5"/><line x1="${xa}" y1="${b}" x2="${x-3}" y2="${b}" stroke="${INK3}" stroke-width="0.5"/>`:''}<line x1="${x}" y1="${a}" x2="${x}" y2="${b}" stroke="${INK}" stroke-width="0.6"/><path d="M${x-2.5},${a+2.5}L${x+2.5},${a-2.5}M${x-2.5},${b+2.5}L${x+2.5},${b-2.5}" stroke="${INK}" stroke-width="1"/>${fit?`<text x="${x-4}" y="${m}" text-anchor="middle" font-size="${fd.toFixed(1)}" fill="${INK}" transform="rotate(-90 ${x-4} ${m})">${lab}</text>`:top?`<text x="${x+7}" y="${(b+fd*0.35).toFixed(1)}" text-anchor="start" font-size="${fd.toFixed(1)}" fill="${INK}">${lab}</text>`:`<text x="${x}" y="${b-6}" text-anchor="middle" font-size="${fd.toFixed(1)}" fill="${INK}">${lab}</text>`}</g>`; };    
   if(o.key){ if(front.length>1) out.push(dimHk(front[0][1],front[front.length-1][1],yF,`Frontage ${m1(front[front.length-1][1]-front[0][1])} m`,Y(front[0][0]),Y(front[front.length-1][0])));
     out.push(dimVk(U0,U1,xDepth,`Lot depth ${m1(U1-U0)} m`,null,SIDE.length>0));        
     if(fu.length){ out.push(dimHk(bv0,bv1,yB,`Building ${m1(bv1-bv0)} m`,Y(bu0),Y(bu0))); out.push(dimVk(bu0,bu1,X(V0)-(MARG.L||0)-fs*1.1,`${m1(bu1-bu0)} m deep`,X(bv0)-2));
@@ -101,7 +105,7 @@ function render(S,o){ o=o||{}; const lot=S.lot, us=lot.map(p=>p[0]), vs=lot.map(
   out.push(`<text x="${sx}" y="${sb+6+fs*1.1}" font-size="${fs}" fill="${INK2}">0</text><text x="${sx+30*k}" y="${sb+6+fs*1.1}" text-anchor="middle" font-size="${fs}" fill="${INK2}">30 m</text>`);
   if(S.north!=null){ const nx=o.key?X(V0)+12:o.scaleRight?sx-30:sx+30*k+40, ny=sb, ang=Array.isArray(S.north)?Math.atan2(S.north[1],S.north[0])*180/Math.PI:S.north; out.push(`<g transform="rotate(${ang.toFixed(1)} ${nx} ${ny})"><path d="M${nx},${ny-14}L${nx+6},${ny+4}L${nx},${ny}L${nx-6},${ny+4}Z" fill="${INK}"/></g><text x="${nx}" y="${ny+18}" text-anchor="middle" font-size="${fs}" font-weight="600" fill="${INK}">N</text>`); }
   out.push(`<defs><marker id="${id}a" markerWidth="8" markerHeight="8" refX="6" refY="4" orient="auto"><path d="M0,0L8,4L0,8Z" fill="${INK2}"/></marker><marker id="${id}d" markerWidth="6" markerHeight="6" refX="5" refY="3" orient="auto"><path d="M0,0L6,3L0,6Z" fill="${INK2}"/></marker><marker id="${id}dm" markerWidth="7" markerHeight="7" refX="6" refY="3.5" orient="auto"><path d="M0,0L7,3.5L0,7Z" fill="${INK}"/></marker></defs>`);
-  return `<svg viewBox="0 0 ${W+60} ${Hh}"${o.key?' data-spcrop="1"':''} role="img" aria-label="${esc(o.label||'Site plan at street level')}" style="font-family:'IBM Plex Sans',system-ui,sans-serif">${out.join('')}</svg>${o.key&&kinds.length?`<p class="sp-key" style="font-size:12px;color:${INK};margin:4px 0 0"><b style="font-weight:600">Doors</b> ${kinds.map((l,i)=>`<span style="white-space:nowrap;margin-left:8px"><span style="display:inline-block;width:15px;height:15px;line-height:13px;border:1px solid ${INK2};border-radius:50%;text-align:center;font-size:10.5px;font-weight:600">${i+1}</span> ${esc(l)}</span>`).join('')}${o.key&&fu.length&&!bFits?'<span style="white-space:nowrap;margin-left:12px">charcoal: the building, storey 1 outline</span>':''}</p>`:''}${o.key&&KX.length?`<p class="sp-key" style="font-size:12px;color:${INK};margin:4px 0 0">${KX.join(' · ')}</p>`:''}<p class="sp-cr" style="font-size:12px;color:${INK2};margin:4px 0 0">${esc(S.credit||'Contains information licensed under the Open Government Licence \u2013 Vancouver.')}${S.note?' '+esc(S.note):''}${capS?' '+esc(capS):''}</p>`; }
+  return `<svg viewBox="0 0 ${W+60} ${Hh}"${o.key?' data-spcrop="1"':''} role="img" aria-label="${esc(o.label||'Site plan at street level')}" style="font-family:'IBM Plex Sans',system-ui,sans-serif">${out.join('')}</svg>${o.key&&kinds.length?`<p class="sp-key" style="font-size:12px;color:${INK};margin:4px 0 0"><b style="font-weight:600">Doors</b> ${kinds.map((l,i)=>`<span style="white-space:nowrap;margin-left:8px"><span style="display:inline-block;width:15px;height:15px;line-height:13px;border:1px solid ${INK2};border-radius:50%;text-align:center;font-size:10.5px;font-weight:600">${i+1}</span> ${esc(l)}</span>`).join('')}${o.key&&fu.length&&!bFits?'<span style="white-space:nowrap;margin-left:12px">charcoal: the building, storey 1 outline</span>':''}</p>`:''}${o.key&&KX.length?`<p class="sp-key" style="font-size:12px;color:${INK};margin:4px 0 0">${KX.join(' · ')}</p>`:''}<p class="sp-cr" style="font-size:12px;color:${INK2};margin:4px 0 0">${o.noCredit?'':esc(S.credit||'Contains information licensed under the Open Government Licence \u2013 Vancouver.')}${S.note?' '+esc(S.note):''}${capS?' '+esc(capS):''}</p>`; }
 
  
 let C339=null; const get=u=>fetch(u).then(r=>r.ok?r.json():null).catch(()=>null);
@@ -115,6 +119,7 @@ function turn(P){ const side=P.street&&P.street.side; if(!side||side==='u-low') 
   const T=side==='u-high'?(u,v)=>[-u,-v]:side==='v-low'?(u,v)=>[v,-u]:(u,v)=>[-v,u], pt=a=>{ const [u,v]=T(a[0],a[1]); a[0]=u; a[1]=v; };
   const rect=r=>{ const c=[T(r[0],r[2]),T(r[1],r[3])]; r[0]=Math.min(c[0][0],c[1][0]); r[1]=Math.max(c[0][0],c[1][0]); r[2]=Math.min(c[0][1],c[1][1]); r[3]=Math.max(c[0][1],c[1][1]); };
   for(const s of q.storeys||[]) for(const z of s.zones||[]){ (z.rects||[]).forEach(rect); (z.rings||[]).forEach(R=>R.forEach(pt)); }
+  if(q.farm&&Array.isArray(q.farm.rects)) q.farm.rects.forEach(rect);    
   if(q.court) rect(q.court); if(q.yard){ (q.yard.rings||[]).forEach(R=>R.forEach(pt)); if(q.yard.truckCourt&&q.yard.truckCourt.rect) rect(q.yard.truckCourt.rect); }
   if(q.site){ (q.site.lot||[]).forEach(pt); (q.site.edges||[]).forEach(e=>{ if(e.a) pt(e.a); if(e.b) pt(e.b); }); if(Array.isArray(q.site.north)) pt(q.site.north); }
   if(q.truckAccess&&q.truckAccess.path) q.truckAccess.path.forEach(pt); const swap=side==='v-low'||side==='v-high'; for(const d of q.doors||[]){ if(d.at) pt(d.at); if(swap&&d.wall) d.wall=d.wall==='h'?'v':'h'; }
@@ -127,11 +132,11 @@ function fromPlan(P,o){ o=o||{}; if(o.turn!==false) P=turn(P); const st=P.site; 
    
   const TA=P.truckAccess||{}, to=TA.to||(TA.kind==='lane'?'lane':'street');
   const want=E.filter(e=>to==='lane'?/lane|alley/i.test(e.abuts||''):(e.kind==='front'||/street/i.test(e.abuts||''))), RE=want.length?want:road;
-  let drive=null, driveW=null, crosses=false;
+  let drive=null, driveW=null, crosses=false, offStreet=false;
   if(ct&&RE.length){ const c=[(ct[0]+ct[1])/2,(ct[2]+ct[3])/2];
     const foot=q=>{ let best=null; for(const e of RE){ const [au,av]=e.a,[bu,bv]=e.b, du=bu-au, dv=bv-av, L2=du*du+dv*dv||1, t=Math.max(0,Math.min(1,((q[0]-au)*du+(q[1]-av)*dv)/L2)), f=[au+t*du,av+t*dv], d=Math.hypot(f[0]-q[0],f[1]-q[1]); if(!best||d<best.d) best={e,f,d}; } return best; };
     const path=(TA.path||[]).slice();
-    if(path.length>=2){ if(Math.hypot(path[0][0]-c[0],path[0][1]-c[1])<Math.hypot(path[path.length-1][0]-c[0],path[path.length-1][1]-c[1])) path.reverse(); const b=foot(path[0]); drive=[b.f,...path]; driveW=TA.width||null; }
+    if(path.length>=2){ if(Math.hypot(path[0][0]-c[0],path[0][1]-c[1])<Math.hypot(path[path.length-1][0]-c[0],path[path.length-1][1]-c[1])) path.reverse(); const b=foot(path[0]); drive=path; driveW=TA.width||null; if(b.d>2) offStreet=true; }    
     else { const b=foot(c), f=b.f, cl=[Math.max(ct[0],Math.min(ct[1],f[0])),Math.max(ct[2],Math.min(ct[3],f[1]))], du=f[0]-c[0], dv=f[1]-c[1], n=Math.hypot(du,dv)||1, out=[f[0]+du/n*5,f[1]+dv/n*5];
       drive=[out,[cl[0]+(c[0]-cl[0])*0.3,cl[1]+(c[1]-cl[1])*0.3]]; if(TA.width&&/^drive/.test(TA.kind||'')) driveW=TA.width;
       for(let i=1;i<20;i++){ const u=f[0]+(cl[0]-f[0])*i/20, v=f[1]+(cl[1]-f[1])*i/20; if(fp.some(R=>pipR(u,v,R))){ crosses=true; break; } } } }
@@ -142,10 +147,11 @@ function fromPlan(P,o){ o=o||{}; if(o.turn!==false) P=turn(P); const st=P.site; 
   return {lot:st.lot, streetName:o.streetName||'', footprint:fp.length?fp:null, yard:P.yard, court:ct,
     doors:(P.doors||[]).filter(d=>d.storey===1&&d.at).map(d=>({p:d.at,kind:d.kind,wall:d.wall,width:d.width})),
     north:st.north||null, neighbours:o.neighbours||[], lanes, drive, driveW,
-    driveLabel:dl, driveCrosses:crosses,
+    driveLabel:dl, driveCrosses:crosses, driveOffStreet:offStreet, farm:P.farm||null,
     credit:o.credit, note:o.note}; }
 function crop(root,pad){ pad=pad==null?14:pad; (root||document).querySelectorAll('svg[data-spcrop]').forEach(svg=>{ try{ let x0=1e9,y0=1e9,x1=-1e9,y1=-1e9;
   for(const el of svg.children){ if(el.tagName==='defs'||el.hasAttribute('data-nocrop')) continue; const b=el.getBBox(); if(!b.width&&!b.height) continue; x0=Math.min(x0,b.x); y0=Math.min(y0,b.y); x1=Math.max(x1,b.x+b.width); y1=Math.max(y1,b.y+b.height); }
   if(x1>x0&&y1>y0){ svg.setAttribute('viewBox',`${(x0-pad).toFixed(1)} ${(y0-pad).toFixed(1)} ${(x1-x0+2*pad).toFixed(1)} ${(y1-y0+2*pad).toFixed(1)}`); svg.removeAttribute('data-spcrop'); } }catch(e){} }); }
-BD.f1siteplan={render,board339,fromPlan,turn,crop};
+const FARM={}; async function farmFor(lot,plan){ lot=String(lot||''); if(!lot||!plan) return null; if(!(lot in FARM)) FARM[lot]=fetch((BD.ASSET_BASE||'')+'f1/farm/van_'+lot+'.json').then(r=>r.ok?r.json():null).catch(()=>null); const d=await FARM[lot]; const f=d&&d.plans&&d.plans[plan]; return f&&(f.rects||[]).length?{rects:f.rects,label:f.label,tag:f.tag,m2:f.m2}:null; }    
+BD.f1siteplan={render,board339,fromPlan,turn,crop,farmFor};
 })();

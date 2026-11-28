@@ -53,7 +53,7 @@ function html(){ return `<div class="f1l2">
  <footer class="f1l2-foot"><div class="f1l2-in"><div><p>Beyond Data, ARCH 540, UBC School of Architecture and Landscape Architecture, 2026</p>
    <p>Data: City of Vancouver open data. Edmonton results are derived from licensed lot data (outlines simplified). Maker and operator figures are labelled as claims.</p>
    <details class="f1l2-lic"><summary>Sources and licences</summary><p>Contains information licensed under the Open Government Licence – Canada (Public Safety Canada, Canada Structures), the Open Government Licence – Vancouver and the Open Government Licence – City of Edmonton. Every figure in the tool names its own source; open the source breakdown to follow one back. <a class="f1l2-a" href="sources.html">The full list of sources and licences</a></p></details></div>
-  <a href="#" class="f1l2-a" data-go="old">The earlier tool (archive)</a></div></footer></div>`; }
+  </div></footer></div>`; }    
 
  
 async function coverage(){ try{ const r=await fetch('data/coverage_public.json',{cache:'no-cache'}); if(!r.ok) return null; return await r.json(); }catch(e){ return null; } }

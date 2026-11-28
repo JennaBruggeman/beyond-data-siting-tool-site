@@ -71,8 +71,8 @@ const SK=l=>'bd-plan-'+l;
 function current(lot){ lot=String(lot||''); const L=BD.S&&BD.S.layout; if(L&&L.lot===lot) return L.id||null; try{ return sessionStorage.getItem(SK(lot)); }catch(e){ return null; } }
 const TPLQ={engineering:'eng',architecture:'arch',municipal:'muni',resident:'res'};
 function urlWrite(lot,id,push){ try{ const u=new URL(location.href), s=BD.S.sel, t=BD.f1&&BD.f1.cur&&BD.f1.cur();
-    if(t&&TPLQ[t]) u.searchParams.set('open',TPLQ[t]); if(s&&s.city) u.searchParams.set('city',s.city); u.searchParams.set('lot',lot);
-    const a=s&&s.a&&s.a[0]; if(a&&!u.searchParams.get('addr')) u.searchParams.set('addr',a); else if(a&&String(u.searchParams.get('lot'))!==lot) u.searchParams.set('addr',a);
+    if(t&&TPLQ[t]) u.searchParams.set('open',TPLQ[t]); if(s&&s.city) u.searchParams.set('city',s.city); const prevLot=u.searchParams.get('lot'); u.searchParams.set('lot',lot);
+    const a=s&&s.a&&s.a[0]; if(a&&(!u.searchParams.get('addr')||String(prevLot)!==String(lot))) u.searchParams.set('addr',a); else if(!a&&String(prevLot)!==String(lot)) u.searchParams.delete('addr');    
     id?u.searchParams.set('layout',id):u.searchParams.delete('layout'); u.searchParams.delete('card'); u.searchParams.delete('x');
     if(u.href!==location.href) history[push?'pushState':'replaceState']({bdLayout:{lot,id:id||null}},'',u.href); }catch(e){} }
 function setCurrent(lot,id,o){ o=o||{}; lot=String(lot); id=id||null; const was=current(lot), had=!!(BD.S.layout&&BD.S.layout.lot===lot); BD.S.layout={lot,id};
@@ -94,7 +94,12 @@ async function sizedLine(x){ const b=await forLot(x); if(!b) return ''; const lo
   if(b.source==='rough') return 'Sized from: a rough size, no layout fits this lot'+lost;
   return `Sized from: ${TN(b.typology)}${b.storeys?`, ${b.storeys} storeys`:''}, ${(+b.MW).toFixed(2)} MW${b.source==='chosen'?' (your pick)':b.board?' (the reference layout)':' ('+(BD.f1hc?BD.f1hc():'the highest-capacity layout for your filters')+')'}${lost}${b.old?'. '+oldLine(b.old):''}`; }
 function change(){ const s=BD.S.sel; if(!s||!BD.f1||!BD.f1.openLot) return; const addr=(s.a&&s.a[0])||'';
-  Promise.resolve(BD.f1.openLot('architecture',s.city,s.id,addr)).then(()=>{ let m=0; const go=()=>{ const b=[...document.querySelectorAll('#f1v .f1v-strip button')].find(e=>/available (plans|layouts)/i.test(e.textContent)); if(b) b.click(); else if(++m<100) setTimeout(go,100); }; setTimeout(go,200); }); }
+  Promise.resolve(BD.f1.openLot('architecture',s.city,s.id,addr)).then(()=>{ let m=0; const go=()=>{ const b=[...document.querySelectorAll('#f1v .f1v-strip button')].find(e=>/pick a (plan|layout)/i.test(e.textContent));     if(b) b.click(); else if(++m<100) setTimeout(go,100); }; setTimeout(go,200); }); }
 const hasEdm=async()=>!!(BD.f1edm&&await BD.f1edm.data());    
-BD.f1best={allOf,hasEdm,forLot,line,index,noisePlan,planData,layoutGen,current,setCurrent,onLot,sizedLine,change,oldF,oldRows,oldLine,away,genLine,refugeLine,rec,ownHeat};
+ 
+async function basisBlock(x){ const b=await forLot(x); if(!b||b.source==='rough') return `<div class="f1-basis"><p><b>No layout fits this lot.</b> The figures below use a rough size.</p></div>`;
+  let th=''; try{ const P=x.city==='van'?await planData(b,x):null; if(P&&(P.storeys||[]).length&&BD.f1mass) th=BD.f1mass.render(P.storeys,{typology:P.typology,exploded:false,k:1.6,labels:false,fire:false,label:'The layout these figures are based on'}).replace(/<svg /,'<svg style="display:block;width:120px;height:auto" '); }catch(e){}
+  const mine=b.source==='chosen'&&!!current(x.sel&&x.sel.id), what=`${TN(b.typology)}${b.storeys?` · ${b.storeys} storeys`:''} · ${(+b.MW).toFixed(2)} MW`;
+  return `<div class="f1-basis">${th?`<div class="f1-basis-th">${th}</div>`:''}<div><p class="f1-basis-h">${mine?'Based on your layout from Architecture':b.board?'Based on the reference layout for this lot':'Based on the layout shown first for this lot'}</p><p class="f1-basis-w">${what}</p>${mine?'':'<p class="f1-basis-n">'+(b.board?'':'The highest-capacity layout for your filters. ')+'Pick your own in Architecture and these figures follow it.</p>'}<button type="button" class="f1-basis-b" onclick="BD.f1best.change()">${mine?'Change layout':'Pick a layout'}</button></div></div>`; }
+BD.f1best={basisBlock,allOf,hasEdm,forLot,line,index,noisePlan,planData,layoutGen,current,setCurrent,onLot,sizedLine,change,oldF,oldRows,oldLine,away,genLine,refugeLine,rec,ownHeat};
 })();

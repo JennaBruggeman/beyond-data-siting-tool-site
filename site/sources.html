@@ -117,7 +117,7 @@ function draw(){ const q=state.q, out=[]; let total=0;
 function init(d){ D=d; state.open={};
   const L=d.licences||{};
   $('terms').innerHTML=`<div><dt>Credit</dt><dd>${esc(d.credit||'')}</dd></div><div><dt>Text and drawings</dt><dd>${esc(L.content||'')}</dd></div><div><dt>Code</dt><dd>${esc(L.code||'')}</dd></div>`;
-  $('foot').innerHTML=`Beyond Data, ARCH 540, UBC School of Architecture and Landscape Architecture, 2026. List built ${esc(d.built||'')}. Each source keeps the licence shown beside it; “cited only” means the publisher keeps all rights and the tool quotes or summarizes it.`;
+  $('foot').innerHTML=`Beyond Data, ARCH 540, UBC School of Architecture and Landscape Architecture, 2026. List built ${esc(d.built||'')}. Each source keeps the licence shown beside it; “cited only” means the publisher keeps all rights and the tool quotes or summarizes it. Building uses around the reference lot: © <a href="https://www.openstreetmap.org/copyright">OpenStreetMap contributors</a>, available under the Open Database Licence (ODbL).`;    
   draw(); }
 
 let t=null; $('q').addEventListener('input',e=>{ clearTimeout(t); t=setTimeout(()=>{ state.raw=e.target.value.trim(); state.q=state.raw.toLowerCase(); state.shown={}; draw(); },120); });
